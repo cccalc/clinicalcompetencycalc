@@ -1,0 +1,89 @@
+% =========================================================
+% =========================================================
+% ======================================== glossary entries
+
+\newglossaryentry{rater}{
+  name={rater},
+  description={Any individual providing feedback on a student's level of competency.
+  This encompasses faculty, nurses, clerkship advisors, and patients.}
+}
+
+\newglossaryentry{student}{
+  name={student},
+  description={The medical student being assessed through the Clinical Competency Calculator.}
+}
+
+\newglossaryentry{gl:epa}{
+  name={Entrustable Professional Activity},
+  plural={Entrustable Professional Activities},
+  description={Units of professional practice, defined as tasks or responsibilities that trainees are entrusted to perform unsupervised once they have attained sufficient specific competence.
+  EPAs are independently executable, observable, and measurable in their process and outcome, and, therefore, suitable for entrustment decisions.}
+}
+
+\newglossaryentry{competency}{
+  name={competency},
+  plural={competencies},
+  description={An observable ability of a health professional, integrating multiple components such as knowledge, skills, values, and attitudes.
+  Since competencies are observable, they can be measured and assessed to ensure their acquisition.}
+}
+
+\newglossaryentry{user}{
+  name={user},
+  description={Any person who interacts with the product, namely the students, raters, and administrators.}
+}
+
+\newglossaryentry{feedback form}{
+  name={feedback form},
+  description={The digital form through which raters will assess students' competencies.},
+  see={rater,student}
+}
+
+\newglossaryentry{MAY}{
+  name={may},
+  description={This word, or the adjective ``OPTIONAL'', means that an item is
+  truly optional.
+  An implementation which does not include a particular option MUST be prepared to interoperate with another implementation which does include the option, though perhaps with reduced functionality.}
+}
+
+\newglossaryentry{MUST}{
+  name={MUST},
+  description={This word, or the terms ``REQUIRED'' or ``SHALL'', means that the definition is an absolute requirement of the specification.}
+}
+
+\newglossaryentry{MUST NOT}{
+  name={MUST NOT},
+  description={This phrase, or the phrase ``SHALL NOT'', means that the definition is an absolute prohibition of the specification.}
+}
+
+\newglossaryentry{SHOULD}{
+  name={SHOULD},
+  description={This word, or the adjective ``RECOMMENDED'', means that there may exist valid reasons in particular circumstances to ignore a particular item, but the full implications must be understood and carefully weighed before choosing a different course.}
+}
+
+\newglossaryentry{SHOULD NOT}{
+  name={SHOULD NOT},
+  description={This phrase, or the phrase ``NOT RECOMMENDED'' means that there may exist valid reasons in particular circumstances when the particular behavior is acceptable or even useful, but the full implications should be understood and the case carefully weighed
+  before implementing any behavior described with this label.}
+}
+
+\newglossaryentry{form response}{
+  name={form response},
+  plural={form responses},
+  description={A particular instance of feedback that a rater provides by a single submission of a completed feedback form.},
+  see={feedback form}
+}
+
+% =========================================================
+% =========================================================
+% =========================================== abbreviations
+
+\newabbreviation{ccc}{CCC}{Clinical Competency Calculator}
+
+\newabbreviation[
+  category={also-in-glossary},
+  longplural={\glspl{gl:epa}},
+  description={Entrustable Professional Activity},
+  see={gl:epa}
+]{epa}{\glsdisp*{gl:epa}{EPA}}{\gls{gl:epa}}
+
+\newabbreviation{gui}{GUI}{Graphical User Interface}
