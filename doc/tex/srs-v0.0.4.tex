@@ -1,0 +1,390 @@
+\documentclass[letterpaper,article,oneside]{memoir}
+
+\newcommand{\srsversion}{v0.0.4}
+\newcommand{\srsdate}{Dec. 12, 2024}
+
+\newcommand{\glsversion}{v0.0.1}
+
+\usepackage{srs-style}
+
+% =========================================================
+% =========================================================
+% ========================================== begin document
+
+\begin{document}
+
+\setlength{\parindent}{0pt}
+\nonzeroparskip
+
+\thispagestyle{empty}
+
+\hbox{%
+  \hspace*{0.15\textwidth}%
+  \rule{1pt}{\textheight}
+  \hspace*{0.05\textwidth}%
+  \parbox[b]{0.75\textwidth}{
+    \vbox{%
+      \raggedright
+      \vspace{0.1\textheight}
+      {\HUGE\bfseries
+        Clinical Competency \par
+        Calculator \par
+      }\vspace{3em}
+
+      {\Large\itshape
+        Software Requirements Specification \par\vspace{0.5ex}
+        \ctext[RGB]{255,223,223}{Draft Document} \par\vspace{0.5ex}
+      }
+
+      \vspace{0.1\textheight}
+      
+      {\Large
+        Dylan Colburn \par\vspace{0.5ex}
+        Jacq Lee \par\vspace{0.5ex}
+        Tyler Muessig \par\vspace{0.5ex}
+        Tyler Price \par\vspace{0.5ex}
+      }
+      
+      \vspace{0.3\textheight}
+      
+      \srsversion \par\vspace{0.5ex}
+      \srsdate \par\vspace{0.5ex}
+
+      \vspace{2\baselineskip}
+    }% end of vbox
+  }% end of parbox
+}% end of hbox
+
+\frontmatter
+\tableofcontents*
+
+\newpage
+\listoffigures
+
+\mainmatter
+\counterwithin{figure}{chapter}
+\pagestyle{fancy}
+
+\chapter{Introduction}
+
+\section{Purpose}
+
+The purpose of the software requirements document is to create a comprehensive outline of the \gls{ccc} for the development team, project advisors, faculty advisors, stakeholders, and members of the Hershey Medical team that will be maintaining this software.
+This outline will describe the functions and high-level requirements of the \gls{ccc}.
+The target audience is expected to know technical terminology related to software development.
+
+\section{Scope}
+
+This document specifies the \gls{ccc} as software designed to be used for the appraisal of \glspl{student} undergoing \gls{clerkship} at Hershey Medical, as is to be utilized by the Department of Family Medicine.
+The \gls{ccc} will provide a means of collecting feedback from \glspl{rater} on the \glspl{competency} of \glspl{student} and performing useful, actionable analyses thereon.
+The \gls{ccc} is not designed to interface with existing Hershey Medical systems or engage in information exchange therewith.
+The \gls{ccc} is also not designed for utilization by other departments within Hershey Medical; should this software be used outside of the stated scope, further requirement elicitation should be carried out and relevant issues addressed.
+
+\section{Client information}
+
+The development of the \gls{ccc} is being sponsored by Anthony Dambro (\email{adambro@pennstatehealth.psu.edu}) from the Milton S. Hershey Medical Center Department of Family Medicine.
+
+\section{Users}
+
+Our intended audience for the \gls{ccc} would be the \glspl{student} undergoing \gls{clerkship}, \glspl{rater} providing feedback on \glspl{student}' \glspl{competency}, and \glspl{administrator} of the entire system and its data.
+
+\section{Definitions}
+
+The definitions for terms required to properly interpret this document are listed below.
+The first mention of each term in this document (excluding this subsection) is highlighted in teal and boldface, and is a hyperlink that will redirect to this subsection when clicked.
+
+Words listed in uppercase indicating requirement levels (MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY) are adapted from RFC 2119 and follows the specification by RFC 8174 that these defined special meanings only apply to uppercase usage of these terms.
+
+In general, the definitions of terms used in this document not listed below conform to the definitions provided in IEEE Std 610.12-1990.
+
+\printglossary
+
+\section{Acronyms and abbreviations}
+
+The definitions of acronyms and abbreviations required to properly interpret this document are listed below.
+The first mention of each abbreviation in this document (excluding this subsection) will be accompanied by its full long form.
+
+\printabbreviations
+
+\section{References}
+
+\textit{Core Entrustable Professional Activities For Entering Residency: Faculty And Learners' Guide}. Association of American Medical Colleges, Washington, D.C. Accessed: Nov. 27, 2024. [Online]. Available: \url{https://store.aamc.org/downloadable/download/sample/sample\_id/66/\%20}
+
+\textit{IEEE Standard Glossary of Software Engineering Terminology}, IEEE Std 610.12-1990, IEEE Standards Board, Sep. 1990. Accessed: Nov. 27, 2024. [Online]. Available: \url{https://www.informatik.htw-dresden.de/~hauptman/SEI/IEEE\_Standard\_Glossary\_of\_Software\_Engineering\_Terminology\%20.pdf}
+
+\textit{Key words for use in RFCs to Indicate Requirement Levels}, RFC 2119, RFC Editor, Mar. 1997. Accessed: Nov. 27, 2024. [Online]. Available: \url{https://www.rfc-editor.org/info/rfc2119}
+
+\textit{Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words}, RFC 8174, RFC Editor, May. 2017. Accessed: Nov. 27, 2024. [Online]. Available: \url{https://www.rfc-editor.org/info/rfc8174}
+
+\chapter{Overall description}
+
+\section{Product perspective}
+
+The \gls{ccc} is a grading tool to be used to assess the \glspl{competency} of \glspl{student} undergoing \gls{clerkship}.
+The \gls{ccc} aims to replace and improve upon the preexisting method of collecting feedback from \glspl{rater} by aggregating more useful feedback and providing more insightful analyses.
+Via this system, \glspl{student} and \glspl{administrator} will have the ability to review student performance as reported by \glspl{rater}.
+\Glspl{administrator} will also be able to filter low-quality feedback.
+All of these options will be implemented to allow \glspl{student}, \glspl{rater}, and \glspl{administrator} to access them via any device that has a modern web browser, such as smartphones, laptops, and desktop computers.
+
+\section{Product functions}
+
+\subsection{Student functions}
+
+\Glspl{student} must be able to request a specific \gls{rater} to fill out a \gls{feedback form} for themselves.
+\Glspl{student} must also be able to view a \gls{full report} of their performance, which displays where they land along the \glspl{epa} and allows the \gls{student} to view specific comments or other relevant feedback that supports the specific assessment.
+
+\subsection{Rater functions}
+
+\Glspl{rater} must be able to fill out new \glspl{feedback form} by accepting requests from \glspl{student}.
+% Additionally, they must be able to view past \glspl{feedback form} that they have submitted.
+
+\subsection{Administrator functions}
+
+\Glspl{administrator} must be able to view all \glspl{feedback form} submitted, along with the \gls{rater} who submitted the forms.
+\Glspl{administrator} must be able to view the \gls{full report} of any \gls{student}.
+\Glspl{administrator} must also be able to audit and reject \glspl{form response} that are of poor quality or otherwise not useful.
+
+\section{User characteristics}
+
+The \glspl{user} of the \gls{ccc} will have a basic sense of computer literacy including minimal keyboard skills and experience interacting with a browser application prior.
+No advanced knowledge of computer systems is needed.
+A \gls{user} should be able to learn the \gls{user} interface swiftly.
+Additionally, \glspl{rater} must have sufficient professional knowledge regarding the questions that are asked in the \gls{feedback form} and \glspl{student} must be able to understand the feedback and analysis given.
+
+\section{Constraints}
+Any device with access to a modern web browser should be able to access and run this application assuming that the device has a monitor/screen to view/interact with the \gls{gui}.
+An internet connection is required to access the web application.
+
+\section{Assumptions}
+The \glspl{student}, \glspl{rater}, and \glspl{administrator} are assumed always to have the correct information to access their respective accounts and the hardware capability to input that information.
+It is also assumed that the database being used is or will be heavily adopted and will likely have support in the near future to ensure an up-to-date system.
+The application is also assumed to be deployed in an environment with a stable network.
+
+\chapter{Specific requirements}
+
+\section{External interface requirements}
+
+\subsection{User interfaces}
+
+The user interface will be a web application that can be accessed through a modern web browser.
+
+\subsection{Hardware interfaces}
+
+The hardware interface will be any device, such as a computer or equivalent, that is capable of accessing the internet through a modern web browser.
+
+\subsection{Software interfaces}
+
+\subsubsection{User authentication and authorization}
+
+The system must allow user authentication and authorization features to ensure proper access.
+The system will interface with the \gls{psu} authentication system for user role validation, which includes password access and two-factor authentication.
+\Glspl{user} will only be able to view data and perform functions as permitted by their authorization level.
+
+\subsubsection{Database management system}
+
+The \gls{ccc} must interface with a database management system to store and retrieve data.
+The database will be used to store \gls{form response} data, \gls{user} data, and other relevant information.
+
+The database system should be a \gls{rdbms} such as MySQL or PostgreSQL.
+
+The database must be able to retain data for a minimum of two (2) years.
+
+\subsubsection{Web application framework}
+
+The main interface of the \gls{ccc} will be a web application.
+The web application will be built using a modern web application framework such as React.
+
+\subsubsection{Server}
+
+The server will be responsible for handling requests from the web application and interfacing with the database.
+The server will be hosted by Hershey Medical.
+
+\section{Functional requirements}\label{sec:functional-requirements}
+
+In this section, ``the system'' refers generally to the \gls{ccc}.
+A use case diagram for the system is provided in \figurename~\ref{fig:use-case-diagram} (p.~\pageref{fig:use-case-diagram}).
+
+\begin{figure}
+  \centering
+  \input{pgf/use-case-diagram.tex}
+  \caption{Use case diagram for the Clinical Competency Calculator.}
+  \label{fig:use-case-diagram}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \input{pgf/fr-topo-tree.tex}
+  \caption[Functional requirements sorted topologically by dependency.]{Functional requirements sorted topologically by dependency. Requirements without dependents and/or dependencies are not included.}
+  \label{fig:fr-topo-tree}
+\end{figure}
+
+\subsection{User authentication and authorization}
+
+\begin{requirements}
+  \requirement{auth1} The system \GLS{MUST} allow each \gls{user} to authenticate and log in to access their role-based permissions.
+  \importance{high}
+
+  \requirement{auth2} \Glspl{administrator} \GLS{MUST} be able to manage user roles for \glspl{student}, \glspl{rater}, and other \glspl{administrator}.
+  \importance{high} \dep{\ref{req:auth1}}
+\end{requirements}
+
+\subsection{Feedback form request and submission}
+
+\begin{requirements}
+  \requirement{ff1} The system \GLS{MUST} provide a \gls{feedback form} for \glspl{rater} to assess the \glspl{competency} of a particular \gls{student}.
+  \importance{high}
+
+  \requirement{ff2} The \gls{rater} \GLS{MUST} be able to submit assessments of \glspl{student} via a \gls{feedback form}.
+  \importance{high} \dep{\ref{req:ff1}}
+
+  \requirement{ff3} The student \GLS{MUST} be able to request a \gls{rater} to fill out a \gls{feedback form}.
+  \importance{high} \dep{\ref{req:ff2}}
+
+  \requirement{ff4} The system \GLS{MUST} notify \glspl{rater} when a \gls{student} requests feedback.
+  \importance{med} \dep{\ref{req:ff3}}
+
+  \requirement{ff5} The system \GLS{MUST} remind \glspl{rater} if \glspl{feedback form} are not completed within a specified time.
+  \importance{med} \dep{\ref{req:ff4}}
+
+  \requirement{ff6} The system \GLS{MUST} notify \glspl{student} when a \gls{rater} has completed a \gls{feedback form} for them.
+  \importance{low} \dep{\ref{req:ff2}}
+
+  \requirement{ff7} \Glspl{student} \GLS{MUST NOT} be able to view the identity of the \gls{rater} of any \gls{form response}.
+  \importance{high} \dep{\ref{req:ff2}}
+\end{requirements}
+
+\subsection{Form response quality control}
+
+The functional requirements in this subsection are related to the auditing and control of the quality of \glspl{form response} received from \glspl{rater}.
+During the process of a \gls{rater} filling in a \gls{feedback form}, if the \gls{rater} attempts to submit a poor \gls{form response}, the system will prompt the \gls{rater} with suggestions to improve their response.
+Upon submission, the system will then further audit the \gls{form response} for quality and flag the \gls{rater} if necessary.
+
+\begin{figure}
+  \centering
+  \input{pgf/response-prompt-rd.tex}
+  \caption{Robustness diagram describing the process of a rater filling in a feedback form.}
+  \label{fig:response-prompt-rd}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \input{pgf/response-prompt-sd.tex}
+  \caption{Sequence diagram describing the process of a rater filling in a feedback form.}
+  \label{fig:response-prompt-sd}
+\end{figure}
+
+\begin{requirements}
+  \requirement{qc1} The system \GLS{MUST} prompt the \gls{rater} for better feedback based on gaps in \glspl{form response} received from \glspl{rater}.
+  \importance{high} \dep{\ref{req:ff1}}
+
+  \requirement{qc2} The system \GLS{MUST} store \glspl{form response} in a database for future access.
+  \importance{high} \dep{\ref{req:ff2}}
+
+  \requirement{qc3} \Glspl{administrator} \GLS{MUST} be able to view all \glspl{form response}.
+  \importance{high} \dep{\ref{req:qc2}}
+  
+  \requirement{qc4} \Glspl{administrator} \GLS{MUST} be able to view who submitted each \gls{form response}.
+  \importance{high} \dep{\ref{req:qc3}}
+
+  \requirement{qc4a} \Glspl{administrator} \GLS{MUST} be able to filter \glspl{form response} by \gls{rater} and \gls{student}.
+  \importance{high} \dep{\ref{req:qc4}}
+
+  \requirement{qc5} The system \GLS{MUST} be able to detect low-quality and unhelpful \glspl{form response}, flag the corresponding responses and \glspl{rater}, and notify \glspl{administrator}.
+  \importance{med} \dep{\ref{req:qc2}}
+
+  \requirement{qc6} \Glspl{administrator} \GLS{MUST} be able to view \glspl{rater} flagged for low-quality or unhelpful \glspl{form response}.
+  \importance{med} \dep{\ref{req:qc5}}
+
+  \requirement{qc7} \Glspl{administrator} \GLS{MUST} be able to filter and remove low-quality or unhelpful \glspl{form response}.
+  \importance{med} \dep{\ref{req:qc6}}
+\end{requirements}
+
+\subsection{Full report}
+
+\begin{requirements}
+  \requirement{fr1} The system \GLS{MUST} be able to generate a \gls{full report} for each specific \gls{student}.
+  \importance{high} \dep{\ref{req:qc2}}
+
+  \requirement{fr2} The \gls{full report} of a student \GLS{MUST} describe the level of \gls{competency} they have been assessed to exhibit in accordance with \glspl{epa}.
+  \importance{high} \dep{\ref{req:fr1}}
+
+  \requirement{fr3} Students \GLS{MUST NOT} be able to view any other \gls{student}'s \gls{full report}.
+  \importance{high} \dep{\ref{req:fr1}}
+
+  \requirement{fr4} \Glspl{administrator} \GLS{MUST} be able to view every \gls{student}'s \gls{full report}.
+  \importance{high} \dep{\ref{req:fr1}}
+\end{requirements}
+
+\subsection{Other functional requirements}
+
+\begin{requirements}
+  \requirement{o1} The software \GLS{MUST} be able to export data via \gls{pdf} and \gls{csv} file formats.
+  \importance{low}
+\end{requirements}
+
+\section{Non-functional requirements}
+
+\subsection{Performance requirements}
+The system should be able to handle concurrent usage by at least 50 users without significant degradation of performance.
+The system should be designed to have an uptime of 99\%, equivalent to slightly more than 3.5 days of downtime per annum.
+
+\subsection{Design constraints}
+
+The system should be accessible via the latest versions of common web browsers such as Google Chrome, Firefox, Safari, and Microsoft Edge that support the latest version of the \gls{html} standard as promulgated by the Web Hypertext Application Technology Working Group (which can be accessed at \url{https://html.spec.whatwg.org/}).
+The system should also be accessible from both mobile devices and desktop environments.
+
+\subsection{Regulatory compliance}
+
+The system must comply with all privacy regulations at Hershey Medical Center and Penn State Health as a company.
+The system must also comply with all relevant regulations set forth by the US Government.
+
+\subsection{Backup and recovery}
+
+The system should have a backup and recovery plan to protect data integrity in the event of system failure or data loss.
+Regular automated backups should be scheduled, with clear procedures for data restoration.
+
+\subsection{User training and documentation}
+
+User training and documentation should be provided to ensure that all users, including \glspl{student}, \glspl{rater}, and \glspl{administrator}, can navigate and use the system.
+This may include user manuals, FAQs, and/or training manuals.
+
+\vfill
+
+\vspace*{1in}
+\begin{tabularx}{\textwidth}{XcX}
+  \hrule           & \hspace*{3em} & \hrule \\
+  Client signature &               & Date   \\
+  Anthony Dambro  
+\end{tabularx}
+
+\newpage
+\appendix
+\addappheadtotoc
+
+% \begin{appendices}
+
+\chapterstyle{default}
+\renewcommand{\chapterheadstart}{\vspace{\beforechapskip}}
+% \setsechook{\defaultsecnum}
+
+\chapter{Software engineering tools}
+
+\section{Version control}
+
+The development team will use Git for version control.
+The repository will be hosted on GitHub.
+
+\section{Issue tracking}
+
+The development team will use GitHub Issues for issue tracking.
+Issues will be created for bugs, feature requests, and other tasks.
+
+\section{Automated testing}
+
+The development team will use GitHub Actions for workflow automation.
+Automated tests will be run on each pull request to ensure code functionality.
+These tests will be written using a testing framework to ensure scalability and maintainability.
+
+% \end{appendices}
+
+\end{document}

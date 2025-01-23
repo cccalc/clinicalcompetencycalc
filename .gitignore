@@ -12,6 +12,7 @@
 *.glo*
 *.gls*
 *.ist
+*.lof
 *.log
 *.nav
 *.out

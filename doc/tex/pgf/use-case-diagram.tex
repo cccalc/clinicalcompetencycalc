@@ -1,0 +1,50 @@
+\begin{tikzpicture}
+  
+  \begin{umlsystem}[x=0, y=0]{Clinical Competency Calculator}
+    \umlusecase[x=0, y=0, width=2cm, name=request-form]
+      {Request rater to fill form}
+    \umlusecase[x=0, y=-2, width=2cm, name=view-report]
+      {View own full report}
+    \umlusecase[x=7, y=0, width=2cm, name=notified]
+      {Notified to fill out form}
+    \umlusecase[x=7, y=-3, width=2cm, name=fill-form]
+      {Fill out feedback form}
+    \umlusecase[x=2.75, y=-5, width=2cm, name=fit-epa]
+      {Fit response to EPAs}
+    \umlusecase[x=0, y=-8, width=2cm, name=generate-report]
+      {Generate full report}
+    \umlusecase[x=4, y=-8, width=2cm, name=flag-unhelpful]
+      {Flag unhelpful responses}
+    \umlusecase[x=0, y=-11, width=2cm, name=view-all-reports]
+      {View all full reports}
+    \umlusecase[x=4, y=-11, width=2.2cm, name=remove-unhelpful]
+      {Remove flagged responses}
+    \umlusecase[x=7, y=-13, width=2cm, name=view-responses]
+      {View all form responses}
+    \umlusecase[x=0, y=-13, width=2cm, name=manage-roles]
+      {Manage user roles}
+  \end{umlsystem}
+
+  \umlactor[x=-3.25, y=-1]{Student}
+  \umlactor[x=10.25, y=-1]{Rater}
+  \umlactor[x=5.5, y=-15.5]{Administrator}
+
+  \umlassoc{Student}{request-form}
+  \umlassoc{Student}{view-report}
+  \umlassoc{Rater}{notified}
+  \umlassoc{Rater}{fill-form}
+  \umlassoc{Administrator}{view-all-reports}
+  \umlassoc{Administrator}{remove-unhelpful}
+  \umlassoc{Administrator}{view-responses}
+  \umlassoc{Administrator}{manage-roles}
+
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=invokes]{request-form}{notified}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=precedes]{notified}{fill-form}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=invokes]{fill-form}{fit-epa}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=invokes]{fill-form}{flag-unhelpful}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=precedes]{fill-form}{view-responses}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=precedes]{fit-epa}{generate-report}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=precedes]{flag-unhelpful}{remove-unhelpful}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=invokes]{view-report}{generate-report}
+  \umldep[-{Stealth[length=6pt]}, fill=white, stereo=invokes]{view-all-reports}{generate-report}
+\end{tikzpicture}

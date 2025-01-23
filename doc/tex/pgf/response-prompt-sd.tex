@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+  \begin{umlseqdiag}
+    \umlactor[no ddots]{Rater}
+    \umlboundary[no ddots]{Feedback Form}
+    \umlboundary[no ddots]{Confirmation}
+    \umlentity[no ddots]{Database}
+
+    \begin{umlcall}[op={submit.onButtonPress()}, with return, dt=5]{Rater}{Feedback Form}
+      \begin{umlcallself}[op={validate\_helpfulness()}]{Feedback Form}
+        \begin{umlfragment}[type=alt, label={helpful}, inner xsep=10]
+          \begin{umlcall}[op={submit()}, with return]{Feedback Form}{Database}
+          \end{umlcall}
+          \begin{umlcall}[op={display()}, with return]{Feedback Form}{Confirmation}
+          \end{umlcall}
+        \umlfpart[unhelpful]
+          \begin{umlcallself}[op={prompt\_suggestions()}]{Feedback Form}
+          \end{umlcallself}
+        \end{umlfragment}
+      \end{umlcallself}
+    \end{umlcall}
+  \end{umlseqdiag}
+\end{tikzpicture}

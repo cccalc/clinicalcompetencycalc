@@ -1,0 +1,23 @@
+\tikz \graph [
+    grow right sep=2em, branch down=2em,
+    right anchor=west,
+  ] {
+  auth1/\ref{req:auth1} -> auth2/\ref{req:auth2};
+  ff1/\ref{req:ff1} -> {
+    ff2/\ref{req:ff2} -> {
+      ff3/\ref{req:ff3} -> ff4/\ref{req:ff4} -> ff5/\ref{req:ff5},
+      ff6/\ref{req:ff6},
+      ff7/\ref{req:ff7},
+      qc2/\ref{req:qc2} -> {
+        qc3/\ref{req:qc3} -> qc4/\ref{req:qc4} -> qc4a/\ref{req:qc4a},
+        qc5/\ref{req:qc5} -> qc6/\ref{req:qc6} -> qc7/\ref{req:qc7},
+        fr1/\ref{req:fr1} -> {
+          fr2/\ref{req:fr2},
+          fr3/\ref{req:fr3},
+          fr4/\ref{req:fr4},
+        },
+      },
+    },
+    qc1/\ref{req:qc1}[y=6em],
+  }
+};

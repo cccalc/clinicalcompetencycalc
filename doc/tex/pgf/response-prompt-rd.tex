@@ -1,0 +1,20 @@
+\begin{tikzpicture}
+  \umlactor[x=-2.5,y=-0.5]{Rater}
+
+  \rdboundary{feedback-form}{0,0}{Feedback\\Form page}
+  \rdboundary{confirm}{0,-7}{Confirma-\\tion page}
+  \rdcontroller{enter}{4,0}{enter\\response}
+  \rdcontroller{helpful}{4,-3.5}{are all\\responses\\helpful?}
+  \rdcontroller{submit}{4,-7}{submit\\form}
+  \rdcontroller{prompt}{8,-1.75}{prompt\\suggestion\\to improve\\response}
+  \rdentity{database}{8,-7}{Database}
+
+  \draw (Rater) -- (feedback-form);
+  \rdarrow{feedback-form}{enter}
+  \rdarrow[Rater presses submit]{enter}{helpful}
+  \rdarrow[no]{helpful}{prompt}
+  \rdarrow[yes]{helpful}{submit}
+  \rdarrow{prompt}{enter}
+  \rdarrow{submit}{confirm}
+  \rdarrow{submit}{database}
+\end{tikzpicture}
