@@ -8,5 +8,5 @@ raters. Administrators will also be able to filter low-quality feedback. All of 
 implemented to allow students, raters, and administrators to access them via any device that has a
 modern web browser, such as smartphones, laptops, and desktop computers.
 
-[!NOTE]
-This is a placeholder. This should contain simple quick start information for navigating and contributing to the project
+> [!NOTE]
+> This is a placeholder. This should contain simple quick start information for navigating and contributing to the project
