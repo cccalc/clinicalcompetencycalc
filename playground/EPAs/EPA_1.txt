@@ -1,0 +1,63 @@
+EPA 1 : Gather a history and perform a physical exam.
+
+Key Functions:
+1. Obtain a complete and accurate history in an
+   organized fashion.
+
+2. Demonstrate patient-centered interview skills.
+
+3. Demonstrate clinical reasoning in gathering focused 
+   information relevant to a patient's care.
+
+4. Perform a clinically relevant, appropriately
+   thorough physical exam pertinent to the setting 
+   and purpose of the patient visit.
+
+QA 1a. How well does the student gather a history of the patient?
+a. Does not collect accurate historical data.
+b. Gathers excessive or incomplete data.
+c. Uses a logical progression of questioning.
+d. Gathered a complete and accurate history.
+(elaborate where needed)
+
+QA 1b. How independent is the student?
+a. Relies heavily on secondary sources.
+b. Struggles to deviate from a template.
+c. When appropriate, seeks secondary sources.
+d. Adopts to different care settings professionally.
+(elaborate where needed)
+
+QA 2. How well is the patient treated?
+a. Inaccurately generalizes based on age, gender, race, or other characteristics.
+b. Ignores patient's verbal or nonverbal cues.
+c. Does not consider patient's privacy or autonomy.
+d. Patient is communicated with effectively without an overreliance on jargon.
+e. Interprets and handles patient's emotions.
+(elaborate where needed)
+
+QA 3a. Does the student accurately understand the patient's need?
+a. Failed to recognize the patient's central problem.
+b. Was able to ascertain patients problem.
+(elaborate where needed)
+
+QA 3b. Is the student effective at understanding patient's issues?
+a. Student asks questions unrelated to evidence and data collected.
+b. Poorly filters information given.
+c. Questions represent a narrow differential diagnosis.
+d. Clarifies patients issues with purposeful questions.
+e. Filters relevant positive and negative symptoms helpful for diagnosing.
+(elaborate where needed)
+
+QA 4a. How organized was the physical exam?
+a. Exam was not performed in an organized and fluid sequence.
+b. Incorrectly performed basic physical exam manuevers. [if checked, how]
+c. Explained exam maneuvers to patient in a clear fashion.
+d. Targeted exam to necessary areas relevant to patient visit.
+(elaborate where needed)
+
+QA 4b. Does the student effectively identify findings?
+a. Student missed key findings.
+b. Identified and accurately described normal findings.
+c. Identified and described abnormal findings, in addition to normal findings. 
+d. Uses the exam to prioritize the working differential diagnosis.
+(elaborate where needed)
