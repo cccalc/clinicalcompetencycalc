@@ -14,8 +14,8 @@ documentation for details.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-    README
-    installation
-    api
-    changelog
+   
+   README
+   installation
+   api
+   changelog
