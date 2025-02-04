@@ -1,0 +1,72 @@
+﻿Node.JS Server Notes
+
+
+How to Initialize Server:
+* Obviously have a directory made
+* Npm init - y to initalize node project
+* Create server.js file
+* Import http module
+* Have a const http = require(‘http’)
+* Use the http module to create the server
+   * Sample server creation: const server = http.createServer((request, response)) =>{ res.status code -> sets the status code, res.setHeader -> sets header, res.end -> sends response}
+* Specify port and start server
+   * Const Port = {port_number}
+   * server.listen(Port, () => { console.log(‘Server is running at http://localhost:$Port} 
+* Run server
+   * npm server.js 
+* Yay the server has been initialized
+How to communicate between Python and NodeJS server using SocketIO
+
+
+* SocketIO
+   * The SockerIO library can be used for communicating between the NodeJS server and the Python application 
+* Set up process
+   * First things first we must set up Express.JS
+      * Npm install express
+      * Create an index.js file with the following contents
+         * Const express = require(‘express’)
+         * Const app = express()
+         * App.get
+         * Const server = app.listen 
+   * Install SocketIO with npm install socket.io
+   * Listen to connection
+      * Const io = socketio(server)
+      * io.on(‘connection’, (socket) => { 
+* Set up on client
+* Communicating between client and server
+   * Set up event listener on server
+      * socket.on(‘Event_Name’, (Data)) =>{}
+      * io.on('connection', (socket) => {
+      *     console.log(`New connection: ${socket.id}`);
+      *       *     socket.on('message', (data) => {
+      *         console.log(`New message from ${socket.id}: ${data}`);
+      *     })
+      * })
+   * Set up event listener on client
+* Be Happy that you can now communicate effectively between client and server using socketio
+
+
+How to communicate between Python client and NodeJS server using WebSocket
+* WebSocket
+   * The websocket library offers a continuous connection between the NodeJS server and the python client 
+* Set up process
+   * Npm install websocket 
+   * Open the server.js file
+   *  Initalize Websocket by typing 
+      *  const WebSocket = require('ws');
+      * const wss = new WebSocket.Server({ port: })
+   * Write a few basic commands to test the server, such as when receiving data, closing connection, and when there is an error
+   * Run the server with node server.js
+   * Install and set up python websocket client
+* Write event listeners for when nodejs is sending/recieving information from the client and vice versa
+* Celebrate your victory 
+Websocket v. Socket Io
+* Obviously we will only need to use one for our project and as such we must make a decision
+* Pros of Socket.io
+   * Ease of development
+   * Consistent API
+   * Better documentation: 
+* Pros of websocket
+   * Less resource intensive
+   * Customizable
+   * Might be easier for python
