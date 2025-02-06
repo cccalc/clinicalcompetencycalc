@@ -1,4 +1,36 @@
 ---
+epa_desc:
+  '1': Gather a History and Perform a Physical Examination
+  '2': Prioritize a Differential Diagnosis Following a Clinical Encounter
+  '3': Recommend and Interpret Diagnostic and Screening Tests
+  '4': Enter and Discuss Orders and Prescriptions
+  '5': Document a Clinical Encounter in the Patient Record
+  '6': Provide an Oral Presentation of a Clinical Encounter
+  '7': Form Clinical Questions and Retrieve Evidence to Advance Patient Care
+  '8': Give or Receive a Patient Handover to Transition Care Responsibility
+  '9': Collaborate as a Member of an Interprofessional Team
+kf_desc:
+  '1.1': Obtain a complete and accurate history in an organized fashion
+  '1.2': Demonstrate patient-centered interview skills
+  '1.3': Demonstrate clinical reasoning in gathering focused information relevant to a patient's care
+  '1.4': Perform a clinically relevant, appropriately thorough physical exam pertinent to the setting and purpose of the patient visit
+  '2.1': Synthesize essential information from previous records, history, physical exam, and initial diagnostic evaluations to propose a scientifically supported differential diagnosis
+  '2.2': Prioritize and continue to integrate information as it emerges to update differential diagnosis, while managing ambiguity
+  '2.3': Engage and communicate with team members for endorsement and verification of the working diagnosis that will inform management plans
+  '3.1': Recommend first-line cost-effective screening and diagnostic tests for routine health maintenance and common disorders
+  '3.2': Provide rationale for decision to order tests, taking into account pre- and posttest probability and patient preference
+  '3.3': Interpret results of basic studies and understand the implication and urgency of the results
+  '4.1': Compose orders efficiently and effectively verbally, on paper, and electronically
+  '4.2': Demonstrate an understanding of the patient's condition that underpins the provided orders
+  '4.3': Recognize and avoid errors by attending to patient-specific factors, using resources, and appropriately responding to safety alerts
+  '4.4': Discuss planned orders and prescriptions with team, patients, and families
+  '5.1': Prioritize and synthesize information into a cogent narrative for a variety of clinical encounters (e.g., admission, progress, pre- and post-op, and procedure notes; informed consent; discharge summary)
+  '5.2': Follow documentation requirements to meet regulations and professional expectations
+  '5.3': Document a problem list, differential diagnosis, and plan supported through clinical reasoning that reflects patient's preferences
+  '6.1': Present personally gathered and verified information, acknowledging areas of uncertainty
+  '6.2': Provide an accurate, concise, well-organized oral presentation
+  '6.3': Adjust the oral presentation to meet the needs of the receiver
+  '6.4': Demonstrate respect for patient's privacy and autonomy
 mcq:
   - epa: '1'
     kf: '1.1'
@@ -147,6 +179,7 @@ mcq:
       4.3.4: Checks patient weight, age, renal function or other comorbidities that may affect doses or intervals.
       4.3.5: Uses resources to inform safe order writing (e.g. guidelines, drug-drug interactions)
       4.3.6: Responds to EHR safety alerts and understands rationale for them
+    question: How does the learner recognize and prevent medication errors?
   - epa: '4'
     kf: '4.4'
     opt_count: 5
