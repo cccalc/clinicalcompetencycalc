@@ -1,7 +1,5 @@
-import Body from './client-body';
-import Footer from './footer';
+import Content from './content';
 import {FormDataYAML} from '@/data/types';
-import Header from './header';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -19,5 +17,5 @@ export default function Home() {
     console.log(e);
   }
 
-  return <Body formData={formData} />;
+  return <Content formData={formData} />;
 }
