@@ -1,0 +1,21 @@
+arrowParens: 'always' # (x) => x instead of x => x
+bracketSpacing: false # {foo: bar} instead of { foo: bar }
+htmlWhitespaceSensitivity: 'css' # wrap HTML according to CSS display property
+jsxSingleQuote: true
+printWidth: 80
+quoteProps: 'as-needed' # only add quotes around object properties when required
+semi: true # add semicolons at the end of statements
+singleQuote: true
+tabWidth: 2
+trailingComma: 'all'
+useTabs: false
+overrides:
+  - files: '*.html'
+    options:
+      printWidth: 120 # increase print width for HTML files
+  - files: '*.md'
+    options:
+      proseWrap: 'preserve' # do not wrap markdown text
+  - files: '*.tsx'
+    options:
+      printWidth: 120 # increase print width for TSX files
