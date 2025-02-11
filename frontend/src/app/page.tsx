@@ -5,7 +5,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 
 export default function Home() {
-  const filePath = path.join(process.cwd(), 'src/data/form.yaml');
+  const filePath = path.join(process.cwd(), 'src/data/form-data.yaml');
   let formData: FormDataYAML | undefined = undefined;
 
   try {
