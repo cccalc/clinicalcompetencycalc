@@ -6,7 +6,7 @@ export default function Question({question, choices}: {question: MCQ | undefined
     <>
       {question ? (
         <div className='text-start my-2'>
-          <div className='fs-4 mb-3'>{question!.question}</div>
+          <div className='fs-4 mb-3'>{question.question}</div>
           <div className='form-check'>
             {Object.entries(question.options).map(([k, v], i) => (
               <div key={k} className='form-check mb-2'>
