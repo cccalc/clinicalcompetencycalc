@@ -38,32 +38,21 @@ export default function Content({formData}: {formData: FormDataYAML | undefined}
     return <></>;
   }, [questionsForCurrentEPA, formData]);
 
-  const handleNextEPA = () => {
+  const handleEPAChange = (direction: 'next' | 'previous') => {
     const currentIndex = formData?.mcq.findIndex((q) => q.epa === currentEPA);
     if (currentIndex !== undefined && currentIndex >= 0 && formData) {
-      let nextEPAIndex = (currentIndex + 1) % formData.mcq.length;
-      let nextEPA = formData.mcq[nextEPAIndex].epa;
-      while (nextEPA === currentEPA && nextEPAIndex !== currentIndex) {
-        nextEPAIndex = (nextEPAIndex + 1) % formData.mcq.length;
-        nextEPA = formData.mcq[nextEPAIndex].epa;
+      let newIndex =
+        direction === 'next'
+          ? (currentIndex + 1) % formData.mcq.length
+          : (currentIndex - 1 + formData.mcq.length) % formData.mcq.length;
+      while (formData.mcq[newIndex].epa === currentEPA) {
+        newIndex =
+          direction === 'next'
+            ? (newIndex + 1) % formData.mcq.length
+            : (newIndex - 1 + formData.mcq.length) % formData.mcq.length;
       }
-      setCurrentEPA(nextEPA);
-      window.scrollTo({top: 0, behavior: 'smooth'}); // Scroll to the top of the page
-    }
-  };
-
-  const handlePreviousEPA = () => {
-    const currentIndex = formData?.mcq.findIndex((q) => q.epa === currentEPA);
-    if (currentIndex !== undefined && currentIndex >= 0 && formData) {
-      let previousEPAIndex = (currentIndex - 1 + formData.mcq.length) % formData.mcq.length;
-      let previousEPA = formData.mcq[previousEPAIndex].epa;
-      while (previousEPA === currentEPA && previousEPAIndex !== currentIndex) {
-        previousEPAIndex = (previousEPAIndex - 1 + formData.mcq.length) % formData.mcq.length;
-        previousEPA = formData.mcq[previousEPAIndex].epa;
-      }
-      console.log(`Current EPA: ${currentEPA}, Previous EPA: ${previousEPA}`);
-      setCurrentEPA(previousEPA);
-      window.scrollTo({top: 0, behavior: 'smooth'}); // Scroll to the top of the page
+      setCurrentEPA(formData.mcq[newIndex].epa);
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
   };
 
@@ -82,10 +71,10 @@ export default function Content({formData}: {formData: FormDataYAML | undefined}
                 </div>
               ))}
               <div className='d-flex justify-content-between mt-4 mb-5'>
-                <button onClick={handlePreviousEPA} className='btn btn-secondary'>
+                <button onClick={() => handleEPAChange('previous')} className='btn btn-secondary'>
                   Previous EPA
                 </button>
-                <button onClick={handleNextEPA} className='btn btn-primary'>
+                <button onClick={() => handleEPAChange('next')} className='btn btn-primary'>
                   Next EPA
                 </button>
               </div>
