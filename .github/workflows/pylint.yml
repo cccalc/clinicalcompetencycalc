@@ -19,8 +19,9 @@ jobs:
         python -m venv venv
         source venv/bin/activate
         python -m pip install --upgrade pip
-        find . -name "requirements.txt" -exec pip install -r {} \;
         pip install pylint
+        find . -name "requirements.txt" -exec pip install -r {} \;
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        source venv/bin/activate
+        python -m pylint $(git ls-files '*.py')
