@@ -19,5 +19,5 @@ jobs:
         find . -name "requirements.txt" -exec bash run.sh \; -exec pip install pylint \;
     - name: Analyzing the code with pylint
       run: |
-        source venv/bin/activate
+        source .venv/bin/activate
         python -m pylint $(git ls-files '*.py')
