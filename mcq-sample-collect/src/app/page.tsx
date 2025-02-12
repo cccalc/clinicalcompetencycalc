@@ -1,5 +1,7 @@
-import Content from './content';
+import ClientPage from './client-page';
+import EnterUsername from './enter-username';
 import {FormDataYAML} from '@/data/types';
+import TaggingInterface from './tagging-interface';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -17,5 +19,5 @@ export default function Home() {
     console.log(e);
   }
 
-  return <Content formData={formData} />;
+  return <ClientPage formData={formData} />;
 }

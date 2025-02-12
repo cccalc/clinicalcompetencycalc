@@ -8,7 +8,7 @@ export default function UsernameModal({username}: {username: {set: Dispatch<SetS
   const handleSave = () => {
     username.set(tempUsername);
     setTempUsername('');
-    (document.getElementById('username-input')! as HTMLInputElement).value = '';
+    (document.getElementById('new-username-input')! as HTMLInputElement).value = '';
   };
 
   return (
@@ -23,7 +23,7 @@ export default function UsernameModal({username}: {username: {set: Dispatch<SetS
         <div className='modal-content'>
           <div className='modal-header'>
             <h1 className='modal-title fs-5' id='username-modal-label'>
-              Change session username
+              Change session user name
             </h1>
             <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
           </div>
@@ -31,11 +31,11 @@ export default function UsernameModal({username}: {username: {set: Dispatch<SetS
             <p>
               You are currently submitting sample tags as <b>{username.val}</b>.
             </p>
-            <p>To change the username, please enter a new username below.</p>
+            <p>To change the name, please enter a new name below.</p>
             <div>
               <input
                 type='text'
-                id='username-input'
+                id='new-username-input'
                 className='form-control'
                 placeholder='New username'
                 onChange={(e) => setTempUsername(e.target.value)}

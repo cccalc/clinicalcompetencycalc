@@ -1,7 +1,7 @@
 import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from '../components/button-svgs';
 import React, {Dispatch, SetStateAction, SyntheticEvent} from 'react';
 
-import {DevLevel} from './content';
+import {DevLevel} from './tagging-interface';
 
 export default function SubmitButtons({
   skip,

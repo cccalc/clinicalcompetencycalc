@@ -1,17 +1,15 @@
 import {Dispatch, SetStateAction} from 'react';
 
 import Image from 'next/image';
+import logo from './ccc-logo-white.svg';
 
-export default function Header({username}: {username: {set: Dispatch<SetStateAction<string>>; val: string}}) {
-  const WIDTH = 50;
-  const HEIGHT = WIDTH * (16 / 21);
-
+export default function Header({username}: {username: string}) {
   return (
     <>
       <div className='bg-secondary text-white p-3'>
         <div className='container-flex mx-3 d-flex gap-2 justify-content-between align-items-center'>
           <div className='d-flex align-items-center' style={{minWidth: '0'}}>
-            <Image className='me-2' src='/dark-bw.svg' width={WIDTH} height={HEIGHT} alt='CCC Logo' />
+            <Image className='me-2' src={logo} height={32} alt='CCC Logo' />
             <span className='d-inline-block text-truncate lh-sm'>
               Clinical Competency <br /> Calculator
             </span>
@@ -23,7 +21,7 @@ export default function Header({username}: {username: {set: Dispatch<SetStateAct
             data-bs-toggle='modal'
             data-bs-target='#username-modal'
           >
-            You are <br /> <b>{username.val}</b>
+            You are <br /> <b>{username}</b>
           </button>
         </div>
       </div>

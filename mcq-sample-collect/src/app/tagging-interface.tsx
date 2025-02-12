@@ -1,8 +1,8 @@
 'use client';
 
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
 import {FormDataYAML, MCQ} from '@/data/types';
 import {getRandomChoicesFromOptions, getRandomItem} from '@/data/util';
-import {useEffect, useMemo, useState} from 'react';
 
 import EpaKfDesc from './epa-kf-desc';
 import Header from '../components/header';
@@ -13,12 +13,17 @@ import UsernameModal from './username-modal';
 
 export type DevLevel = 'none' | 'rem' | 'edv' | 'dev' | 'ent';
 
-export default function Content({formData}: {formData: FormDataYAML | undefined}) {
+export default function TaggingInterface({
+  formData,
+  username,
+}: {
+  formData: FormDataYAML | undefined;
+  username: {set: Dispatch<SetStateAction<string>>; val: string};
+}) {
   const [loading, setLoading] = useState(true);
   const [question, setQuestion] = useState<MCQ | undefined>(undefined);
   const [choices, setChoices] = useState<{[key: string]: boolean}>({});
   const [devLevel, setDevLevel] = useState<DevLevel>('none');
-  const [username, setUsername] = useState<string>('');
 
   useEffect(() => {
     getNewQuestion();
@@ -47,7 +52,7 @@ export default function Content({formData}: {formData: FormDataYAML | undefined}
     <>
       <div className='d-flex flex-column min-vh-100'>
         <div className='row sticky-top'>
-          <Header username={{set: setUsername, val: username}} />
+          <Header username={username.val} />
           {loading || <EpaKfDesc desc={desc} />}
         </div>
         <div className='row flex-grow-1'>
@@ -59,7 +64,7 @@ export default function Content({formData}: {formData: FormDataYAML | undefined}
           {loading || <SubmitButtons skip={getNewQuestion} devLevel={{set: setDevLevel, val: devLevel}} />}
         </div>
       </div>
-      <UsernameModal username={{set: setUsername, val: username}} />
+      <UsernameModal username={username} />
     </>
   );
 }
