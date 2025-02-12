@@ -1,9 +1,9 @@
-import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './footer_svgs';
+import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './button-svgs';
 import React, {Dispatch, SetStateAction, SyntheticEvent} from 'react';
 
 import {DevLevel} from './content';
 
-export default function Footer({
+export default function SubmitButtons({
   skip,
   devLevel,
 }: {
