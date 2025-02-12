@@ -5,7 +5,7 @@ import {getRandomChoicesFromOptions, getRandomItem} from '@/data/util';
 import {useEffect, useMemo, useState} from 'react';
 
 import EpaKfDesc from './epa-kf-desc';
-import Header from './header';
+import Header from '../components/header';
 import Loading from '@/components/loading';
 import Question from './question';
 import SubmitButtons from './submit-buttons';

@@ -1,4 +1,4 @@
-import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './button-svgs';
+import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from '../components/button-svgs';
 import React, {Dispatch, SetStateAction, SyntheticEvent} from 'react';
 
 import {DevLevel} from './content';
