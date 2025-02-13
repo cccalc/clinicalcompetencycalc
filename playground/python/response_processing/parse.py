@@ -8,6 +8,15 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint)
 
 
 def parse_sentences_t5(sentences):
+  """
+  Return a list of random ingredients as strings.
+
+  :param sentences: Optional "kind" of ingredients.
+  :type sentences: list[str] or None
+  :return: The ingredients list.
+  :rtype: list[str]
+
+  """
   complex_sentences = sent_tokenize(sentences)
 
   encoder_max_length = 256
