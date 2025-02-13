@@ -19,3 +19,5 @@ CCC Sphinx documentation
    installation
    api
    changelog
+
+   autodoc
