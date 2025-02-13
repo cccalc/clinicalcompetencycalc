@@ -15,7 +15,7 @@ jobs:
       run: |
         find . -name "requirements.txt" -execdir bash run.sh \;
     - name: Build HTML
-      run: ./venv/bin/activate -m sphinx -b html sphinx sphinx/_build/html
+      run: ./venv/bin/python -m sphinx -b html sphinx sphinx/_build/html
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
