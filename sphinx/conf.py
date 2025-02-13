@@ -8,7 +8,7 @@
 import sys
 from pathlib import Path
 #sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'playground/python/response_processing/'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'playground/python/response_processing/'))
 
 project = 'Clinical Compentancy Calculator'
 copyright = '2025, Dylan Colburn, Jacq Li, Tyler Muessig, Tyler Price'
