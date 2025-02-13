@@ -19,4 +19,4 @@ jobs:
         find . -name "requirements.txt" -execdir bash run.sh \; -execdir pip install pylint \;
     - name: Analyzing the code with pylint
       run: |
-        find . -name "requirements.txt" -execdir source .venv/bin/activate \; -execdir python -m pylint $(git ls-files '*.py') \;
+        find . -name "requirements.txt" -execdir python -m pylint $(git ls-files '*.py') \;
