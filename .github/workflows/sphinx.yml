@@ -17,6 +17,7 @@ jobs:
     - name: Build HTML
       run: |
         python -m venv venv
+        ./venv/bin/python -m pip install sphinx
         ./venv/bin/python -m sphinx -b html sphinx sphinx/_build/html
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
