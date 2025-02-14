@@ -1,5 +1,5 @@
-import Content from './content';
-import {FormDataYAML} from '@/data/types';
+import ClientPage from './client-page';
+import {FormDataYAML} from '../utils/types';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -7,7 +7,7 @@ import yaml from 'js-yaml';
 // import styles from './page.module.css';
 
 export default function Home() {
-  const filePath = path.join(process.cwd(), 'src/data/form-data.yaml');
+  const filePath = path.join(process.cwd(), 'src/utils/form-data.yaml');
   let formData: FormDataYAML | undefined = undefined;
 
   try {
@@ -17,5 +17,5 @@ export default function Home() {
     console.log(e);
   }
 
-  return <Content formData={formData} />;
+  return <ClientPage formData={formData} />;
 }

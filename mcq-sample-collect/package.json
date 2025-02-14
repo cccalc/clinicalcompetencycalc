@@ -6,9 +6,12 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "load_supabase_types": "npx supabase gen types typescript --project-id speeohoyelvckretnfao -s trainingdata > ./src/utils/database.types.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.48.1",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "js-yaml": "^4.1.0",
@@ -24,6 +27,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "supabase": "^2.12.1",
     "typescript": "^5"
   }
 }
