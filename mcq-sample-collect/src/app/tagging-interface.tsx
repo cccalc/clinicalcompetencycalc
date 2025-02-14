@@ -1,8 +1,8 @@
 'use client';
 
+import {DevLevel, FormDataYAML, MCQ} from '@/utils/types';
 import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
-import {FormDataYAML, MCQ} from '@/data/types';
-import {getRandomChoicesFromOptions, getRandomItem} from '@/data/util';
+import {getRandomChoicesFromOptions, getRandomItem} from '@/utils/util';
 
 import EpaKfDesc from './epa-kf-desc';
 import Header from '../components/header';
@@ -10,8 +10,6 @@ import Loading from '@/components/loading';
 import Question from './question';
 import SubmitButtons from './submit-buttons';
 import UsernameModal from './username-modal';
-
-export type DevLevel = 'none' | 'rem' | 'edv' | 'dev' | 'ent';
 
 export default function TaggingInterface({
   formData,

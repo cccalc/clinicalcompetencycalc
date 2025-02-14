@@ -11,3 +11,5 @@ export type MCQ = {
   options: {[key: string]: string};
   question: string;
 };
+
+export type DevLevel = 'none' | 'remedial' | 'early-developing' | 'developing' | 'entrustable';

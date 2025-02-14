@@ -19,9 +19,9 @@ export default function EnterUsername({setUsername}: {setUsername: Dispatch<SetS
       <div className='text-center'>
         <Image className='mb-3' src={logo} height={56} alt='CCC logo' />
         <h1 className='display-5'>Clinical Competency Calculator</h1>
-        <p className='lead'>MCQ Sample Collection</p>
+        <p className='fs-3'>MCQ Sample Collection</p>
       </div>
-      <div className='w-75'>
+      <div className='w-75' style={{maxWidth: '400px'}}>
         <label htmlFor='username-input' className='form-label'>
           Enter your name
         </label>
@@ -32,7 +32,7 @@ export default function EnterUsername({setUsername}: {setUsername: Dispatch<SetS
           className='form-control'
           onChange={(e) => setTempUsername(e.target.value)}
         />
-        <div className='form-text'>This name will be used to identify your submissions. You can change it later.</div>
+        <div className='form-text'>This name will be used to identify your submissions. You can change this later.</div>
       </div>
       <button type='button' className='btn btn-primary mt-3' onClick={handleSave} disabled={tempUsername.length === 0}>
         Start

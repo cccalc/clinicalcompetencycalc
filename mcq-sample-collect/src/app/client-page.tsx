@@ -1,7 +1,7 @@
 'use client';
 
 import EnterUsername from './enter-username';
-import {FormDataYAML} from '@/data/types';
+import {FormDataYAML} from '@/utils/types';
 import TaggingInterface from './tagging-interface';
 import {useState} from 'react';
 
