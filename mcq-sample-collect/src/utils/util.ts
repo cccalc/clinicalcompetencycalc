@@ -1,4 +1,3 @@
-import type { Tables } from './supabase/database.types';
 import { DevLevel } from './types';
 
 /**
