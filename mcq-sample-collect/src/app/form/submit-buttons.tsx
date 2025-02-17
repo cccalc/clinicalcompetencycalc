@@ -1,14 +1,17 @@
-import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './button-svgs';
-import React, {Dispatch, SetStateAction, SyntheticEvent} from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent } from 'react';
 
-import {DevLevel} from '@/utils/types';
+import { DevLevel } from '@/utils/types';
+
+import { DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon } from './button-svgs';
 
 export default function SubmitButtons({
   skip,
+  submit,
   devLevel,
 }: {
   skip: () => void;
-  devLevel: {set: Dispatch<SetStateAction<DevLevel>>; val: DevLevel};
+  submit: () => void;
+  devLevel: { set: Dispatch<SetStateAction<DevLevel>>; val: DevLevel };
 }) {
   const size = '2.5em';
   // prettier-ignore
@@ -37,7 +40,7 @@ export default function SubmitButtons({
 
   return (
     <div className='bg-light text-center'>
-      <div className='container p-3' style={{maxWidth: '720px'}}>
+      <div className='container p-3' style={{ maxWidth: '720px' }}>
         <div className='row'>
           <div className='btn-toolbar' role='toolbar' aria-label='Toolbar with button groups'>
             <div className='btn-group me-2 flex-grow-1' role='group' aria-label='Development level'>
@@ -73,7 +76,7 @@ export default function SubmitButtons({
             </button>
           </div>
           <div className='col d-grid'>
-            <button type='button' className='btn btn-primary mt-3'>
+            <button type='button' className='btn btn-primary mt-3' onClick={submit} disabled={devLevel.val === 'none'}>
               Submit<i className='bi bi-send ms-2'></i>
             </button>
           </div>

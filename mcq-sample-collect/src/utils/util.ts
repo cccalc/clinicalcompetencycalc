@@ -1,4 +1,4 @@
-import {DevLevel} from './types';
+import { DevLevel } from './types';
 
 /**
  * Takes in a list of items and returns a random item from the list.
@@ -15,10 +15,10 @@ export function getRandomItem<T>(list: T[]): T | undefined {
  * @param options - The options at `MCQ['options']`.
  * @returns An object with the option keys and boolean values indicating if the option is selected.
  */
-export function getRandomChoicesFromOptions(options: {[key: string]: string}): {[key: string]: boolean} {
+export function getRandomChoicesFromOptions(options: { [key: string]: string }): { [key: string]: boolean } {
   let choices;
   do {
-    choices = Object.keys(options).reduce((o, k) => ({...o, [k]: Math.random() < 0.5}), {});
+    choices = Object.keys(options).reduce((o, k) => ({ ...o, [k]: Math.random() < 0.5 }), {});
   } while (Object.values(choices).every((v) => !v));
   return choices;
 }

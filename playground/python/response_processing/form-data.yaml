@@ -9,6 +9,10 @@ epa_desc:
   '7': Form Clinical Questions and Retrieve Evidence to Advance Patient Care
   '8': Give or Receive a Patient Handover to Transition Care Responsibility
   '9': Collaborate as a Member of an Interprofessional Team
+  '10': Recognize a Patient Requiring Urgent or Emergent Care and Initiate Evaluation and Management
+  '11': Obtain Informed Consent for Tests and/or Procedures
+  '12': Perform General Procedures of a Physician
+  '13': Identify System Failures and Contribute to a Culture of Safety and Improvement
 kf_desc:
   '1.1': Obtain a complete and accurate history in an organized fashion
   '1.2': Demonstrate patient-centered interview skills
@@ -31,6 +35,33 @@ kf_desc:
   '6.2': Provide an accurate, concise, well-organized oral presentation
   '6.3': Adjust the oral presentation to meet the needs of the receiver
   '6.4': Demonstrate respect for patient's privacy and autonomy
+  '7.1': Combine curiosity, objectivity, and scientific reasoning to develop a well-formed, focused, pertinent clinical question (ASK)
+  '7.2': Demonstrate awareness and skill in using information technology to access accurate and reliable medical information (ACQUIRE)
+  '7.3': Demonstrate skill in appraising sources, content, and applicability of evidence (APPRAISE)
+  '7.4': Apply findings to individuals and/or patient panels; communicate findings to the patient and team, reflecting on process and outcomes (ADVISE)
+  '8.1': Document and update an electronic handover tool and apply this to deliver a structured verbal handover
+  '8.2': Conduct handover using communication strategies known to minimize threats to transition of care
+  '8.3': Provide succinct verbal communication conveying illness severity, situational awareness, action planning, and contingency planning
+  '8.4': Give or elicit feedback about handover communication and ensure closed-loop communication
+  '8.5': Demonstrate respect for patient's privacy and confidentiality
+  '9.1': Identify team members' roles and responsibilities and seek help from other members of the team to optimize health care delivery
+  '9.2': Include team members, listen attentively, and adjust communication content and style to align with team-member needs
+  '9.3': Establish and maintain a climate of mutual respect, dignity, integrity, and trust // Prioritize team needs over personal needs to optimize delivery of care // Help team members in need
+  '10.1': Recognize normal and abnormal vital signs as they relate to patient- and disease-specific factors as potential etiologies of a patient's decompensation
+  '10.2': Recognize severity of a patient's illness and indications for escalating care and initiate interventions and management
+  '10.3': Initiate and participate in a code response and apply basic and advanced life support
+  '10.4': Upon recognition of a patient's deterioration, communicate situation, clarify patient's goals of care, and update family members
+  '11.1': 'Describe the key elements of informed consent: indications, contraindications, risks, benefits, alternatives, and potential complications of the intervention'
+  '11.2': Communicate with the patient and family to ensure that they understand the intervention
+  '11.3': Display an appropriate balance of confidence and skill to put the patient and family at ease, seeking help when needed
+  '12.1': Demonstrate technical skills required for the procedure
+  '12.2': Understand and explain the anatomy, physiology, indications, contraindications, risks, benefits, alternatives, and potential complications of the procedure
+  '12.3': Communicate with the patient and family to ensure they understand pre- and post- procedural activities
+  '12.4': Demonstrate confidence that puts patients and families at ease
+  '13.1': Identify and report actual and potential ("near miss") errors in care using system reporting structure (e.g., event reporting systems, chain of command policies)
+  '13.2': Participate in system improvement activities in the context of rotations or learning experiences (e.g., rapid- cycle change using plan-do-study- act cycles, root cause analyses, morbidity and mortality conference, failure modes and effects analyses, improvement projects)
+  '13.3': Engage in daily safety habits (e.g., accurate and complete documentation, including allergies and adverse reactions, medicine reconciliation, patient education, universal precautions, hand washing, isolation protocols, falls and other risk assessments, standard prophylaxis, time-outs)
+  '13.4': Admit one's own errors, reflect on one's contribution, and develop an individual improvement plan
 mcq:
   - epa: '1'
     kf: '1.1'
@@ -272,3 +303,316 @@ mcq:
       6.4.1: Disregards patient privacy
       6.4.2: Demonstrates situational awareness when discussing patients
     question: How would you describe the learner's attention to patient privacy during presentations?
+  - epa: '7'
+    kf: '7.1'
+    opt_count: 4
+    options:
+      7.1.1: Does not form clinical questions
+      7.1.2: Cannot apply evidence to the specific patient care scenario
+      7.1.3: Identifies gaps in personal knowledge
+      7.1.4: Develops well-formed clinical questions
+    question: How would you describe the learner's ability to form clinical questions?
+  - epa: '7'
+    kf: '7.2'
+    opt_count: 5
+    options:
+      7.2.1: Does not seek new information
+      7.2.2: Search strategy is vague or inappropriate
+      7.2.3: Amount of information is unmanagable
+      7.2.4: Refined search strategy
+      7.2.5: Efficiently able to locate relevant information
+    question: How would you describe the learner's ability to acquire reliable medical information?
+  - epa: '7'
+    kf: '7.3'
+    opt_count: 6
+    options:
+      7.3.1: Cannot identify gaps or limitations in the evidence
+      7.3.2: Cannot apply evidence to the specific patient care scenario
+      7.3.3: Needs assistence
+      7.3.4: Applies evidence to specific patient care scenarios
+      7.3.5: Judges evidence quality
+      7.3.6: Independent
+    question: How would you describe the learner's ability to appraise information sources?
+  - epa: '7'
+    kf: '7.4'
+    opt_count: 5
+    options:
+      7.4.1: Cannot discuss findings
+      7.4.2: Recitation of the findings without deeper understanding
+      7.4.3: Acknowledges ambiguity of findings
+      7.4.4: Manages personal bias
+      7.4.5: Conveys the consistency of evidence
+    question: How would you describe the learners ability to communicate findings?
+  - epa: '8'
+    kf: '8.1'
+    opt_count: 8
+    options:
+      8.1.1: Does not use standard format
+      8.1.2: Information is incorrect
+      8.1.3: Inconsistent
+      8.1.4: Too detailed or too brief
+      8.1.5: Applies a standard template
+      8.1.6: Consistent
+      8.1.7: Relevant
+      8.1.8: Complete
+    question: How would you describe the learner's ability to use electronic handover tools?
+  - epa: '8'
+    kf: '8.2'
+    opt_count: 4
+    options:
+      8.2.1: Frequently distracted
+      8.2.2: Requires assistance with time management
+      8.2.3: Avoids interuptions
+      8.2.4: Manages time effectively
+    question: How would you describe the learner's ability to manage the environment at turnover?
+  - epa: '8'
+    kf: '8.3'
+    opt_count: 6
+    options:
+      8.3.1: Lacks all key components of a standardized turnover (e.g. illness severity, action plans, contingency plans)
+      8.3.2: Inconsistent
+      8.3.3: Lacks clarity at times
+      8.3.4: Consistent
+      8.3.5: Relevant
+      8.3.6: Complete
+    question: How would you describe the learner's verbal turnover?
+  - epa: '8'
+    kf: '8.4'
+    opt_count: 5
+    options:
+      8.4.1: Does not summarize key points
+      8.4.2: Inconsistent
+      8.4.3: Asks clarifying questions
+      8.4.4: Consistent
+      8.4.5: Summarizes key points
+    question: How would you describe the learner's ability to use closed loop communication?
+  - epa: '8'
+    kf: '8.5'
+    opt_count: 2
+    options:
+      8.5.1: Disregards patient privacy
+      8.5.2: Demonstrates situational awareness when discussing patients
+    question: How would you describe the learner's attention to patient privacy during turnover?
+  - epa: '9'
+    kf: '9.1'
+    opt_count: 6
+    options:
+      9.1.1: No initiative or insight to include other team members
+      9.1.2: Acts independently of input from team
+      9.1.3: Knows which team members to include in care
+      9.1.4: Knows how to seek team member input/recommendations
+      9.1.5: Effectively partners with other team members
+      9.1.6: Understands unique contributions of other team members
+    question: How would you describe the learner's ability to incorporate team members from other professions?
+  - epa: '9'
+    kf: '9.2'
+    opt_count: 5
+    options:
+      9.2.1: Dismissive
+      9.2.2: Unidirectional
+      9.2.3: Active listener
+      9.2.4: Keeps team members informed
+      9.2.5: Tailored communication
+    question: How would you describe the learner's ability to communicate with team members?
+  - epa: '9'
+    kf: '9.3'
+    opt_count: 4
+    options:
+      9.3.1: Disrespectful
+      9.3.2: Professional with team members
+      9.3.3: Respectful
+      9.3.4: Builds trusting relationships among team members
+    question: How would you describes the learner's ability to promote a climate of mutual respect?
+  - epa: '9'
+    kf: '9.3'
+    opt_count: 4
+    options:
+      9.3.5: Prioritizes own goals above those of the team
+      9.3.6: Passive member of the team
+      9.3.7: Actively supports other team members
+      9.3.8: Prioritizes team needs over personal needs
+    question: How would you describe the learner's ability to support the team?
+  - epa: '10'
+    kf: '10.1'
+    opt_count: 5
+    options:
+      10.1.1: Fails to recognize patterns indicating decompensation
+      10.1.2: Limited ability to gather and process information in a urgent/emergent setting
+      10.1.3: Recognizes outliers and unexpected results
+      10.1.4: Seeks out explanation for deviations
+      10.1.5: Gathers and processes information in a urgent/emergent setting
+    question: How would you describe the learner's ability to recognize abnormal trends or vital signs?
+  - epa: '10'
+    kf: '10.2'
+    opt_count: 5
+    options:
+      10.2.1: Fails to recognize the need for urgent/emergent care
+      10.2.2: Distracted by multiple problems and struggles to prioritize
+      10.2.3: Anticipates next steps
+      10.2.4: Responds to early clinical signs
+      10.2.5: Prioritizes patients needing immediate care
+    question: How would you describe the learner's prioritization of urgent/emergent care?
+  - epa: '10'
+    kf: '10.2'
+    opt_count: 3
+    options:
+      10.2.6: Does not seek help in urgent/emergent setting
+      10.2.7: Accepts help when struggling
+      10.2.8: Asks for help from teammates
+    question: How would you describe the learner's help-seeking behavior?
+  - epa: '10'
+    kf: '10.3'
+    opt_count: 6
+    options:
+      10.3.1: Detracts or harms the team's response
+      10.3.2: Requires prompting
+      10.3.3: Applies BLS skills
+      10.3.4: Basic management plans
+      10.3.5: Applies ACLS skills
+      10.3.6: Monitors responses to initial interventions and responds accordingly
+    question: How would you describe the learner's ability to participate in the code response?
+  - epa: '10'
+    kf: '10.4'
+    opt_count: 6
+    options:
+      10.4.1: Dismisses concerns from the team
+      10.4.2: Disregards patient goals of care or code status
+      10.4.3: Unidirectional communication
+      10.4.4: Tailors communication
+      10.4.5: Partners with team and patient/family in care planning
+      10.4.6: Keeps team and patient/family up to date
+    question: How would you describe the learner's communication in the urgent/emergent setting?
+  - epa: '11'
+    kf: '11.1'
+    opt_count: 5
+    options:
+      11.1.1: Lack basic knowledge of the intervention
+      11.1.2: Inaccurate or misleading
+      11.1.3: Lacks specificity
+      11.1.4: Complete and accurate
+      11.1.5: Explains the key elements of informed consent
+    question: How would you describe the learner's knowledge of the key elements of informed consent? (indications, contraindications, risks, benefits, alternatives, possible complications)
+  - epa: '11'
+    kf: '11.2'
+    opt_count: 7
+    options:
+      11.2.1: Uses frightening language
+      11.2.2: Uses medical jargon
+      11.2.3: Does not attend to emotional cues
+      11.2.4: Responds to emotional cues
+      11.2.5: Uses interpreter when needed
+      11.2.6: Avoids jargon
+      11.2.7: Shared decision making
+    question: How would you describe the learner's communication with patient or family around informed consent?
+  - epa: '11'
+    kf: '11.3'
+    opt_count: 2
+    options:
+      11.3.1: No
+      11.3.2: Yes
+    question: Was the learner able to keep the patient/family at ease?
+  - epa: '11'
+    kf: '11.3'
+    opt_count: 3
+    options:
+      11.3.3: Overconfident
+      11.3.4: Appropriate
+      11.3.5: Lack of confidence
+    question: How would you describe the learner's confidence as compared to their level of skill?
+  - epa: '12'
+    kf: '12.1'
+    opt_count: 5
+    options:
+      12.1.1: Lacks required skills
+      12.1.2: Inconsistent
+      12.1.3: Struggles to adapt approach
+      12.1.4: Able to prepare procedure
+      12.1.5: Completes procedure correctly
+    question: How would you describe the learner's technical skills?
+  - epa: '12'
+    kf: '12.1'
+    opt_count: 2
+    options:
+      12.2.6: Inconsistent with aseptic technique
+      12.2.7: Consistently attentive to aseptic technique
+    question: How would you describe the learner's attention to aseptic technique?
+  - epa: '12'
+    kf: '12.2'
+    opt_count: 4
+    options:
+      12.2.1: Lack basic knowledge of the procedure
+      12.2.2: Has a general command of the procedure
+      12.2.3: Complete and accurate understanding of the procedure
+      12.2.4: Able to take steps to mitigate complications
+    question: How would you describe the learner's knowledge of the key elements of the procedure? (anatomy, physiology, indications, contraindications, risks, benefits, alternatives, possible complications)
+  - epa: '12'
+    kf: '12.3'
+    opt_count: 6
+    options:
+      12.3.1: Inaccurate or unclear communication
+      12.3.2: Use jargon
+      12.3.3: Does not attend to emotional cues
+      12.3.4: Responds to emotional cues
+      12.3.5: Avoids jargon
+      12.3.6: Shared decision making
+    question: How would you describe the learner's communication with patient or family before, during and/or after the procedure?
+  - epa: '12'
+    kf: '12.4'
+    opt_count: 2
+    options:
+      12.4.1: No
+      12.4.2: Yes
+    question: Was the learner able to keep the patient/family/team at ease?
+  - epa: '12'
+    kf: '12.4'
+    opt_count: 3
+    options:
+      12.4.3: Overconfident
+      12.4.4: Appropriate
+      12.4.5: Lack of confidence
+    question: How would you describe the learner's confidence as compared to their level of skill?
+  - epa: '13'
+    kf: '13.1'
+    opt_count: 6
+    options:
+      13.1.1: Disrespectful
+      13.1.2: Misleading
+      13.1.3: Superficial understanding
+      13.1.4: Describes key elements
+      13.1.5: Timely
+      13.1.6: Uses existing system reporting structures
+    question: How would you describe the learner's ability to identify real and potential errors?
+  - epa: '13'
+    kf: '13.2'
+    opt_count: 5
+    options:
+      13.2.1: Frustrated with system improvement efforts
+      13.2.2: Passive participation
+      13.2.3: Relies on others to identify system failures
+      13.2.4: Actively engaged
+      13.2.5: Finds solutions
+    question: How would you describe the learner's participation in system improvement activities?
+  - epa: '13'
+    kf: '13.3'
+    opt_count: 4
+    options:
+      13.3.1: Places self or others at risk
+      13.3.2: Requires prompting
+      13.3.3: Demonstrates safety behaviors
+      13.3.4: Rare lapses
+    question: How would you describe the learner's daily safety habits? (e.g. hand washing, isolation protocols, accurate/timely documentation, patient education, handling of sharps)
+  - epa: '13'
+    kf: '13.4'
+    opt_count: 10
+    options:
+      13.4.1: Avoid discussing errors
+      13.4.2: Defensive
+      13.4.3: Covers up mistakes
+      13.4.4: Shifts blame
+      13.4.5: Needs prompting
+      13.4.6: Needs help developing an improvement plan
+      13.4.7: Takes responsibility for errors
+      13.4.8: Recognizes causes of lapses (e.g. fatigue)
+      13.4.9: Seeks help
+      13.4.10: Modifies behaviors
+    question: How would you describe the learner's ability to identify their own errors and make corrections?

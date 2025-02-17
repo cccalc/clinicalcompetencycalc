@@ -1,11 +1,11 @@
 export default function EpaKfDesc({
   desc,
 }: {
-  desc: {epa: string | undefined; kf: string | undefined; epa_desc: string | undefined; kf_desc: string | undefined};
+  desc: { epa: string | undefined; kf: string | undefined; epa_desc: string | undefined; kf_desc: string | undefined };
 }) {
   return (
     <div className='bg-secondary-subtle'>
-      <div className='container' style={{maxWidth: '720px'}}>
+      <div className='container' style={{ maxWidth: '720px' }}>
         <div className='accordion accordion-flush' id='epa-kf-cont'>
           <div className='accordion-item'>
             <div className='accordion-header'>
