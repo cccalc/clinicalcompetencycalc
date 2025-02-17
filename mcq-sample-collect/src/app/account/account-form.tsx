@@ -15,6 +15,8 @@ export default function AccountForm({ user }: { user: User | null }) {
 
   const getProfile = useCallback(async () => {
     try {
+      if (!user) throw new Error('No user');
+
       setLoading(true);
       const { data, error, status } = await supabase
         .schema('public')
