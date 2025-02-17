@@ -1,13 +1,16 @@
-import { DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon } from './button-svgs';
 import React, { Dispatch, SetStateAction, SyntheticEvent } from 'react';
 
 import { DevLevel } from '@/utils/types';
 
+import { DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon } from './button-svgs';
+
 export default function SubmitButtons({
   skip,
+  submit,
   devLevel,
 }: {
   skip: () => void;
+  submit: () => void;
   devLevel: { set: Dispatch<SetStateAction<DevLevel>>; val: DevLevel };
 }) {
   const size = '2.5em';
@@ -73,7 +76,7 @@ export default function SubmitButtons({
             </button>
           </div>
           <div className='col d-grid'>
-            <button type='button' className='btn btn-primary mt-3'>
+            <button type='button' className='btn btn-primary mt-3' onClick={submit} disabled={devLevel.val === 'none'}>
               Submit<i className='bi bi-send ms-2'></i>
             </button>
           </div>

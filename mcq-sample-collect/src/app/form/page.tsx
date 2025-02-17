@@ -5,19 +5,33 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Header from '@/components/header';
 import Loading from '@/components/loading';
 import { getFormData } from '@/utils/get-epa-data';
+import { createClient } from '@/utils/supabase/client';
 import { DevLevel, EPADataYAML, MCQ } from '@/utils/types';
-import { getRandomChoicesFromOptions, getRandomItem } from '@/utils/util';
+import { getDevLevelInt, getRandomChoicesFromOptions, getRandomItem } from '@/utils/util';
 
+import { insert } from './actions';
 import EpaKfDesc from './epa-kf-desc';
 import Question from './question';
 import SubmitButtons from './submit-buttons';
 
 export default function Form() {
+  const [userID, setUserID] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [question, setQuestion] = useState<MCQ | undefined>(undefined);
   const [choices, setChoices] = useState<{ [key: string]: boolean }>({});
   const [devLevel, setDevLevel] = useState<DevLevel>('none');
   const [formData, setFormData] = useState<EPADataYAML | undefined>(undefined);
+
+  useEffect(() => {
+    const getUserId = async (): Promise<string | null> => {
+      const supabase = await createClient();
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data?.user) return null;
+      return data.user.id;
+    };
+
+    getUserId().then((id) => setUserID(id));
+  }, []);
 
   useEffect(() => {
     getFormData()
@@ -48,6 +62,23 @@ export default function Form() {
     };
   }, [formData, question]);
 
+  const submit = () => {
+    if (!question) return;
+    if (Object.keys(choices).length === 0) return;
+    if (!userID) return;
+
+    const tableName = 'mcq_kf' + question.kf.replace(/\./g, '_');
+
+    const payload = {
+      ...Object.keys(choices).reduce((o, k) => ({ ...o, ['c' + k.replace(/\./g, '_')]: choices[k] }), {}),
+      dev_level: getDevLevelInt(devLevel),
+      user_id: userID,
+    };
+
+    console.log(tableName, payload);
+    insert(tableName, payload);
+  };
+
   return (
     <>
       <div className='d-flex flex-column min-vh-100'>
@@ -61,10 +92,11 @@ export default function Form() {
           </div>
         </div>
         <div className='row sticky-bottom'>
-          {loading || <SubmitButtons skip={getNewQuestion} devLevel={{ set: setDevLevel, val: devLevel }} />}
+          {loading || (
+            <SubmitButtons skip={getNewQuestion} submit={submit} devLevel={{ set: setDevLevel, val: devLevel }} />
+          )}
         </div>
       </div>
-      {/* <UsernameModal username={username} /> */}
     </>
   );
 }
