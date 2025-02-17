@@ -1,4 +1,5 @@
 'use client';
+import Loading from '@/components/loading';
 import { createClient } from '@/utils/supabase/client';
 import { type User } from '@supabase/supabase-js';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,13 +8,16 @@ import { useCallback, useEffect, useState } from 'react';
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient({ db: { schema: 'public' } });
+
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
   const [displayname, setDisplayname] = useState<string | null>(null);
 
   const getProfile = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error, status } = await supabase
+        .schema('public')
         .from('profiles')
         .select(`display_name`)
         .eq('id', user?.id)
@@ -27,10 +31,10 @@ export default function AccountForm({ user }: { user: User | null }) {
       if (data) {
         setDisplayname(data.display_name);
       }
+
+      setLoading(false);
     } catch (error) {
       alert(`Error loading user data: ${JSON.stringify(error)}`);
-    } finally {
-      setLoading(false);
     }
   }, [user, supabase]); // getProfile ====================
 
@@ -40,7 +44,7 @@ export default function AccountForm({ user }: { user: User | null }) {
 
   async function updateProfile({ displayname }: { displayname: string | null }) {
     try {
-      setLoading(true);
+      setUpdating(true);
 
       const { error } = await supabase.from('profiles').upsert({
         id: user?.id,
@@ -52,9 +56,11 @@ export default function AccountForm({ user }: { user: User | null }) {
       alert(`Error updating the data: ${JSON.stringify(error)}`);
       console.log(user?.id, displayname, new Date().toISOString());
     } finally {
-      setLoading(false);
+      setUpdating(false);
     }
   } // updateProfile ====================
+
+  if (loading) return <Loading />;
 
   return (
     <>
@@ -81,8 +87,8 @@ export default function AccountForm({ user }: { user: User | null }) {
       </form>
       <div className='mb-3'>
         <div>
-          <button className='btn btn-primary' onClick={() => updateProfile({ displayname })} disabled={loading}>
-            {loading ? 'Loading ...' : 'Update'}
+          <button className='btn btn-primary' onClick={() => updateProfile({ displayname })} disabled={updating}>
+            {updating ? 'Updating ...' : 'Update'}
           </button>
         </div>
       </div>
