@@ -1,7 +1,13 @@
-import {MCQ} from '@/utils/types';
+import { MCQ } from '@/utils/types';
 import React from 'react';
 
-export default function Question({question, choices}: {question: MCQ | undefined; choices: {[key: string]: boolean}}) {
+export default function Question({
+  question,
+  choices,
+}: {
+  question: MCQ | undefined;
+  choices: { [key: string]: boolean };
+}) {
   return (
     <>
       {question ? (

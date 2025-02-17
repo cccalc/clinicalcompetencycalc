@@ -1,14 +1,14 @@
-import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './button-svgs';
-import React, {Dispatch, SetStateAction, SyntheticEvent} from 'react';
+import { DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon } from './button-svgs';
+import React, { Dispatch, SetStateAction, SyntheticEvent } from 'react';
 
-import {DevLevel} from '@/utils/types';
+import { DevLevel } from '@/utils/types';
 
 export default function SubmitButtons({
   skip,
   devLevel,
 }: {
   skip: () => void;
-  devLevel: {set: Dispatch<SetStateAction<DevLevel>>; val: DevLevel};
+  devLevel: { set: Dispatch<SetStateAction<DevLevel>>; val: DevLevel };
 }) {
   const size = '2.5em';
   // prettier-ignore
@@ -37,7 +37,7 @@ export default function SubmitButtons({
 
   return (
     <div className='bg-light text-center'>
-      <div className='container p-3' style={{maxWidth: '720px'}}>
+      <div className='container p-3' style={{ maxWidth: '720px' }}>
         <div className='row'>
           <div className='btn-toolbar' role='toolbar' aria-label='Toolbar with button groups'>
             <div className='btn-group me-2 flex-grow-1' role='group' aria-label='Development level'>

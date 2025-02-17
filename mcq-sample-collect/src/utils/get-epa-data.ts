@@ -1,6 +1,6 @@
 'use server';
 
-import {EPADataYAML} from './types';
+import { EPADataYAML } from './types';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -12,7 +12,7 @@ import yaml from 'js-yaml';
 export async function getFormData(): Promise<EPADataYAML | undefined> {
   const filePath = path.join(process.cwd(), 'src/utils/epa-questions.yaml');
   try {
-    const data = await fs.promises.readFile(filePath, {encoding: 'utf8'});
+    const data = await fs.promises.readFile(filePath, { encoding: 'utf8' });
     const formData = yaml.load(data) as EPADataYAML;
     return formData;
   } catch (err) {

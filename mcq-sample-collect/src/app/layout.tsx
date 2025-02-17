@@ -4,8 +4,8 @@ import './globals.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import BootstrapClient from '@/components/bootstrap-client';
-import {Inter} from 'next/font/google';
-import type {Metadata} from 'next';
+import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -17,7 +17,7 @@ import type {Metadata} from 'next';
 //   subsets: ["latin"],
 // });
 
-const inter = Inter({subsets: ['latin']});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Clinical Competency Calculator',

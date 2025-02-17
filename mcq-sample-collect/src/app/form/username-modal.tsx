@@ -1,8 +1,12 @@
 'use client';
 
-import {Dispatch, SetStateAction, useState} from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
-export default function UsernameModal({username}: {username: {set: Dispatch<SetStateAction<string>>; val: string}}) {
+export default function UsernameModal({
+  username,
+}: {
+  username: { set: Dispatch<SetStateAction<string>>; val: string };
+}) {
   const [tempUsername, setTempUsername] = useState<string>('');
 
   const handleSave = () => {

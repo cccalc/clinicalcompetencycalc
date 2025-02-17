@@ -1,4 +1,4 @@
-export function RemedialIcon({size}: {size: string}) {
+export function RemedialIcon({ size }: { size: string }) {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 102 102' fill='currentColor'>
       <path
@@ -11,7 +11,7 @@ export function RemedialIcon({size}: {size: string}) {
   );
 }
 
-export function EarlyDevelopingIcon({size}: {size: string}) {
+export function EarlyDevelopingIcon({ size }: { size: string }) {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 102 102' fill='currentColor'>
       <path
@@ -25,7 +25,7 @@ export function EarlyDevelopingIcon({size}: {size: string}) {
   );
 }
 
-export function DevelopingIcon({size}: {size: string}) {
+export function DevelopingIcon({ size }: { size: string }) {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 102 102' fill='currentColor'>
       <path
@@ -47,7 +47,7 @@ export function DevelopingIcon({size}: {size: string}) {
   );
 }
 
-export function EntrustableIcon({size}: {size: string}) {
+export function EntrustableIcon({ size }: { size: string }) {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' width={size} height={size} viewBox='0 0 102 102' fill='currentColor'>
       <path

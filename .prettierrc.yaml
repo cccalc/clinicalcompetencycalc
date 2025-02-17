@@ -7,7 +7,7 @@ quoteProps: as-needed # only add quotes around object properties when required
 semi: true # add semicolons at the end of statements
 singleQuote: true
 tabWidth: 2
-trailingComma: all
+trailingComma: es5
 useTabs: false
 overrides:
   - files: '*.html'
@@ -16,6 +16,10 @@ overrides:
   - files: '*.md'
     options:
       proseWrap: 'preserve' # do not wrap markdown text
+  - files: '*.ts'
+    options:
+      printWidth: 120 # increase print width for TSX files
+      bracketSpacing: true # add spaces between brackets in object literals
   - files: '*.tsx'
     options:
       printWidth: 120 # increase print width for TSX files
