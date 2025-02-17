@@ -1,0 +1,22 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.12"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        find . -name "requirements.txt" -execdir bash run.sh \; -execdir pip install pylint \;
+    - name: Analyzing the code with pylint
+      run: |
+        find . -name "requirements.txt" -execdir source .venv/bin/activate \; -execdir python -m pylint $(git ls-files '*.py') \;
