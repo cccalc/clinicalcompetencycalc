@@ -1,4 +1,4 @@
-export type EPADataYAML = {
+export type EPAData = {
   epa_desc: { [key: string]: string };
   kf_desc: { [key: string]: string };
   mcq: MCQ[];

@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Header from '@/components/header';
 import Loading from '@/components/loading';
-import { getFormData } from '@/utils/get-epa-data';
+import { getEPAData } from '@/utils/get-epa-data';
 import { createClient } from '@/utils/supabase/client';
-import { DevLevel, EPADataYAML, MCQ } from '@/utils/types';
+import { DevLevel, EPAData, MCQ } from '@/utils/types';
 import { getDevLevelInt, getRandomChoicesFromOptions, getRandomItem } from '@/utils/util';
 
 import { insert } from './actions';
@@ -18,7 +18,7 @@ export default function Form() {
   const [userID, setUserID] = useState<string | null>(null);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [formData, setFormData] = useState<EPADataYAML | undefined>(undefined);
+  const [formData, setFormData] = useState<EPAData | undefined>(undefined);
 
   const [question, setQuestion] = useState<MCQ | undefined>(undefined);
   const [choices, setChoices] = useState<{ [key: string]: boolean }>({});
@@ -36,7 +36,7 @@ export default function Form() {
   }, []);
 
   useEffect(() => {
-    getFormData()
+    getEPAData()
       .then((data) => setFormData(data))
       .catch((err) => console.error(err));
   }, []);

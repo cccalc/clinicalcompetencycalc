@@ -1,3 +1,5 @@
+'use server';
+
 import Header from '@/components/header';
 import { createClient } from '@/utils/supabase/server';
 
@@ -8,7 +10,12 @@ export default async function Account() {
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error(error);
+  }
 
   return (
     <div className='d-flex flex-column min-vh-100'>
