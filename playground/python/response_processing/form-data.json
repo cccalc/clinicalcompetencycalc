@@ -1,0 +1,787 @@
+{
+  "epa_desc": {
+    "1": "Gather a History and Perform a Physical Examination",
+    "2": "Prioritize a Differential Diagnosis Following a Clinical Encounter",
+    "3": "Recommend and Interpret Diagnostic and Screening Tests",
+    "4": "Enter and Discuss Orders and Prescriptions",
+    "5": "Document a Clinical Encounter in the Patient Record",
+    "6": "Provide an Oral Presentation of a Clinical Encounter",
+    "7": "Form Clinical Questions and Retrieve Evidence to Advance Patient Care",
+    "8": "Give or Receive a Patient Handover to Transition Care Responsibility",
+    "9": "Collaborate as a Member of an Interprofessional Team",
+    "10": "Recognize a Patient Requiring Urgent or Emergent Care and Initiate Evaluation and Management",
+    "11": "Obtain Informed Consent for Tests and/or Procedures",
+    "12": "Perform General Procedures of a Physician",
+    "13": "Identify System Failures and Contribute to a Culture of Safety and Improvement"
+  },
+  "kf_desc": {
+    "1.1": "Obtain a complete and accurate history in an organized fashion",
+    "1.2": "Demonstrate patient-centered interview skills",
+    "1.3": "Demonstrate clinical reasoning in gathering focused information relevant to a patient's care",
+    "1.4": "Perform a clinically relevant, appropriately thorough physical exam pertinent to the setting and purpose of the patient visit",
+    "2.1": "Synthesize essential information from previous records, history, physical exam, and initial diagnostic evaluations to propose a scientifically supported differential diagnosis",
+    "2.2": "Prioritize and continue to integrate information as it emerges to update differential diagnosis, while managing ambiguity",
+    "2.3": "Engage and communicate with team members for endorsement and verification of the working diagnosis that will inform management plans",
+    "3.1": "Recommend first-line cost-effective screening and diagnostic tests for routine health maintenance and common disorders",
+    "3.2": "Provide rationale for decision to order tests, taking into account pre- and posttest probability and patient preference",
+    "3.3": "Interpret results of basic studies and understand the implication and urgency of the results",
+    "4.1": "Compose orders efficiently and effectively verbally, on paper, and electronically",
+    "4.2": "Demonstrate an understanding of the patient's condition that underpins the provided orders",
+    "4.3": "Recognize and avoid errors by attending to patient-specific factors, using resources, and appropriately responding to safety alerts",
+    "4.4": "Discuss planned orders and prescriptions with team, patients, and families",
+    "5.1": "Prioritize and synthesize information into a cogent narrative for a variety of clinical encounters (e.g., admission, progress, pre- and post-op, and procedure notes; informed consent; discharge summary)",
+    "5.2": "Follow documentation requirements to meet regulations and professional expectations",
+    "5.3": "Document a problem list, differential diagnosis, and plan supported through clinical reasoning that reflects patient's preferences",
+    "6.1": "Present personally gathered and verified information, acknowledging areas of uncertainty",
+    "6.2": "Provide an accurate, concise, well-organized oral presentation",
+    "6.3": "Adjust the oral presentation to meet the needs of the receiver",
+    "6.4": "Demonstrate respect for patient's privacy and autonomy",
+    "7.1": "Combine curiosity, objectivity, and scientific reasoning to develop a well-formed, focused, pertinent clinical question (ASK)",
+    "7.2": "Demonstrate awareness and skill in using information technology to access accurate and reliable medical information (ACQUIRE)",
+    "7.3": "Demonstrate skill in appraising sources, content, and applicability of evidence (APPRAISE)",
+    "7.4": "Apply findings to individuals and/or patient panels; communicate findings to the patient and team, reflecting on process and outcomes (ADVISE)",
+    "8.1": "Document and update an electronic handover tool and apply this to deliver a structured verbal handover",
+    "8.2": "Conduct handover using communication strategies known to minimize threats to transition of care",
+    "8.3": "Provide succinct verbal communication conveying illness severity, situational awareness, action planning, and contingency planning",
+    "8.4": "Give or elicit feedback about handover communication and ensure closed-loop communication",
+    "8.5": "Demonstrate respect for patient's privacy and confidentiality",
+    "9.1": "Identify team members' roles and responsibilities and seek help from other members of the team to optimize health care delivery",
+    "9.2": "Include team members, listen attentively, and adjust communication content and style to align with team-member needs",
+    "9.3": "Establish and maintain a climate of mutual respect, dignity, integrity, and trust // Prioritize team needs over personal needs to optimize delivery of care // Help team members in need",
+    "10.1": "Recognize normal and abnormal vital signs as they relate to patient- and disease-specific factors as potential etiologies of a patient's decompensation",
+    "10.2": "Recognize severity of a patient's illness and indications for escalating care and initiate interventions and management",
+    "10.3": "Initiate and participate in a code response and apply basic and advanced life support",
+    "10.4": "Upon recognition of a patient's deterioration, communicate situation, clarify patient's goals of care, and update family members",
+    "11.1": "Describe the key elements of informed consent: indications, contraindications, risks, benefits, alternatives, and potential complications of the intervention",
+    "11.2": "Communicate with the patient and family to ensure that they understand the intervention",
+    "11.3": "Display an appropriate balance of confidence and skill to put the patient and family at ease, seeking help when needed",
+    "12.1": "Demonstrate technical skills required for the procedure",
+    "12.2": "Understand and explain the anatomy, physiology, indications, contraindications, risks, benefits, alternatives, and potential complications of the procedure",
+    "12.3": "Communicate with the patient and family to ensure they understand pre- and post- procedural activities",
+    "12.4": "Demonstrate confidence that puts patients and families at ease",
+    "13.1": "Identify and report actual and potential (\"near miss\") errors in care using system reporting structure (e.g., event reporting systems, chain of command policies)",
+    "13.2": "Participate in system improvement activities in the context of rotations or learning experiences (e.g., rapid- cycle change using plan-do-study- act cycles, root cause analyses, morbidity and mortality conference, failure modes and effects analyses, improvement projects)",
+    "13.3": "Engage in daily safety habits (e.g., accurate and complete documentation, including allergies and adverse reactions, medicine reconciliation, patient education, universal precautions, hand washing, isolation protocols, falls and other risk assessments, standard prophylaxis, time-outs)",
+    "13.4": "Admit one's own errors, reflect on one's contribution, and develop an individual improvement plan"
+  },
+  "mcq": [
+    {
+      "epa": "1",
+      "kf": "1.1",
+      "opt_count": 7,
+      "options": {
+        "1.1.1": "Does not collect accurate history data",
+        "1.1.2": "Unstructured or overly broad",
+        "1.1.3": "Misses key historical data",
+        "1.1.4": "Follows a structured approach",
+        "1.1.5": "Prioritizes questions",
+        "1.1.6": "Seeks additional sources of data when appropriate (family member, outside records)",
+        "1.1.7": "Adapts approach to different care settings"
+      },
+      "question": "How would you describe the learner's approach to obtaining a patient history?"
+    },
+    {
+      "epa": "1",
+      "kf": "1.2",
+      "opt_count": 8,
+      "options": {
+        "1.2.1": "Disrespectful in interactions",
+        "1.2.2": "Disregards patient privacy or autonomy",
+        "1.2.3": "Does not respond to verbal or non verbal cues",
+        "1.2.4": "Makes generalizations on age, gender, race, etc",
+        "1.2.5": "Uses open-ended questions effectively",
+        "1.2.6": "Uses body language effectively",
+        "1.2.7": "Avoids jargon",
+        "1.2.8": "Responds effectively to patient's emotions and verbal/non verbal cues."
+      },
+      "question": "How patient-centered was the learner in obtaining a patient history?"
+    },
+    {
+      "epa": "1",
+      "kf": "1.3",
+      "opt_count": 5,
+      "options": {
+        "1.3.1": "Fails to recognize the patient's central problem",
+        "1.3.2": "Questions are not guided by patient responses",
+        "1.3.3": "Questions reflect a narrow differential",
+        "1.3.4": "Questions clarfiy the patient's issues",
+        "1.3.5": "Questions are targeted and hypothesis driven"
+      },
+      "question": "How does the learner apply clinical reasoning to focus their history-taking?"
+    },
+    {
+      "epa": "1",
+      "kf": "1.4",
+      "opt_count": 5,
+      "options": {
+        "1.4.1": "No consideration for patient privacy or comfort",
+        "1.4.2": "Disorganized",
+        "1.4.3": "Targets exam to the neccessary areas",
+        "1.4.4": "Logical and fluid approach to exam",
+        "1.4.5": "Distinguishes normal and abnormal abnormal findings"
+      },
+      "question": "How would you describe the learner's physical exam organization?"
+    },
+    {
+      "epa": "1",
+      "kf": "1.4",
+      "opt_count": 4,
+      "options": {
+        "1.4.6": "Incorrectly performs basic exam manuevers",
+        "1.4.7": "Misses or misinterprets key exam findings",
+        "1.4.8": "Correctly performs basic exam maneuvers",
+        "1.4.9": "Identifies normal findings only"
+      },
+      "question": "How would you describe the learner's physical exam accuracy?"
+    },
+    {
+      "epa": "2",
+      "kf": "2.1",
+      "opt_count": 5,
+      "options": {
+        "2.1.1": "Cannot gather or synthesize data to inform acceptable diagnosis",
+        "2.1.2": "Differential is too narrow or too broad or contains inaccuracies",
+        "2.1.3": "Struggles to make connections between or prioritize sources of information",
+        "2.1.4": "Proposes a reasonable differential but may neglect supporting information",
+        "2.1.5": "Differential is relevant and well supported by clinical data"
+      },
+      "question": "How would you describe the learner's ability to create a differential diagnosis?"
+    },
+    {
+      "epa": "2",
+      "kf": "2.2",
+      "opt_count": 5,
+      "options": {
+        "2.2.1": "New information is disregarded",
+        "2.2.2": "Defensive when questioned about the differential",
+        "2.2.3": "Displays discomfort with ambiguity",
+        "2.2.4": "Seeks and integrates new information to refine the differential",
+        "2.2.5": "Encourages questions and challenges from patients and team"
+      },
+      "question": "How would you describe the impact of new clinical information on the learner's differential?"
+    },
+    {
+      "epa": "2",
+      "kf": "2.3",
+      "opt_count": 5,
+      "options": {
+        "2.3.1": "Ignores team recommendations",
+        "2.3.2": "Does not explain clinical reasoning",
+        "2.3.3": "Depends heavily on the team for development of the differential",
+        "2.3.4": "Can explain clinical reasoning in general terms",
+        "2.3.5": "Clinical reasoning is complete and succint"
+      },
+      "question": "How does the learner communicate their clinical reasoning to the team?"
+    },
+    {
+      "epa": "3",
+      "kf": "3.1",
+      "opt_count": 5,
+      "options": {
+        "3.1.1": "Unable to recommend a standard set of tests",
+        "3.1.2": "Recommends tests for common conditions",
+        "3.1.3": "Does not consider harm, cost, guidelines or patient resources",
+        "3.1.4": "Repeats tests at intervals that are too lengthy or too frequent",
+        "3.1.5": "Considers harms, cost, guidelines or patient resources"
+      },
+      "question": "How would you describe the learner's approach to screening or diagnostic tests?"
+    },
+    {
+      "epa": "3",
+      "kf": "3.2",
+      "opt_count": 6,
+      "options": {
+        "3.2.1": "Cannot provide a rationale for proposed tests",
+        "3.2.2": "Recommends unnecessary tests or tests with low pretest probability",
+        "3.2.3": "Neglects patient preferences",
+        "3.2.4": "Neglects impact of false positives or negatives",
+        "3.2.5": "Provides rationale based on patient preferences and risk factors",
+        "3.2.6": "Explains how results influence diagnosis"
+      },
+      "question": "How would you describe the learner's interpretation of test results?"
+    },
+    {
+      "epa": "3",
+      "kf": "3.3",
+      "opt_count": 7,
+      "options": {
+        "3.3.1": "Can only interpret results based on normal values from the lab",
+        "3.3.2": "Cannot discern urgent from nonurgent results",
+        "3.3.3": "Misinterprets insignificant or explainable abnormals",
+        "3.3.4": "Depends heavily on the team to understand results",
+        "3.3.5": "Does not know how to respond to urgent test results",
+        "3.3.6": "Can distinguish common, insignificant abnormals from clinically important findings",
+        "3.3.7": "Discerns urgent from nonurgent results and responds correctly"
+      },
+      "question": "How would you describe the learner's interpretation of test results?"
+    },
+    {
+      "epa": "4",
+      "kf": "4.1",
+      "opt_count": 5,
+      "options": {
+        "4.1.1": "Does not know how to enter orders or prescriptions",
+        "4.1.2": "Does not follow established protocols for placing orders",
+        "4.1.3": "Orders/recommends excessive tests (shotgun)",
+        "4.1.4": "Completes simple orders",
+        "4.1.5": "Able to complete complex orders (e.g. tapers)"
+      },
+      "question": "How does the learner compose and enter orders?"
+    },
+    {
+      "epa": "4",
+      "kf": "4.2",
+      "opt_count": 5,
+      "options": {
+        "4.2.1": "Lacks basic knowledge needed to guide orders",
+        "4.2.2": "Unable to articulate rationale behind orders",
+        "4.2.3": "May not account for subtle signs or findings that guide orders",
+        "4.2.4": "Adjusts orders appropriately based on patient's condition, limitations, or preferences.",
+        "4.2.5": "Explains how test results will influence clincial decision making."
+      },
+      "question": "How does the learner tailor orders to the patient's clinical condition?"
+    },
+    {
+      "epa": "4",
+      "kf": "4.3",
+      "opt_count": 6,
+      "options": {
+        "4.3.1": "Fails to adjust doses when advised to do so",
+        "4.3.2": "Ignores alerts",
+        "4.3.3": "Underuses information that could help avoid errors (e.g. references, electronic pharmacopeia)",
+        "4.3.4": "Checks patient weight, age, renal function or other comorbidities that may affect doses or intervals.",
+        "4.3.5": "Uses resources to inform safe order writing (e.g. guidelines, drug-drug interactions)",
+        "4.3.6": "Responds to EHR safety alerts and understands rationale for them"
+      },
+      "question": "How does the learner recognize and prevent medication errors?"
+    },
+    {
+      "epa": "4",
+      "kf": "4.4",
+      "opt_count": 5,
+      "options": {
+        "4.4.1": "Orders conflict with patient/family health or cultural beliefs",
+        "4.4.2": "Places orders without communicating with patient or team",
+        "4.4.3": "No consideration of patient preferences",
+        "4.4.4": "Orders reflect patient preferences",
+        "4.4.5": "Orders reflect team input"
+      },
+      "question": "How would you describe the learner's communication with patients and the team around orders and prescriptions?"
+    },
+    {
+      "epa": "4",
+      "kf": "4.4",
+      "opt_count": 2,
+      "options": {
+        "4.4.6": "No consideration for cost of orders/prescriptions",
+        "4.4.7": "Orders reflect consideration for costs of orders"
+      },
+      "question": "How would you describe the learner's consideration of cost when discussing or placing orders and prescriptions?"
+    },
+    {
+      "epa": "5",
+      "kf": "5.1",
+      "opt_count": 6,
+      "options": {
+        "5.1.1": "Incoherent, unclear, incomplete or lacks relevance",
+        "5.1.2": "Templated without modifcation",
+        "5.1.3": "Misses key information",
+        "5.1.4": "Some excess or redundancy",
+        "5.1.5": "Adjusts documentation to audience, context or purpose",
+        "5.1.6": "Clear, cogent narrative"
+      },
+      "question": "How would you describe the learner's clinical documentation?"
+    },
+    {
+      "epa": "5",
+      "kf": "5.2",
+      "opt_count": 7,
+      "options": {
+        "5.2.1": "Copy-and-paste without verification or attribution",
+        "5.2.2": "Documentation is late",
+        "5.2.3": "Contains minor errors or unclear/prohibited abbreviations",
+        "5.2.4": "Legible and organized",
+        "5.2.5": "Documentation is timely",
+        "5.2.6": "Accurate",
+        "5.2.7": "Includes secondary sources of information (outside records, family members)"
+      },
+      "question": "How does the learner adhere to institutional and legal documentation standards?"
+    },
+    {
+      "epa": "5",
+      "kf": "5.3",
+      "opt_count": 9,
+      "options": {
+        "5.3.1": "Includes inappropriate terminology",
+        "5.3.2": "No documentation of problem list, differential or plan",
+        "5.3.3": "Can only interpret results based on normal values from the lab",
+        "5.3.4": "Cannot provide a rationale for proposed tests",
+        "5.3.5": "Interprets laboratory values accurately",
+        "5.3.6": "Provides rationale for proposed tests",
+        "5.3.7": "Documents a problem list, differential and plan",
+        "5.3.8": "Accurate and complete",
+        "5.3.9": "Includes patient preferences"
+      },
+      "question": "How does the learner document their clinical reasoning throughout the problem list, differential diagnosis, and management plan?"
+    },
+    {
+      "epa": "6",
+      "kf": "6.1",
+      "opt_count": 6,
+      "options": {
+        "6.1.1": "Fabricates information when unable to respond to questions",
+        "6.1.2": "Fails to verify information personally",
+        "6.1.3": "Does not obtain/report sensitive information (e.g. sexual history) when relevant",
+        "6.1.4": "Acknowledge gaps in presentation and seeks to fill them",
+        "6.1.5": "Complete",
+        "6.1.6": "Accurate"
+      },
+      "question": "How would you describe the learner's ability to present personally gathered information?"
+    },
+    {
+      "epa": "6",
+      "kf": "6.2",
+      "opt_count": 6,
+      "options": {
+        "6.2.1": "Incoherent, unclear, incomplete or lacks relevance",
+        "6.2.2": "Wandering, not concise",
+        "6.2.3": "Organized around a chief concern(s)",
+        "6.2.4": "Concise",
+        "6.2.5": "Pertinent",
+        "6.2.6": "Well synthesized"
+      },
+      "question": "How would you describe the learner's organization in the presentation?"
+    },
+    {
+      "epa": "6",
+      "kf": "6.3",
+      "opt_count": 4,
+      "options": {
+        "6.3.1": "Presents in a manner that frightens patient or family",
+        "6.3.2": "Templated",
+        "6.3.3": "Incomplete or exhaustive",
+        "6.3.4": "Adjusts length and complexity appropriately"
+      },
+      "question": "How would you describe the learner's ability to adjust the presentation style when needed? (e.g. bedside rounds vs calling a consult)"
+    },
+    {
+      "epa": "6",
+      "kf": "6.4",
+      "opt_count": 2,
+      "options": {
+        "6.4.1": "Disregards patient privacy",
+        "6.4.2": "Demonstrates situational awareness when discussing patients"
+      },
+      "question": "How would you describe the learner's attention to patient privacy during presentations?"
+    },
+    {
+      "epa": "7",
+      "kf": "7.1",
+      "opt_count": 4,
+      "options": {
+        "7.1.1": "Does not form clinical questions",
+        "7.1.2": "Cannot apply evidence to the specific patient care scenario",
+        "7.1.3": "Identifies gaps in personal knowledge",
+        "7.1.4": "Develops well-formed clinical questions"
+      },
+      "question": "How would you describe the learner's ability to form clinical questions?"
+    },
+    {
+      "epa": "7",
+      "kf": "7.2",
+      "opt_count": 5,
+      "options": {
+        "7.2.1": "Does not seek new information",
+        "7.2.2": "Search strategy is vague or inappropriate",
+        "7.2.3": "Amount of information is unmanagable",
+        "7.2.4": "Refined search strategy",
+        "7.2.5": "Efficiently able to locate relevant information"
+      },
+      "question": "How would you describe the learner's ability to acquire reliable medical information?"
+    },
+    {
+      "epa": "7",
+      "kf": "7.3",
+      "opt_count": 6,
+      "options": {
+        "7.3.1": "Cannot identify gaps or limitations in the evidence",
+        "7.3.2": "Cannot apply evidence to the specific patient care scenario",
+        "7.3.3": "Needs assistence",
+        "7.3.4": "Applies evidence to specific patient care scenarios",
+        "7.3.5": "Judges evidence quality",
+        "7.3.6": "Independent"
+      },
+      "question": "How would you describe the learner's ability to appraise information sources?"
+    },
+    {
+      "epa": "7",
+      "kf": "7.4",
+      "opt_count": 5,
+      "options": {
+        "7.4.1": "Cannot discuss findings",
+        "7.4.2": "Recitation of the findings without deeper understanding",
+        "7.4.3": "Acknowledges ambiguity of findings",
+        "7.4.4": "Manages personal bias",
+        "7.4.5": "Conveys the consistency of evidence"
+      },
+      "question": "How would you describe the learners ability to communicate findings?"
+    },
+    {
+      "epa": "8",
+      "kf": "8.1",
+      "opt_count": 8,
+      "options": {
+        "8.1.1": "Does not use standard format",
+        "8.1.2": "Information is incorrect",
+        "8.1.3": "Inconsistent",
+        "8.1.4": "Too detailed or too brief",
+        "8.1.5": "Applies a standard template",
+        "8.1.6": "Consistent",
+        "8.1.7": "Relevant",
+        "8.1.8": "Complete"
+      },
+      "question": "How would you describe the learner's ability to use electronic handover tools?"
+    },
+    {
+      "epa": "8",
+      "kf": "8.2",
+      "opt_count": 4,
+      "options": {
+        "8.2.1": "Frequently distracted",
+        "8.2.2": "Requires assistance with time management",
+        "8.2.3": "Avoids interuptions",
+        "8.2.4": "Manages time effectively"
+      },
+      "question": "How would you describe the learner's ability to manage the environment at turnover?"
+    },
+    {
+      "epa": "8",
+      "kf": "8.3",
+      "opt_count": 6,
+      "options": {
+        "8.3.1": "Lacks all key components of a standardized turnover (e.g. illness severity, action plans, contingency plans)",
+        "8.3.2": "Inconsistent",
+        "8.3.3": "Lacks clarity at times",
+        "8.3.4": "Consistent",
+        "8.3.5": "Relevant",
+        "8.3.6": "Complete"
+      },
+      "question": "How would you describe the learner's verbal turnover?"
+    },
+    {
+      "epa": "8",
+      "kf": "8.4",
+      "opt_count": 5,
+      "options": {
+        "8.4.1": "Does not summarize key points",
+        "8.4.2": "Inconsistent",
+        "8.4.3": "Asks clarifying questions",
+        "8.4.4": "Consistent",
+        "8.4.5": "Summarizes key points"
+      },
+      "question": "How would you describe the learner's ability to use closed loop communication?"
+    },
+    {
+      "epa": "8",
+      "kf": "8.5",
+      "opt_count": 2,
+      "options": {
+        "8.5.1": "Disregards patient privacy",
+        "8.5.2": "Demonstrates situational awareness when discussing patients"
+      },
+      "question": "How would you describe the learner's attention to patient privacy during turnover?"
+    },
+    {
+      "epa": "9",
+      "kf": "9.1",
+      "opt_count": 6,
+      "options": {
+        "9.1.1": "No initiative or insight to include other team members",
+        "9.1.2": "Acts independently of input from team",
+        "9.1.3": "Knows which team members to include in care",
+        "9.1.4": "Knows how to seek team member input/recommendations",
+        "9.1.5": "Effectively partners with other team members",
+        "9.1.6": "Understands unique contributions of other team members"
+      },
+      "question": "How would you describe the learner's ability to incorporate team members from other professions?"
+    },
+    {
+      "epa": "9",
+      "kf": "9.2",
+      "opt_count": 5,
+      "options": {
+        "9.2.1": "Dismissive",
+        "9.2.2": "Unidirectional",
+        "9.2.3": "Active listener",
+        "9.2.4": "Keeps team members informed",
+        "9.2.5": "Tailored communication"
+      },
+      "question": "How would you describe the learner's ability to communicate with team members?"
+    },
+    {
+      "epa": "9",
+      "kf": "9.3",
+      "opt_count": 4,
+      "options": {
+        "9.3.1": "Disrespectful",
+        "9.3.2": "Professional with team members",
+        "9.3.3": "Respectful",
+        "9.3.4": "Builds trusting relationships among team members"
+      },
+      "question": "How would you describes the learner's ability to promote a climate of mutual respect?"
+    },
+    {
+      "epa": "9",
+      "kf": "9.3",
+      "opt_count": 4,
+      "options": {
+        "9.3.5": "Prioritizes own goals above those of the team",
+        "9.3.6": "Passive member of the team",
+        "9.3.7": "Actively supports other team members",
+        "9.3.8": "Prioritizes team needs over personal needs"
+      },
+      "question": "How would you describe the learner's ability to support the team?"
+    },
+    {
+      "epa": "10",
+      "kf": "10.1",
+      "opt_count": 5,
+      "options": {
+        "10.1.1": "Fails to recognize patterns indicating decompensation",
+        "10.1.2": "Limited ability to gather and process information in a urgent/emergent setting",
+        "10.1.3": "Recognizes outliers and unexpected results",
+        "10.1.4": "Seeks out explanation for deviations",
+        "10.1.5": "Gathers and processes information in a urgent/emergent setting"
+      },
+      "question": "How would you describe the learner's ability to recognize abnormal trends or vital signs?"
+    },
+    {
+      "epa": "10",
+      "kf": "10.2",
+      "opt_count": 5,
+      "options": {
+        "10.2.1": "Fails to recognize the need for urgent/emergent care",
+        "10.2.2": "Distracted by multiple problems and struggles to prioritize",
+        "10.2.3": "Anticipates next steps",
+        "10.2.4": "Responds to early clinical signs",
+        "10.2.5": "Prioritizes patients needing immediate care"
+      },
+      "question": "How would you describe the learner's prioritization of urgent/emergent care?"
+    },
+    {
+      "epa": "10",
+      "kf": "10.2",
+      "opt_count": 3,
+      "options": {
+        "10.2.6": "Does not seek help in urgent/emergent setting",
+        "10.2.7": "Accepts help when struggling",
+        "10.2.8": "Asks for help from teammates"
+      },
+      "question": "How would you describe the learner's help-seeking behavior?"
+    },
+    {
+      "epa": "10",
+      "kf": "10.3",
+      "opt_count": 6,
+      "options": {
+        "10.3.1": "Detracts or harms the team's response",
+        "10.3.2": "Requires prompting",
+        "10.3.3": "Applies BLS skills",
+        "10.3.4": "Basic management plans",
+        "10.3.5": "Applies ACLS skills",
+        "10.3.6": "Monitors responses to initial interventions and responds accordingly"
+      },
+      "question": "How would you describe the learner's ability to participate in the code response?"
+    },
+    {
+      "epa": "10",
+      "kf": "10.4",
+      "opt_count": 6,
+      "options": {
+        "10.4.1": "Dismisses concerns from the team",
+        "10.4.2": "Disregards patient goals of care or code status",
+        "10.4.3": "Unidirectional communication",
+        "10.4.4": "Tailors communication",
+        "10.4.5": "Partners with team and patient/family in care planning",
+        "10.4.6": "Keeps team and patient/family up to date"
+      },
+      "question": "How would you describe the learner's communication in the urgent/emergent setting?"
+    },
+    {
+      "epa": "11",
+      "kf": "11.1",
+      "opt_count": 5,
+      "options": {
+        "11.1.1": "Lack basic knowledge of the intervention",
+        "11.1.2": "Inaccurate or misleading",
+        "11.1.3": "Lacks specificity",
+        "11.1.4": "Complete and accurate",
+        "11.1.5": "Explains the key elements of informed consent"
+      },
+      "question": "How would you describe the learner's knowledge of the key elements of informed consent? (indications, contraindications, risks, benefits, alternatives, possible complications)"
+    },
+    {
+      "epa": "11",
+      "kf": "11.2",
+      "opt_count": 7,
+      "options": {
+        "11.2.1": "Uses frightening language",
+        "11.2.2": "Uses medical jargon",
+        "11.2.3": "Does not attend to emotional cues",
+        "11.2.4": "Responds to emotional cues",
+        "11.2.5": "Uses interpreter when needed",
+        "11.2.6": "Avoids jargon",
+        "11.2.7": "Shared decision making"
+      },
+      "question": "How would you describe the learner's communication with patient or family around informed consent?"
+    },
+    {
+      "epa": "11",
+      "kf": "11.3",
+      "opt_count": 2,
+      "options": {
+        "11.3.1": false,
+        "11.3.2": true
+      },
+      "question": "Was the learner able to keep the patient/family at ease?"
+    },
+    {
+      "epa": "11",
+      "kf": "11.3",
+      "opt_count": 3,
+      "options": {
+        "11.3.3": "Overconfident",
+        "11.3.4": "Appropriate",
+        "11.3.5": "Lack of confidence"
+      },
+      "question": "How would you describe the learner's confidence as compared to their level of skill?"
+    },
+    {
+      "epa": "12",
+      "kf": "12.1",
+      "opt_count": 5,
+      "options": {
+        "12.1.1": "Lacks required skills",
+        "12.1.2": "Inconsistent",
+        "12.1.3": "Struggles to adapt approach",
+        "12.1.4": "Able to prepare procedure",
+        "12.1.5": "Completes procedure correctly"
+      },
+      "question": "How would you describe the learner's technical skills?"
+    },
+    {
+      "epa": "12",
+      "kf": "12.1",
+      "opt_count": 2,
+      "options": {
+        "12.2.6": "Inconsistent with aseptic technique",
+        "12.2.7": "Consistently attentive to aseptic technique"
+      },
+      "question": "How would you describe the learner's attention to aseptic technique?"
+    },
+    {
+      "epa": "12",
+      "kf": "12.2",
+      "opt_count": 4,
+      "options": {
+        "12.2.1": "Lack basic knowledge of the procedure",
+        "12.2.2": "Has a general command of the procedure",
+        "12.2.3": "Complete and accurate understanding of the procedure",
+        "12.2.4": "Able to take steps to mitigate complications"
+      },
+      "question": "How would you describe the learner's knowledge of the key elements of the procedure? (anatomy, physiology, indications, contraindications, risks, benefits, alternatives, possible complications)"
+    },
+    {
+      "epa": "12",
+      "kf": "12.3",
+      "opt_count": 6,
+      "options": {
+        "12.3.1": "Inaccurate or unclear communication",
+        "12.3.2": "Use jargon",
+        "12.3.3": "Does not attend to emotional cues",
+        "12.3.4": "Responds to emotional cues",
+        "12.3.5": "Avoids jargon",
+        "12.3.6": "Shared decision making"
+      },
+      "question": "How would you describe the learner's communication with patient or family before, during and/or after the procedure?"
+    },
+    {
+      "epa": "12",
+      "kf": "12.4",
+      "opt_count": 2,
+      "options": {
+        "12.4.1": false,
+        "12.4.2": true
+      },
+      "question": "Was the learner able to keep the patient/family/team at ease?"
+    },
+    {
+      "epa": "12",
+      "kf": "12.4",
+      "opt_count": 3,
+      "options": {
+        "12.4.3": "Overconfident",
+        "12.4.4": "Appropriate",
+        "12.4.5": "Lack of confidence"
+      },
+      "question": "How would you describe the learner's confidence as compared to their level of skill?"
+    },
+    {
+      "epa": "13",
+      "kf": "13.1",
+      "opt_count": 6,
+      "options": {
+        "13.1.1": "Disrespectful",
+        "13.1.2": "Misleading",
+        "13.1.3": "Superficial understanding",
+        "13.1.4": "Describes key elements",
+        "13.1.5": "Timely",
+        "13.1.6": "Uses existing system reporting structures"
+      },
+      "question": "How would you describe the learner's ability to identify real and potential errors?"
+    },
+    {
+      "epa": "13",
+      "kf": "13.2",
+      "opt_count": 5,
+      "options": {
+        "13.2.1": "Frustrated with system improvement efforts",
+        "13.2.2": "Passive participation",
+        "13.2.3": "Relies on others to identify system failures",
+        "13.2.4": "Actively engaged",
+        "13.2.5": "Finds solutions"
+      },
+      "question": "How would you describe the learner's participation in system improvement activities?"
+    },
+    {
+      "epa": "13",
+      "kf": "13.3",
+      "opt_count": 4,
+      "options": {
+        "13.3.1": "Places self or others at risk",
+        "13.3.2": "Requires prompting",
+        "13.3.3": "Demonstrates safety behaviors",
+        "13.3.4": "Rare lapses"
+      },
+      "question": "How would you describe the learner's daily safety habits? (e.g. hand washing, isolation protocols, accurate/timely documentation, patient education, handling of sharps)"
+    },
+    {
+      "epa": "13",
+      "kf": "13.4",
+      "opt_count": 10,
+      "options": {
+        "13.4.1": "Avoid discussing errors",
+        "13.4.2": "Defensive",
+        "13.4.3": "Covers up mistakes",
+        "13.4.4": "Shifts blame",
+        "13.4.5": "Needs prompting",
+        "13.4.6": "Needs help developing an improvement plan",
+        "13.4.7": "Takes responsibility for errors",
+        "13.4.8": "Recognizes causes of lapses (e.g. fatigue)",
+        "13.4.9": "Seeks help",
+        "13.4.10": "Modifies behaviors"
+      },
+      "question": "How would you describe the learner's ability to identify their own errors and make corrections?"
+    }
+  ]
+}
