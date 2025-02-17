@@ -9,5 +9,8 @@ export async function insert(tablename: string, payload: object) {
 
   if (error) {
     console.log(error);
+    return false;
   }
+
+  return true;
 }

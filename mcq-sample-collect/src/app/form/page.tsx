@@ -16,15 +16,17 @@ import SubmitButtons from './submit-buttons';
 
 export default function Form() {
   const [userID, setUserID] = useState<string | null>(null);
+
   const [loading, setLoading] = useState<boolean>(true);
+  const [formData, setFormData] = useState<EPADataYAML | undefined>(undefined);
+
   const [question, setQuestion] = useState<MCQ | undefined>(undefined);
   const [choices, setChoices] = useState<{ [key: string]: boolean }>({});
   const [devLevel, setDevLevel] = useState<DevLevel>('none');
-  const [formData, setFormData] = useState<EPADataYAML | undefined>(undefined);
 
   useEffect(() => {
     const getUserId = async (): Promise<string | null> => {
-      const supabase = await createClient();
+      const supabase = createClient({ db: { schema: 'trainingdata' } });
       const { data, error } = await supabase.auth.getUser();
       if (error || !data?.user) return null;
       return data.user.id;
@@ -62,21 +64,22 @@ export default function Form() {
     };
   }, [formData, question]);
 
-  const submit = () => {
+  const submit = async () => {
     if (!question) return;
     if (Object.keys(choices).length === 0) return;
     if (!userID) return;
 
     const tableName = 'mcq_kf' + question.kf.replace(/\./g, '_');
 
-    const payload = {
+    const row = {
+      user_id: userID,
+      created_at: new Date().toISOString(),
       ...Object.keys(choices).reduce((o, k) => ({ ...o, ['c' + k.replace(/\./g, '_')]: choices[k] }), {}),
       dev_level: getDevLevelInt(devLevel),
-      user_id: userID,
     };
 
-    console.log(tableName, payload);
-    insert(tableName, payload);
+    const success = insert(tableName, row);
+    if (await success) getNewQuestion();
   };
 
   return (
