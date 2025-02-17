@@ -1,8 +1,11 @@
-import Content from './content';
-import {FormDataYAML} from '@/data/types';
 import fs from 'fs';
 import path from 'path';
+
 import yaml from 'js-yaml';
+
+import { FormDataYAML } from '@/data/types';
+
+import Content from './content';
 
 export default function Home() {
   const filePath = path.join(process.cwd(), 'src/data/form-data.yaml');
