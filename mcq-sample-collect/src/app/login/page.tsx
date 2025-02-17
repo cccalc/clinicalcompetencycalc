@@ -12,6 +12,8 @@ export default function Login() {
   const [passwordValidationClass, setPasswordValidationClass] = useState<string>('');
 
   const validate = (e: SyntheticEvent, f: (formData: FormData) => Promise<void>) => {
+    console.log(f.name);
+
     let valid = true;
 
     const form = (e.target as HTMLButtonElement).form as HTMLFormElement;
@@ -84,10 +86,10 @@ export default function Login() {
           <div className='invalid-feedback'>Password must be at least 8 characters long.</div>
         </div>
         <div className='d-flex justify-content-end gap-2 pt-5'>
-          <button className='btn btn-outline-secondary' id='signup' onClick={(e) => validate(e, signup)}>
+          <button id='signup' className='btn btn-outline-secondary' type='button' onClick={(e) => validate(e, signup)}>
             Sign Up
           </button>
-          <button className='btn btn-primary' id='login' onClick={(e) => validate(e, login)}>
+          <button id='login' className='btn btn-primary' type='submit' onClick={(e) => validate(e, login)}>
             Login
           </button>
         </div>

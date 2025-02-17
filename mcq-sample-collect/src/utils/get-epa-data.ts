@@ -1,22 +1,19 @@
 'use server';
 
-import { EPADataYAML } from './types';
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
+import { EPAData } from './types';
 
 /**
- * Reads EPA data from a YAML file asynchronously.
- * @returns Parsed data from `form-data.yaml` in type `EPADataYAML`. If an error occurs, returns `undefined`.
+ * Reads EPA data from Supabase storage API.
+ * @returns Parsed data from `form-data.json` in type `EPAData`. If an error occurs, returns `undefined`.
  */
-export async function getFormData(): Promise<EPADataYAML | undefined> {
-  const filePath = path.join(process.cwd(), 'src/utils/epa-questions.yaml');
-  try {
-    const data = await fs.promises.readFile(filePath, { encoding: 'utf8' });
-    const formData = yaml.load(data) as EPADataYAML;
-    return formData;
-  } catch (err) {
-    console.error(err);
+export async function getEPAData(): Promise<EPAData | undefined> {
+  const response = await fetch(
+    'https://speeohoyelvckretnfao.supabase.co/storage/v1/object/public/epa-questions/epa-questions.json'
+  );
+  if (!response.ok) {
+    console.error('Failed to fetch EPA data:', response.statusText);
     return undefined;
   }
+  const data = (await response.json()) as EPAData;
+  return data;
 }
