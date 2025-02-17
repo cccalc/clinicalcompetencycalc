@@ -1,4 +1,4 @@
-export type FormDataYAML = {
+export type EPADataYAML = {
   epa_desc: {[key: string]: string};
   kf_desc: {[key: string]: string};
   mcq: MCQ[];
@@ -12,4 +12,9 @@ export type MCQ = {
   question: string;
 };
 
-export type DevLevel = 'none' | 'remedial' | 'early-developing' | 'developing' | 'entrustable';
+export type DevLevel =
+  | 'none'
+  | 'remedial'
+  | 'early-developing'
+  | 'developing'
+  | 'entrustable';

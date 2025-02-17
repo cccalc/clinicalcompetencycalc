@@ -1,9 +1,9 @@
-import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './footer_svgs';
+import {DevelopingIcon, EarlyDevelopingIcon, EntrustableIcon, RemedialIcon} from './button-svgs';
 import React, {Dispatch, SetStateAction, SyntheticEvent} from 'react';
 
-import {DevLevel} from './content';
+import {DevLevel} from '@/utils/types';
 
-export default function Footer({
+export default function SubmitButtons({
   skip,
   devLevel,
 }: {
@@ -11,11 +11,12 @@ export default function Footer({
   devLevel: {set: Dispatch<SetStateAction<DevLevel>>; val: DevLevel};
 }) {
   const size = '2.5em';
-  const buttons: {text: string; value: string; color: string; icon: React.JSX.Element}[] = [
-    {text: 'Rem', value: 'rem', color: 'danger', icon: <RemedialIcon size={size} />},
-    {text: 'E Dev', value: 'edv', color: 'warning', icon: <EarlyDevelopingIcon size={size} />},
-    {text: 'Dev', value: 'dev', color: 'info', icon: <DevelopingIcon size={size} />},
-    {text: 'Ent', value: 'ent', color: 'success', icon: <EntrustableIcon size={size} />},
+  // prettier-ignore
+  const buttons: {text: string; value: DevLevel; color: string; icon: React.JSX.Element}[] = [
+    {text: 'Rem',   value: 'remedial',         color: 'danger',  icon: <RemedialIcon        size={size} />},
+    {text: 'E Dev', value: 'early-developing', color: 'warning', icon: <EarlyDevelopingIcon size={size} />},
+    {text: 'Dev',   value: 'developing',       color: 'info',    icon: <DevelopingIcon      size={size} />},
+    {text: 'Ent',   value: 'entrustable',      color: 'success', icon: <EntrustableIcon     size={size} />},
   ];
 
   const handleInput = (e: SyntheticEvent) => {
@@ -68,12 +69,12 @@ export default function Footer({
         <div className='row'>
           <div className='col d-grid'>
             <button type='button' className='btn btn-secondary mt-3' onClick={handleSkip}>
-              Skip
+              Skip<i className='bi bi-ban ms-2'></i>
             </button>
           </div>
           <div className='col d-grid'>
             <button type='button' className='btn btn-primary mt-3'>
-              Submit
+              Submit<i className='bi bi-send ms-2'></i>
             </button>
           </div>
         </div>
