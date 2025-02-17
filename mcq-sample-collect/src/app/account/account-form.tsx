@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 // ...
 
 export default function AccountForm({ user }: { user: User | null }) {
-  const supabase = createClient();
+  const supabase = createClient({ db: { schema: 'public' } });
   const [loading, setLoading] = useState(true);
   const [displayname, setDisplayname] = useState<string | null>(null);
 
