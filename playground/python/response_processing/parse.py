@@ -8,6 +8,20 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint)
 
 
 def parse_sentences_t5(sentences):
+  """
+  This Python function takes a list of sentences, tokenizes them using a
+  tokenizer, generates simpler sentences using a model, and returns the simplified
+  sentences as a string separated by newlines.
+
+  :param sentences: The `parse_sentences_t5` function takes a string of sentences
+  as input, tokenizes the sentences using a tokenizer, generates simpler versions
+  of the sentences using a T5 model, and then returns the simplified sentences as
+  a single string separated by double newline characters
+  :return: The function `parse_sentences_t5` takes a string of sentences as input,
+  tokenizes the sentences using a T5 model, generates simplified versions of the
+  sentences, and returns the simplified sentences as a single string separated by
+  newline characters ("\n\n").
+  """
   complex_sentences = sent_tokenize(sentences)
 
   encoder_max_length = 256
