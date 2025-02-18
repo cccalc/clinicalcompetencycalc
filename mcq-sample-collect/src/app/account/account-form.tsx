@@ -48,7 +48,7 @@ export default function AccountForm({ user }: { user: User | null }) {
     try {
       setUpdating(true);
 
-      const { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.schema('public').from('profiles').upsert({
         id: user?.id,
         display_name: displayname,
         updated_at: new Date().toISOString(),
