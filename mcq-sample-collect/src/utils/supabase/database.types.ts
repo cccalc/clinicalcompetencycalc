@@ -7,6 +7,111 @@ export type Json =
   | Json[]
 
 export type Database = {
+  public: {
+    Tables: {
+      epa_kf_descriptions: {
+        Row: {
+          epa_descriptions: Json | null
+          id: number
+          kf_descriptions: Json | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          epa_descriptions?: Json | null
+          id?: number
+          kf_descriptions?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          epa_descriptions?: Json | null
+          id?: number
+          kf_descriptions?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      mcqs_options: {
+        Row: {
+          data: Json | null
+          id: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          data?: Json | null
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          data?: Json | null
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          display_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          display_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      roles: {
+        Row: {
+          assigned_at: string
+          id: number
+          role: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          id?: number
+          role: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          id?: number
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      custom_access_token_hook: {
+        Args: {
+          event: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   trainingdata: {
     Tables: {
       mcq_kf1_1: {
@@ -21,7 +126,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c1_1_1?: boolean | null
@@ -34,7 +139,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c1_1_1?: boolean | null
@@ -47,7 +152,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -64,7 +169,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c1_2_1?: boolean | null
@@ -78,7 +183,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c1_2_1?: boolean | null
@@ -92,7 +197,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -106,7 +211,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c1_3_1?: boolean | null
@@ -117,7 +222,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c1_3_1?: boolean | null
@@ -128,7 +233,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -146,7 +251,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c1_4_1?: boolean | null
@@ -161,7 +266,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c1_4_1?: boolean | null
@@ -176,7 +281,589 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf10_1: {
+        Row: {
+          c10_1_1: boolean | null
+          c10_1_2: boolean | null
+          c10_1_3: boolean | null
+          c10_1_4: boolean | null
+          c10_1_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c10_1_1?: boolean | null
+          c10_1_2?: boolean | null
+          c10_1_3?: boolean | null
+          c10_1_4?: boolean | null
+          c10_1_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c10_1_1?: boolean | null
+          c10_1_2?: boolean | null
+          c10_1_3?: boolean | null
+          c10_1_4?: boolean | null
+          c10_1_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf10_2: {
+        Row: {
+          c10_2_1: boolean | null
+          c10_2_2: boolean | null
+          c10_2_3: boolean | null
+          c10_2_4: boolean | null
+          c10_2_5: boolean | null
+          c10_2_6: boolean | null
+          c10_2_7: boolean | null
+          c10_2_8: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c10_2_1?: boolean | null
+          c10_2_2?: boolean | null
+          c10_2_3?: boolean | null
+          c10_2_4?: boolean | null
+          c10_2_5?: boolean | null
+          c10_2_6?: boolean | null
+          c10_2_7?: boolean | null
+          c10_2_8?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c10_2_1?: boolean | null
+          c10_2_2?: boolean | null
+          c10_2_3?: boolean | null
+          c10_2_4?: boolean | null
+          c10_2_5?: boolean | null
+          c10_2_6?: boolean | null
+          c10_2_7?: boolean | null
+          c10_2_8?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf10_3: {
+        Row: {
+          c10_3_1: boolean | null
+          c10_3_2: boolean | null
+          c10_3_3: boolean | null
+          c10_3_4: boolean | null
+          c10_3_5: boolean | null
+          c10_3_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c10_3_1?: boolean | null
+          c10_3_2?: boolean | null
+          c10_3_3?: boolean | null
+          c10_3_4?: boolean | null
+          c10_3_5?: boolean | null
+          c10_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c10_3_1?: boolean | null
+          c10_3_2?: boolean | null
+          c10_3_3?: boolean | null
+          c10_3_4?: boolean | null
+          c10_3_5?: boolean | null
+          c10_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf10_4: {
+        Row: {
+          c10_4_1: boolean | null
+          c10_4_2: boolean | null
+          c10_4_3: boolean | null
+          c10_4_4: boolean | null
+          c10_4_5: boolean | null
+          c10_4_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c10_4_1?: boolean | null
+          c10_4_2?: boolean | null
+          c10_4_3?: boolean | null
+          c10_4_4?: boolean | null
+          c10_4_5?: boolean | null
+          c10_4_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c10_4_1?: boolean | null
+          c10_4_2?: boolean | null
+          c10_4_3?: boolean | null
+          c10_4_4?: boolean | null
+          c10_4_5?: boolean | null
+          c10_4_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf11_1: {
+        Row: {
+          c11_1_1: boolean | null
+          c11_1_2: boolean | null
+          c11_1_3: boolean | null
+          c11_1_4: boolean | null
+          c11_1_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c11_1_1?: boolean | null
+          c11_1_2?: boolean | null
+          c11_1_3?: boolean | null
+          c11_1_4?: boolean | null
+          c11_1_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c11_1_1?: boolean | null
+          c11_1_2?: boolean | null
+          c11_1_3?: boolean | null
+          c11_1_4?: boolean | null
+          c11_1_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf11_2: {
+        Row: {
+          c11_2_1: boolean | null
+          c11_2_2: boolean | null
+          c11_2_3: boolean | null
+          c11_2_4: boolean | null
+          c11_2_5: boolean | null
+          c11_2_6: boolean | null
+          c11_2_7: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c11_2_1?: boolean | null
+          c11_2_2?: boolean | null
+          c11_2_3?: boolean | null
+          c11_2_4?: boolean | null
+          c11_2_5?: boolean | null
+          c11_2_6?: boolean | null
+          c11_2_7?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c11_2_1?: boolean | null
+          c11_2_2?: boolean | null
+          c11_2_3?: boolean | null
+          c11_2_4?: boolean | null
+          c11_2_5?: boolean | null
+          c11_2_6?: boolean | null
+          c11_2_7?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf11_3: {
+        Row: {
+          c11_3_1: boolean | null
+          c11_3_2: boolean | null
+          c11_3_3: boolean | null
+          c11_3_4: boolean | null
+          c11_3_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c11_3_1?: boolean | null
+          c11_3_2?: boolean | null
+          c11_3_3?: boolean | null
+          c11_3_4?: boolean | null
+          c11_3_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c11_3_1?: boolean | null
+          c11_3_2?: boolean | null
+          c11_3_3?: boolean | null
+          c11_3_4?: boolean | null
+          c11_3_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf12_1: {
+        Row: {
+          c12_1_1: boolean | null
+          c12_1_2: boolean | null
+          c12_1_3: boolean | null
+          c12_1_4: boolean | null
+          c12_1_5: boolean | null
+          c12_2_6: boolean | null
+          c12_2_7: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c12_1_1?: boolean | null
+          c12_1_2?: boolean | null
+          c12_1_3?: boolean | null
+          c12_1_4?: boolean | null
+          c12_1_5?: boolean | null
+          c12_2_6?: boolean | null
+          c12_2_7?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c12_1_1?: boolean | null
+          c12_1_2?: boolean | null
+          c12_1_3?: boolean | null
+          c12_1_4?: boolean | null
+          c12_1_5?: boolean | null
+          c12_2_6?: boolean | null
+          c12_2_7?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf12_2: {
+        Row: {
+          c12_2_1: boolean | null
+          c12_2_2: boolean | null
+          c12_2_3: boolean | null
+          c12_2_4: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c12_2_1?: boolean | null
+          c12_2_2?: boolean | null
+          c12_2_3?: boolean | null
+          c12_2_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c12_2_1?: boolean | null
+          c12_2_2?: boolean | null
+          c12_2_3?: boolean | null
+          c12_2_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf12_3: {
+        Row: {
+          c12_3_1: boolean | null
+          c12_3_2: boolean | null
+          c12_3_3: boolean | null
+          c12_3_4: boolean | null
+          c12_3_5: boolean | null
+          c12_3_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c12_3_1?: boolean | null
+          c12_3_2?: boolean | null
+          c12_3_3?: boolean | null
+          c12_3_4?: boolean | null
+          c12_3_5?: boolean | null
+          c12_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c12_3_1?: boolean | null
+          c12_3_2?: boolean | null
+          c12_3_3?: boolean | null
+          c12_3_4?: boolean | null
+          c12_3_5?: boolean | null
+          c12_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf12_4: {
+        Row: {
+          c12_4_1: boolean | null
+          c12_4_2: boolean | null
+          c12_4_3: boolean | null
+          c12_4_4: boolean | null
+          c12_4_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c12_4_1?: boolean | null
+          c12_4_2?: boolean | null
+          c12_4_3?: boolean | null
+          c12_4_4?: boolean | null
+          c12_4_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c12_4_1?: boolean | null
+          c12_4_2?: boolean | null
+          c12_4_3?: boolean | null
+          c12_4_4?: boolean | null
+          c12_4_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf13_1: {
+        Row: {
+          c13_1_1: boolean | null
+          c13_1_2: boolean | null
+          c13_1_3: boolean | null
+          c13_1_4: boolean | null
+          c13_1_5: boolean | null
+          c13_1_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c13_1_1?: boolean | null
+          c13_1_2?: boolean | null
+          c13_1_3?: boolean | null
+          c13_1_4?: boolean | null
+          c13_1_5?: boolean | null
+          c13_1_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c13_1_1?: boolean | null
+          c13_1_2?: boolean | null
+          c13_1_3?: boolean | null
+          c13_1_4?: boolean | null
+          c13_1_5?: boolean | null
+          c13_1_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf13_2: {
+        Row: {
+          c13_2_1: boolean | null
+          c13_2_2: boolean | null
+          c13_2_3: boolean | null
+          c13_2_4: boolean | null
+          c13_2_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c13_2_1?: boolean | null
+          c13_2_2?: boolean | null
+          c13_2_3?: boolean | null
+          c13_2_4?: boolean | null
+          c13_2_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c13_2_1?: boolean | null
+          c13_2_2?: boolean | null
+          c13_2_3?: boolean | null
+          c13_2_4?: boolean | null
+          c13_2_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf13_3: {
+        Row: {
+          c13_3_1: boolean | null
+          c13_3_2: boolean | null
+          c13_3_3: boolean | null
+          c13_3_4: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c13_3_1?: boolean | null
+          c13_3_2?: boolean | null
+          c13_3_3?: boolean | null
+          c13_3_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c13_3_1?: boolean | null
+          c13_3_2?: boolean | null
+          c13_3_3?: boolean | null
+          c13_3_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf13_4: {
+        Row: {
+          c13_4_1: boolean | null
+          c13_4_10: boolean | null
+          c13_4_2: boolean | null
+          c13_4_3: boolean | null
+          c13_4_4: boolean | null
+          c13_4_5: boolean | null
+          c13_4_6: boolean | null
+          c13_4_7: boolean | null
+          c13_4_8: boolean | null
+          c13_4_9: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c13_4_1?: boolean | null
+          c13_4_10?: boolean | null
+          c13_4_2?: boolean | null
+          c13_4_3?: boolean | null
+          c13_4_4?: boolean | null
+          c13_4_5?: boolean | null
+          c13_4_6?: boolean | null
+          c13_4_7?: boolean | null
+          c13_4_8?: boolean | null
+          c13_4_9?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c13_4_1?: boolean | null
+          c13_4_10?: boolean | null
+          c13_4_2?: boolean | null
+          c13_4_3?: boolean | null
+          c13_4_4?: boolean | null
+          c13_4_5?: boolean | null
+          c13_4_6?: boolean | null
+          c13_4_7?: boolean | null
+          c13_4_8?: boolean | null
+          c13_4_9?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -190,7 +877,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c2_1_1?: boolean | null
@@ -201,7 +888,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c2_1_1?: boolean | null
@@ -212,7 +899,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -226,7 +913,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c2_2_1?: boolean | null
@@ -237,7 +924,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c2_2_1?: boolean | null
@@ -248,7 +935,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -262,7 +949,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c2_3_1?: boolean | null
@@ -273,7 +960,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c2_3_1?: boolean | null
@@ -284,7 +971,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -298,7 +985,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c3_1_1?: boolean | null
@@ -309,7 +996,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c3_1_1?: boolean | null
@@ -320,7 +1007,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -335,7 +1022,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c3_2_1?: boolean | null
@@ -347,7 +1034,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c3_2_1?: boolean | null
@@ -359,7 +1046,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -375,7 +1062,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c3_3_1?: boolean | null
@@ -388,7 +1075,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c3_3_1?: boolean | null
@@ -401,7 +1088,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -415,7 +1102,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c4_1_1?: boolean | null
@@ -426,7 +1113,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c4_1_1?: boolean | null
@@ -437,7 +1124,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -451,7 +1138,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c4_2_1?: boolean | null
@@ -462,7 +1149,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c4_2_1?: boolean | null
@@ -473,7 +1160,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -488,7 +1175,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c4_3_1?: boolean | null
@@ -500,7 +1187,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c4_3_1?: boolean | null
@@ -512,7 +1199,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -528,7 +1215,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c4_4_1?: boolean | null
@@ -541,7 +1228,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c4_4_1?: boolean | null
@@ -554,7 +1241,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -569,7 +1256,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c5_1_1?: boolean | null
@@ -581,7 +1268,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c5_1_1?: boolean | null
@@ -593,7 +1280,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -609,7 +1296,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c5_2_1?: boolean | null
@@ -622,7 +1309,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c5_2_1?: boolean | null
@@ -635,7 +1322,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -653,7 +1340,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c5_3_1?: boolean | null
@@ -668,7 +1355,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c5_3_1?: boolean | null
@@ -683,7 +1370,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -698,7 +1385,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c6_1_1?: boolean | null
@@ -710,7 +1397,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c6_1_1?: boolean | null
@@ -722,7 +1409,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -737,7 +1424,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c6_2_1?: boolean | null
@@ -749,7 +1436,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c6_2_1?: boolean | null
@@ -761,7 +1448,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -774,7 +1461,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c6_3_1?: boolean | null
@@ -784,7 +1471,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c6_3_1?: boolean | null
@@ -794,7 +1481,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -805,7 +1492,7 @@ export type Database = {
           created_at: string | null
           dev_level: number | null
           id: number
-          submitted_by: string | null
+          user_id: string | null
         }
         Insert: {
           c6_4_1?: boolean | null
@@ -813,7 +1500,7 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
         }
         Update: {
           c6_4_1?: boolean | null
@@ -821,7 +1508,451 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
-          submitted_by?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf7_1: {
+        Row: {
+          c7_1_1: boolean | null
+          c7_1_2: boolean | null
+          c7_1_3: boolean | null
+          c7_1_4: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c7_1_1?: boolean | null
+          c7_1_2?: boolean | null
+          c7_1_3?: boolean | null
+          c7_1_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c7_1_1?: boolean | null
+          c7_1_2?: boolean | null
+          c7_1_3?: boolean | null
+          c7_1_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf7_2: {
+        Row: {
+          c7_2_1: boolean | null
+          c7_2_2: boolean | null
+          c7_2_3: boolean | null
+          c7_2_4: boolean | null
+          c7_2_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c7_2_1?: boolean | null
+          c7_2_2?: boolean | null
+          c7_2_3?: boolean | null
+          c7_2_4?: boolean | null
+          c7_2_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c7_2_1?: boolean | null
+          c7_2_2?: boolean | null
+          c7_2_3?: boolean | null
+          c7_2_4?: boolean | null
+          c7_2_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf7_3: {
+        Row: {
+          c7_3_1: boolean | null
+          c7_3_2: boolean | null
+          c7_3_3: boolean | null
+          c7_3_4: boolean | null
+          c7_3_5: boolean | null
+          c7_3_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c7_3_1?: boolean | null
+          c7_3_2?: boolean | null
+          c7_3_3?: boolean | null
+          c7_3_4?: boolean | null
+          c7_3_5?: boolean | null
+          c7_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c7_3_1?: boolean | null
+          c7_3_2?: boolean | null
+          c7_3_3?: boolean | null
+          c7_3_4?: boolean | null
+          c7_3_5?: boolean | null
+          c7_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf7_4: {
+        Row: {
+          c7_4_1: boolean | null
+          c7_4_2: boolean | null
+          c7_4_3: boolean | null
+          c7_4_4: boolean | null
+          c7_4_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c7_4_1?: boolean | null
+          c7_4_2?: boolean | null
+          c7_4_3?: boolean | null
+          c7_4_4?: boolean | null
+          c7_4_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c7_4_1?: boolean | null
+          c7_4_2?: boolean | null
+          c7_4_3?: boolean | null
+          c7_4_4?: boolean | null
+          c7_4_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf8_1: {
+        Row: {
+          c8_1_1: boolean | null
+          c8_1_2: boolean | null
+          c8_1_3: boolean | null
+          c8_1_4: boolean | null
+          c8_1_5: boolean | null
+          c8_1_6: boolean | null
+          c8_1_7: boolean | null
+          c8_1_8: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c8_1_1?: boolean | null
+          c8_1_2?: boolean | null
+          c8_1_3?: boolean | null
+          c8_1_4?: boolean | null
+          c8_1_5?: boolean | null
+          c8_1_6?: boolean | null
+          c8_1_7?: boolean | null
+          c8_1_8?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c8_1_1?: boolean | null
+          c8_1_2?: boolean | null
+          c8_1_3?: boolean | null
+          c8_1_4?: boolean | null
+          c8_1_5?: boolean | null
+          c8_1_6?: boolean | null
+          c8_1_7?: boolean | null
+          c8_1_8?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf8_2: {
+        Row: {
+          c8_2_1: boolean | null
+          c8_2_2: boolean | null
+          c8_2_3: boolean | null
+          c8_2_4: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c8_2_1?: boolean | null
+          c8_2_2?: boolean | null
+          c8_2_3?: boolean | null
+          c8_2_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c8_2_1?: boolean | null
+          c8_2_2?: boolean | null
+          c8_2_3?: boolean | null
+          c8_2_4?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf8_3: {
+        Row: {
+          c8_3_1: boolean | null
+          c8_3_2: boolean | null
+          c8_3_3: boolean | null
+          c8_3_4: boolean | null
+          c8_3_5: boolean | null
+          c8_3_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c8_3_1?: boolean | null
+          c8_3_2?: boolean | null
+          c8_3_3?: boolean | null
+          c8_3_4?: boolean | null
+          c8_3_5?: boolean | null
+          c8_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c8_3_1?: boolean | null
+          c8_3_2?: boolean | null
+          c8_3_3?: boolean | null
+          c8_3_4?: boolean | null
+          c8_3_5?: boolean | null
+          c8_3_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf8_4: {
+        Row: {
+          c8_4_1: boolean | null
+          c8_4_2: boolean | null
+          c8_4_3: boolean | null
+          c8_4_4: boolean | null
+          c8_4_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c8_4_1?: boolean | null
+          c8_4_2?: boolean | null
+          c8_4_3?: boolean | null
+          c8_4_4?: boolean | null
+          c8_4_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c8_4_1?: boolean | null
+          c8_4_2?: boolean | null
+          c8_4_3?: boolean | null
+          c8_4_4?: boolean | null
+          c8_4_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf8_5: {
+        Row: {
+          c8_5_1: boolean | null
+          c8_5_2: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c8_5_1?: boolean | null
+          c8_5_2?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c8_5_1?: boolean | null
+          c8_5_2?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf9_1: {
+        Row: {
+          c9_1_1: boolean | null
+          c9_1_2: boolean | null
+          c9_1_3: boolean | null
+          c9_1_4: boolean | null
+          c9_1_5: boolean | null
+          c9_1_6: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c9_1_1?: boolean | null
+          c9_1_2?: boolean | null
+          c9_1_3?: boolean | null
+          c9_1_4?: boolean | null
+          c9_1_5?: boolean | null
+          c9_1_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c9_1_1?: boolean | null
+          c9_1_2?: boolean | null
+          c9_1_3?: boolean | null
+          c9_1_4?: boolean | null
+          c9_1_5?: boolean | null
+          c9_1_6?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf9_2: {
+        Row: {
+          c9_2_1: boolean | null
+          c9_2_2: boolean | null
+          c9_2_3: boolean | null
+          c9_2_4: boolean | null
+          c9_2_5: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c9_2_1?: boolean | null
+          c9_2_2?: boolean | null
+          c9_2_3?: boolean | null
+          c9_2_4?: boolean | null
+          c9_2_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c9_2_1?: boolean | null
+          c9_2_2?: boolean | null
+          c9_2_3?: boolean | null
+          c9_2_4?: boolean | null
+          c9_2_5?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mcq_kf9_3: {
+        Row: {
+          c9_3_1: boolean | null
+          c9_3_2: boolean | null
+          c9_3_3: boolean | null
+          c9_3_4: boolean | null
+          c9_3_5: boolean | null
+          c9_3_6: boolean | null
+          c9_3_7: boolean | null
+          c9_3_8: boolean | null
+          created_at: string | null
+          dev_level: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          c9_3_1?: boolean | null
+          c9_3_2?: boolean | null
+          c9_3_3?: boolean | null
+          c9_3_4?: boolean | null
+          c9_3_5?: boolean | null
+          c9_3_6?: boolean | null
+          c9_3_7?: boolean | null
+          c9_3_8?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
+        }
+        Update: {
+          c9_3_1?: boolean | null
+          c9_3_2?: boolean | null
+          c9_3_3?: boolean | null
+          c9_3_4?: boolean | null
+          c9_3_5?: boolean | null
+          c9_3_6?: boolean | null
+          c9_3_7?: boolean | null
+          c9_3_8?: boolean | null
+          created_at?: string | null
+          dev_level?: number | null
+          id?: never
+          user_id?: string | null
         }
         Relationships: []
       }

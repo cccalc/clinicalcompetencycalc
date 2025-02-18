@@ -4,8 +4,8 @@ import Header from '@/components/header';
 import type { Tables } from '@/utils/supabase/database.types';
 import { createClient } from '@/utils/supabase/server';
 
-import AccountForm from './account-form';
 import type { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
+import { redirect } from 'next/navigation';
 
 export default async function Account() {
   const supabase = await createClient();
@@ -17,7 +17,7 @@ export default async function Account() {
 
   if (userError) console.error(userError);
 
-  const { data, error: roleError } = (await supabase
+  const { data: roleData, error: roleError } = (await supabase
     .schema('public')
     .from('roles')
     .select('role')
@@ -26,17 +26,15 @@ export default async function Account() {
 
   if (roleError) console.error('Error retrieving role: ', roleError.message);
 
+  if (!user || !roleData || roleData.role !== 'ccc_admin') redirect('/');
+
   return (
     <div className='d-flex flex-column min-vh-100'>
       <div className='row sticky-top'>
         <Header />
       </div>
       <div className='container p-5' style={{ maxWidth: '720px' }}>
-        {userError ? (
-          <div className='alert alert-danger'>An error occurred: {userError.message}</div>
-        ) : (
-          <AccountForm user={user} role={data?.role} />
-        )}
+        <h3>Edit form questions and options</h3>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 'use server';
 
-import { EPAData } from './types';
+import type { PostgrestSingleResponse } from '@supabase/supabase-js';
+import { createClient } from './supabase/server';
+import { EPAData, MCQ } from './types';
+import type { Tables } from './supabase/database.types';
 
 /**
  * Reads EPA data from Supabase storage API.
@@ -16,4 +19,23 @@ export async function getEPAData(): Promise<EPAData | undefined> {
   }
   const data = (await response.json()) as EPAData;
   return data;
+}
+
+export async function getMCQs(): Promise<MCQ | undefined> {
+  const supabase = await createClient();
+  const { data, error } = (await supabase
+    .schema('public')
+    .from('mcqs_options')
+    .select()
+    .order('updated_at', { ascending: false })
+    .single()) satisfies PostgrestSingleResponse<Tables<'mcqs_options'>>;
+  if (error) {
+    console.error('Failed to fetch MCQs:', error.message);
+    return undefined;
+  }
+  if (!data) {
+    console.error('Failed to fetch MCQs: No data');
+    return undefined;
+  }
+  return data.data as MCQ;
 }

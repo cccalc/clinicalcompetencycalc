@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "load_supabase_types": "npx supabase gen types typescript --project-id speeohoyelvckretnfao -s trainingdata > ./src/utils/supabase/database.types.ts"
+    "load_supabase_types": "npx supabase gen types typescript --project-id speeohoyelvckretnfao -s \"trainingdata,public\" > ./src/utils/supabase/database.types.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

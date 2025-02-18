@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 // ...
 
-export default function AccountForm({ user }: { user: User | null }) {
+export default function AccountForm({ user, role }: { user: User | null; role: string | undefined }) {
   const supabase = createClient({ db: { schema: 'public' } });
 
   const [loading, setLoading] = useState(true);
@@ -67,6 +67,13 @@ export default function AccountForm({ user }: { user: User | null }) {
   return (
     <>
       <form id='account-form' className='pb-3'>
+        <h3 className='mb-3'>Account details</h3>
+        <div className='form-floating'>
+          <input id='uid' className='form-control-plaintext' placeholder='uid' value={user?.id} readOnly />
+          <label htmlFor='uid' className='form-label'>
+            User ID
+          </label>
+        </div>
         <div className='form-floating mb-3'>
           <input id='email' className='form-control-plaintext' placeholder='email' value={user?.email} readOnly />
           <label htmlFor='email' className='form-label'>
@@ -94,6 +101,18 @@ export default function AccountForm({ user }: { user: User | null }) {
           </button>
         </div>
       </div>
+      {role === 'ccc_admin' && (
+        <>
+          <hr className='my-5' />
+          <h3 className='mb-3'>Admin functions</h3>
+          <div className='mb-3'>
+            <a className='btn btn-primary' href='/admin/edit-questions-options'>
+              Edit questions and options
+            </a>
+          </div>
+        </>
+      )}
+      <hr className='my-5' />
       <div className='mb-3'>
         <form action='/auth/signout' method='post'>
           <button className='btn btn-danger' type='submit'>
