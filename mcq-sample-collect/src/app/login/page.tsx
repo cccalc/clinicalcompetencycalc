@@ -10,8 +10,10 @@ import { login, signup } from './actions';
 export default function Login() {
   const [emailValidationClass, setEmailValidationClass] = useState<string>('');
   const [passwordValidationClass, setPasswordValidationClass] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [alertColor, setAlertColor] = useState<string>('');
 
-  const validate = (e: SyntheticEvent, f: (formData: FormData) => Promise<void>) => {
+  const validate = (e: SyntheticEvent, f: (formData: FormData) => Promise<{ alertColor: string; error: string }>) => {
     console.log(f.name);
 
     let valid = true;
@@ -38,7 +40,10 @@ export default function Login() {
       const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
-      f(formData);
+      f(formData).then(({ alertColor, error }) => {
+        if (error) setError(error);
+        if (alertColor) setAlertColor(alertColor);
+      });
     }
   };
 
@@ -60,7 +65,10 @@ export default function Login() {
             required
             aria-required='true'
             placeholder='email@example.com'
-            onChange={() => setEmailValidationClass('')}
+            onChange={() => {
+              setEmailValidationClass('');
+              setError(null);
+            }}
           />
           <label htmlFor='email' className='form-label'>
             Email
@@ -75,7 +83,10 @@ export default function Login() {
             required
             aria-required='true'
             placeholder='password'
-            onChange={() => setPasswordValidationClass('')}
+            onChange={() => {
+              setPasswordValidationClass('');
+              setError(null);
+            }}
           />
           <label htmlFor='password' className='form-label'>
             Password
@@ -85,7 +96,8 @@ export default function Login() {
           </div>
           <div className='invalid-feedback'>Password must be at least 8 characters long.</div>
         </div>
-        <div className='d-flex justify-content-end gap-2 pt-5'>
+        <div className={`alert alert-${alertColor} ${error ? 'visible' : 'invisible'}`}>{error}</div>
+        <div className='d-flex justify-content-end gap-2'>
           <button id='signup' className='btn btn-outline-secondary' type='button' onClick={(e) => validate(e, signup)}>
             Sign Up
           </button>
