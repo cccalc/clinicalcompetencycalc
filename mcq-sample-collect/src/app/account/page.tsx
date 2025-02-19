@@ -1,11 +1,9 @@
 'use server';
 
 import Header from '@/components/header';
-import type { Tables } from '@/utils/supabase/database.types';
 import { createClient } from '@/utils/supabase/server';
 
 import AccountForm from './account-form';
-import type { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
 
 export default async function Account() {
   const supabase = await createClient();
@@ -17,15 +15,6 @@ export default async function Account() {
 
   if (userError) console.error(userError);
 
-  const { data, error: roleError } = (await supabase
-    .schema('public')
-    .from('roles')
-    .select('role')
-    .eq('user_id', user?.id)
-    .maybeSingle()) satisfies PostgrestMaybeSingleResponse<Tables<'roles'>>;
-
-  if (roleError) console.error('Error retrieving role: ', roleError.message);
-
   return (
     <div className='d-flex flex-column min-vh-100'>
       <div className='row sticky-top'>
@@ -35,7 +24,7 @@ export default async function Account() {
         {userError ? (
           <div className='alert alert-danger'>An error occurred: {userError.message}</div>
         ) : (
-          <AccountForm user={user} role={data?.role} />
+          <AccountForm user={user} />
         )}
       </div>
     </div>

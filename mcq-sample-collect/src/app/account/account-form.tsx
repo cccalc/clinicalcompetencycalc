@@ -1,17 +1,31 @@
 'use client';
 import Loading from '@/components/loading';
 import { createClient } from '@/utils/supabase/client';
+import type { JwtPayload } from '@/utils/types';
 import { type User } from '@supabase/supabase-js';
+import { jwtDecode } from 'jwt-decode';
 import { useCallback, useEffect, useState } from 'react';
 
-// ...
-
-export default function AccountForm({ user, role }: { user: User | null; role: string | undefined }) {
+export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient({ db: { schema: 'public' } });
 
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [displayname, setDisplayname] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (error) return console.error('Failed to fetch session:', error.message);
+      if (!data || !data.session) return console.error('Failed to fetch session: No data');
+
+      const jwt = jwtDecode(data.session.access_token) as JwtPayload;
+      setRole(jwt.user_role);
+      console.log('jwt', jwt);
+    });
+  }, [user, supabase]);
+
+  // console.log('role:', role);
 
   const getProfile = useCallback(async () => {
     try {

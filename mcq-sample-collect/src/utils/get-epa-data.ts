@@ -25,8 +25,6 @@ export async function getMCQs(): Promise<MCQ[] | undefined> {
   const { data, error } = await supabase.schema('public').from('mcqs_options').select('data');
   // .order('updated_at', { ascending: false });
 
-  console.log('data', data);
-
   if (error) {
     console.error('Failed to fetch MCQs:', error.message);
     return undefined;

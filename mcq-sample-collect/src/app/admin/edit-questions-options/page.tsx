@@ -1,36 +1,13 @@
 'use server';
 
 import Header from '@/components/header';
-import type { Tables } from '@/utils/supabase/database.types';
-import { createClient } from '@/utils/supabase/server';
-
-import type { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
-import { redirect } from 'next/navigation';
-import QuestionList from './question-list';
-import { getMCQs } from '@/utils/get-epa-data';
 import Loading from '@/components/loading';
+import { getMCQs } from '@/utils/get-epa-data';
+
+import QuestionList from './question-list';
 
 export default async function Account() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) console.error(userError);
-
-  const { data: roleData, error: roleError } = (await supabase
-    .schema('public')
-    .from('roles')
-    .select('role')
-    .eq('user_id', user?.id)
-    .maybeSingle()) satisfies PostgrestMaybeSingleResponse<Tables<'roles'>>;
-
-  if (roleError) console.error('Error retrieving role: ', roleError.message);
-
-  if (!user || !roleData || roleData.role !== 'ccc_admin') redirect('/');
-
+  // const supabase = await createClient();
   const mcqs = await getMCQs();
 
   return (

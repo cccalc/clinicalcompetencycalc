@@ -13,3 +13,7 @@ export type MCQ = {
 };
 
 export type DevLevel = 'none' | 'remedial' | 'early-developing' | 'developing' | 'entrustable';
+
+export interface JwtPayload {
+  user_role: string;
+}
