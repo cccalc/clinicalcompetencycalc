@@ -38,6 +38,11 @@ export default function SubmitButtons({
     skip();
   };
 
+  const handleSubmit = () => {
+    handleClear();
+    submit();
+  };
+
   return (
     <div className='bg-light text-center'>
       <div className='container p-3' style={{ maxWidth: '720px' }}>
@@ -76,7 +81,12 @@ export default function SubmitButtons({
             </button>
           </div>
           <div className='col d-grid'>
-            <button type='button' className='btn btn-primary mt-3' onClick={submit} disabled={devLevel.val === 'none'}>
+            <button
+              type='button'
+              className='btn btn-primary mt-3'
+              onClick={handleSubmit}
+              disabled={devLevel.val === 'none'}
+            >
               Submit<i className='bi bi-send ms-2'></i>
             </button>
           </div>
