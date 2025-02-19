@@ -6,6 +6,9 @@ import { createClient } from '@/utils/supabase/server';
 
 import type { PostgrestMaybeSingleResponse } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
+import QuestionList from './question-list';
+import { getMCQs } from '@/utils/get-epa-data';
+import Loading from '@/components/loading';
 
 export default async function Account() {
   const supabase = await createClient();
@@ -28,13 +31,15 @@ export default async function Account() {
 
   if (!user || !roleData || roleData.role !== 'ccc_admin') redirect('/');
 
+  const mcqs = await getMCQs();
+
   return (
     <div className='d-flex flex-column min-vh-100'>
       <div className='row sticky-top'>
         <Header />
       </div>
       <div className='container p-5' style={{ maxWidth: '720px' }}>
-        <h3>Edit form questions and options</h3>
+        {mcqs ? <QuestionList mcqs={mcqs} /> : <Loading />}
       </div>
     </div>
   );
