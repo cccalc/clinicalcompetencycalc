@@ -2,12 +2,12 @@
 
 import Header from '@/components/header';
 import Loading from '@/components/loading';
-import { getLatestMCQs } from '@/utils/get-epa-data';
+import { getHistoricalMCQs } from '@/utils/get-epa-data';
 
 import QuestionList from './question-list';
 
 export default async function Account() {
-  const mcqs = await getLatestMCQs();
+  const mcqs = await getHistoricalMCQs();
 
   return (
     <div className='d-flex flex-column min-vh-100'>
