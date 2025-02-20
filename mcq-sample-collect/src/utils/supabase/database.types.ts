@@ -72,23 +72,41 @@ export type Database = {
         }
         Relationships: []
       }
-      roles: {
+      role_permissions: {
+        Row: {
+          id: number
+          permission: Database["public"]["Enums"]["user_permission"]
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          id?: number
+          permission: Database["public"]["Enums"]["user_permission"]
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          id?: number
+          permission?: Database["public"]["Enums"]["user_permission"]
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
+      user_roles: {
         Row: {
           assigned_at: string
           id: number
-          role: string
+          role: Database["public"]["Enums"]["user_role"]
           user_id: string
         }
         Insert: {
           assigned_at?: string
           id?: number
-          role: string
+          role: Database["public"]["Enums"]["user_role"]
           user_id: string
         }
         Update: {
           assigned_at?: string
           id?: number
-          role?: string
+          role?: Database["public"]["Enums"]["user_role"]
           user_id?: string
         }
         Relationships: []
@@ -98,6 +116,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authorize: {
+        Args: {
+          requested_permission: Database["public"]["Enums"]["user_permission"]
+        }
+        Returns: boolean
+      }
       custom_access_token_hook: {
         Args: {
           event: Json
@@ -106,7 +130,12 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_permission:
+        | "mcqs_options.insert"
+        | "mcqs_options.select"
+        | "mcqs_options.update"
+        | "mcqs_options.delete"
+      user_role: "ccc_admin"
     }
     CompositeTypes: {
       [_ in never]: never

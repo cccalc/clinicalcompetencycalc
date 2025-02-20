@@ -1,7 +1,9 @@
 'use server';
 
+import type { PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
 import { createClient } from './supabase/server';
 import { EPAData, MCQ } from './types';
+import { Tables } from './supabase/database.types';
 
 /**
  * Reads EPA data from Supabase storage API.
@@ -19,11 +21,16 @@ export async function getEPAData(): Promise<EPAData | undefined> {
   return data;
 }
 
-export async function getMCQs(): Promise<MCQ[] | undefined> {
+export async function getLatestMCQs(): Promise<MCQ[] | undefined> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.schema('public').from('mcqs_options').select('data');
-  // .order('updated_at', { ascending: false });
+  const { data, error } = (await supabase
+    .schema('public')
+    .from('mcqs_options')
+    .select('data')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single()) satisfies PostgrestSingleResponse<Tables<'mcqs_options'>>;
 
   if (error) {
     console.error('Failed to fetch MCQs:', error.message);
@@ -35,5 +42,27 @@ export async function getMCQs(): Promise<MCQ[] | undefined> {
     return undefined;
   }
 
-  // return data.data;
+  return data.data as MCQ[];
+}
+
+export async function getHistoricalMCQs(): Promise<Tables<'mcqs_options'>[] | undefined> {
+  const supabase = await createClient();
+
+  const { data, error } = (await supabase
+    .schema('public')
+    .from('mcqs_options')
+    .select()
+    .order('updated_at', { ascending: false })) satisfies PostgrestResponse<Tables<'mcqs_options'>>;
+
+  if (error) {
+    console.error('Failed to fetch MCQs:', error.message);
+    return undefined;
+  }
+
+  if (!data) {
+    console.error('Failed to fetch MCQs: No data');
+    return undefined;
+  }
+
+  return data as Tables<'mcqs_options'>[];
 }

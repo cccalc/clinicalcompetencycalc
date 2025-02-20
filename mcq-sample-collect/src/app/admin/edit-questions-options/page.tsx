@@ -2,13 +2,12 @@
 
 import Header from '@/components/header';
 import Loading from '@/components/loading';
-import { getMCQs } from '@/utils/get-epa-data';
+import { getLatestMCQs } from '@/utils/get-epa-data';
 
 import QuestionList from './question-list';
 
 export default async function Account() {
-  // const supabase = await createClient();
-  const mcqs = await getMCQs();
+  const mcqs = await getLatestMCQs();
 
   return (
     <div className='d-flex flex-column min-vh-100'>

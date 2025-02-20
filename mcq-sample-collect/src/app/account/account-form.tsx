@@ -25,7 +25,6 @@ export default function AccountForm({ user }: { user: User | null }) {
     });
   }, [user, supabase]);
 
-  // console.log('role:', role);
 
   const getProfile = useCallback(async () => {
     try {
