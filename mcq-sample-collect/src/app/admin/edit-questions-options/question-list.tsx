@@ -1,39 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Loading from '@/components/loading';
+import { getHistoricalMCQs } from '@/utils/get-epa-data';
 import type { Tables } from '@/utils/supabase/database.types';
 import type { MCQ } from '@/utils/types';
 
 import EditModal from './edit-modal';
 import { renderOption, renderQuestion } from './render-spans';
 
-export default function QuestionList({ mcqs }: { mcqs: Tables<'mcqs_options'>[] }) {
-  const [optMCQ, setOptMCQ] = useState<MCQ | null>(null);
-  const [optKey, setOptKey] = useState<string | null>(null);
-  const [optText, setOptText] = useState<string | null>(null);
+export default function QuestionList() {
+  const [mcqInformation, setMCQInformation] = useState<Tables<'mcqs_options'>[] | null>(null);
 
-  const [newOptText, setNewOptText] = useState<string | null>(null);
+  const [optionMCQ, setOptionMCQ] = useState<MCQ | null>(null);
+  const [optionKey, setOptionKey] = useState<string | null>(null);
+  const [optionText, setOptionText] = useState<string | null>(null);
+  const [newOptionText, setNewOptionText] = useState<string | null>(null);
 
-  const handleClick = (oMCQ: MCQ, oKey: string, oText: string) => {
-    setOptMCQ(oMCQ);
-    setOptKey(oKey);
-    setOptText(oText);
-    setNewOptText(oText);
+  useEffect(() => {
+    const fetchMCQs = async () => setMCQInformation((await getHistoricalMCQs()) ?? null);
+    fetchMCQs();
+  }, []);
+
+  const handleClick = (mcq: MCQ, key: string, text: string) => {
+    setOptionMCQ(mcq);
+    setOptionKey(key);
+    setOptionText(text);
+    setNewOptionText(text);
     document.querySelectorAll('input[id="new-option"]').forEach((el) => {
-      (el as HTMLInputElement).value = oText;
+      (el as HTMLInputElement).value = text;
     });
   };
 
   return (
     <>
       <h3 className='mb-3'>Edit form questions and options</h3>
-      {!mcqs || !mcqs.length || !mcqs![0].data ? (
+      {!mcqInformation || !mcqInformation.length || !mcqInformation![0].data ? (
         <Loading />
       ) : (
         <div className='accordion' id='question-list'>
-          {(mcqs[0].data as MCQ[]).map((mcq, i) => (
+          {(mcqInformation[0].data as MCQ[]).map((mcq, i) => (
             <div className='accordion-item' key={i}>
               <h4 className='accordion-header' id={`heading-${i}`}>
                 <button
@@ -75,11 +82,14 @@ export default function QuestionList({ mcqs }: { mcqs: Tables<'mcqs_options'>[] 
       )}
 
       <EditModal
-        optMCQ={optMCQ}
-        optKey={optKey}
-        optText={optText}
-        newOptText={newOptText}
-        setNewOptText={setNewOptText}
+        mcqInformation={mcqInformation}
+        setMCQInformation={setMCQInformation}
+        optionMCQ={optionMCQ}
+        optionKey={optionKey}
+        setOptionKey={setOptionKey}
+        optionText={optionText}
+        newOptionText={newOptionText}
+        setNewOptionText={setNewOptionText}
       />
     </>
   );

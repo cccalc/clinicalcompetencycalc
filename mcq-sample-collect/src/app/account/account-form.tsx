@@ -1,30 +1,21 @@
 'use client';
 import Loading from '@/components/loading';
+import { supabase_authorize } from '@/utils/async-util';
 import { createClient } from '@/utils/supabase/client';
-import type { JwtPayload } from '@/utils/types';
 import { type User } from '@supabase/supabase-js';
-import { jwtDecode } from 'jwt-decode';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient({ db: { schema: 'public' } });
 
-  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [displayname, setDisplayname] = useState<string | null>(null);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (error) return console.error('Failed to fetch session:', error.message);
-      if (!data || !data.session) return console.error('Failed to fetch session: No data');
-
-      const jwt = jwtDecode(data.session.access_token) as JwtPayload;
-      setRole(jwt.user_role);
-      console.log('jwt', jwt);
-    });
+    supabase_authorize(['mcqs_options.select', 'mcqs_options.insert']).then((result) => setAuthorized(result));
   }, [user, supabase]);
-
 
   const getProfile = useCallback(async () => {
     try {
@@ -114,7 +105,7 @@ export default function AccountForm({ user }: { user: User | null }) {
           </button>
         </div>
       </div>
-      {role === 'ccc_admin' && (
+      {authorized && (
         <>
           <hr className='my-5' />
           <h3 className='mb-3'>Admin functions</h3>

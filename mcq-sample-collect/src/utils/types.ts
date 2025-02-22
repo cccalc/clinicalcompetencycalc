@@ -1,7 +1,6 @@
-export type EPAData = {
+export type EPAKFDesc = {
   epa_desc: { [key: string]: string };
   kf_desc: { [key: string]: string };
-  mcq: MCQ[];
 };
 
 export type MCQ = {
@@ -13,7 +12,3 @@ export type MCQ = {
 };
 
 export type DevLevel = 'none' | 'remedial' | 'early-developing' | 'developing' | 'entrustable';
-
-export interface JwtPayload {
-  user_role: string;
-}

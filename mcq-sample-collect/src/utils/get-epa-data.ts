@@ -2,23 +2,33 @@
 
 import type { PostgrestResponse, PostgrestSingleResponse } from '@supabase/supabase-js';
 import { createClient } from './supabase/server';
-import { EPAData, MCQ } from './types';
+import { MCQ, type EPAKFDesc } from './types';
 import { Tables } from './supabase/database.types';
 
-/**
- * Reads EPA data from Supabase storage API.
- * @returns Parsed data from `form-data.json` in type `EPAData`. If an error occurs, returns `undefined`.
- */
-export async function getEPAData(): Promise<EPAData | undefined> {
-  const response = await fetch(
-    'https://speeohoyelvckretnfao.supabase.co/storage/v1/object/public/epa-questions/epa-questions.json'
-  );
-  if (!response.ok) {
-    console.error('Failed to fetch EPA data:', response.statusText);
+export async function getEPAKFDescs(): Promise<EPAKFDesc | undefined> {
+  const supabase = await createClient();
+  const { data, error } = (await supabase
+    .schema('public')
+    .from('epa_kf_descriptions')
+    .select('epa_descriptions, kf_descriptions')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single()) satisfies PostgrestSingleResponse<Tables<'epa_kf_descriptions'>>;
+
+  if (error) {
+    console.error('Failed to fetch EPA and KF descriptions:', error.message);
     return undefined;
   }
-  const data = (await response.json()) as EPAData;
-  return data;
+
+  if (!data) {
+    console.error('Failed to fetch EPA and KF descriptions: No data');
+    return undefined;
+  }
+
+  return {
+    epa_desc: data.epa_descriptions,
+    kf_desc: data.kf_descriptions,
+  } as EPAKFDesc;
 }
 
 export async function getLatestMCQs(): Promise<MCQ[] | undefined> {

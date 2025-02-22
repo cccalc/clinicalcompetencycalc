@@ -1,6 +1,7 @@
 'use client';
 
-import { cache, useEffect, useState } from 'react';
+import { cache, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import React from 'react';
 
 import Loading from '@/components/loading';
 import { getHistoricalMCQs } from '@/utils/get-epa-data';
@@ -8,23 +9,29 @@ import { createClient } from '@/utils/supabase/client';
 import type { Tables } from '@/utils/supabase/database.types';
 import type { MCQ } from '@/utils/types';
 
-import { getUpdaterDetails } from './actions';
+import { getUpdaterDetails, submitNewOption } from './actions';
 import { renderOption, renderQuestion } from './render-spans';
 
 const getCachedUpdaterDetails = cache(getUpdaterDetails);
 
 export default function EditModal({
-  optMCQ,
-  optKey,
-  optText,
-  newOptText,
-  setNewOptText,
+  mcqInformation,
+  setMCQInformation,
+  optionMCQ,
+  optionKey,
+  setOptionKey,
+  optionText,
+  newOptionText,
+  setNewOptionText,
 }: {
-  optMCQ: MCQ | null;
-  optKey: string | null;
-  optText: string | null;
-  newOptText: string | null;
-  setNewOptText: React.Dispatch<React.SetStateAction<string | null>>;
+  mcqInformation: Tables<'mcqs_options'>[] | null;
+  setMCQInformation: Dispatch<SetStateAction<Tables<'mcqs_options'>[] | null>>;
+  optionMCQ: MCQ | null;
+  optionKey: string | null;
+  setOptionKey: Dispatch<SetStateAction<string | null>>;
+  optionText: string | null;
+  newOptionText: string | null;
+  setNewOptionText: Dispatch<SetStateAction<string | null>>;
 }) {
   type OptHistoryInstance = {
     updated_at: Date;
@@ -36,27 +43,30 @@ export default function EditModal({
 
   const supabase = createClient();
 
-  const [mcqMetas, setMCQMetas] = useState<Tables<'mcqs_options'>[] | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [optHistory, setOptHistory] = useState<OptHistoryInstance[] | null>(null);
+  const [optionHistory, setOptionHistory] = useState<OptHistoryInstance[] | null>(null);
 
+  // on render, get historical MCQs
   useEffect(() => {
-    (async () => setMCQMetas((await getHistoricalMCQs()) ?? null))();
+    (async () => setMCQInformation((await getHistoricalMCQs()) ?? null))();
+    // add event listener when modal is closed
     document.getElementById('edit-modal')?.addEventListener('hide.bs.modal', () => {
+      setOptionKey(null);
       if (document.getElementById('changes-list')?.classList.contains('show'))
         document.getElementById('changes-list-button')?.click();
     });
-  }, []);
+  }, [setMCQInformation, setOptionKey]);
 
+  // on change of selected option, get historical change data
   useEffect(() => {
-    const fetch = async () => {
+    const fetchHistory = async () => {
       setLoadingHistory(true);
-      setOptHistory(null);
+      setOptionHistory(null);
 
-      let history = mcqMetas?.map((mcqMeta) => ({
+      let history = mcqInformation?.map((mcqMeta) => ({
         updated_at: new Date(mcqMeta.updated_at),
         updated_by: mcqMeta.updated_by ?? '',
-        option: (mcqMeta.data as MCQ[]).filter((mcq) => mcq.options[optKey ?? ''])[0]?.options[optKey ?? ''],
+        option: (mcqMeta.data as MCQ[]).filter((mcq) => mcq.options[optionKey ?? ''])[0]?.options[optionKey ?? ''],
       }));
 
       const updaterIDs = Array.from(new Set(history?.map((h) => h.updated_by)));
@@ -72,13 +82,26 @@ export default function EditModal({
           updater_email: updater?.email,
         };
       });
-      setOptHistory(history ?? null);
+      setOptionHistory(history ?? null);
 
       setLoadingHistory(false);
     };
 
-    fetch();
-  }, [mcqMetas, optKey, supabase]);
+    fetchHistory();
+  }, [mcqInformation, optionKey, supabase]);
+
+  const filterHistory = (history: OptHistoryInstance[]) => {
+    if (history.length === 0) return history;
+    const filtered = history.filter(
+      (h, i) => (history[i + 1] && h.option !== history[i + 1].option) || i === history.length - 1
+    );
+    return filtered.length === 0 ? history.slice(history.length - 1) : filtered;
+  };
+
+  const handleSubmit = async () => {
+    submitNewOption(optionKey!, newOptionText!);
+    (async () => setMCQInformation((await getHistoricalMCQs()) ?? null))();
+  };
 
   return (
     <div className='modal fade' id='edit-modal' tabIndex={-1} aria-labelledby='edit-modal-label' aria-hidden='true'>
@@ -93,7 +116,7 @@ export default function EditModal({
             <p>
               <strong>Question:</strong>
               <br />
-              {optMCQ ? renderQuestion(optMCQ.kf, optMCQ.question) : ''}
+              {optionMCQ ? renderQuestion(optionMCQ.kf, optionMCQ.question) : ''}
             </p>
 
             <hr />
@@ -101,7 +124,7 @@ export default function EditModal({
             <p>
               <strong>Old option:</strong>
               <br />
-              {optKey ? renderOption(optKey, optText ?? '') : ''}
+              {renderOption(optionKey ?? '', optionText ?? '')}
             </p>
             <p className='fw-bold mb-1'>New option:</p>
             <div className='mb-3'>
@@ -110,7 +133,7 @@ export default function EditModal({
                 className='form-control'
                 type='text'
                 placeholder='Option text'
-                onChange={(e) => setNewOptText(e.target.value)}
+                onChange={(e) => setNewOptionText(e.target.value)}
               />
             </div>
 
@@ -139,8 +162,8 @@ export default function EditModal({
                         <Loading />
                       </div>
                     ) : (
-                      <ul className='list-group list-group-flush'>
-                        {optHistory?.map((h, i) => (
+                      <ul className='list-group list-group-flush rounded-bottom'>
+                        {filterHistory(optionHistory ?? []).map((h, i) => (
                           <li className='list-group-item' key={i}>
                             <div className='mb-1'>
                               <span className='badge bg-body-secondary text-dark me-2'>
@@ -168,7 +191,9 @@ export default function EditModal({
             <button
               type='button'
               className='btn btn-primary'
-              disabled={!optMCQ || !optKey || !optText || !newOptText || newOptText === optText}
+              data-bs-dismiss='modal'
+              disabled={!optionMCQ || !optionKey || !optionText || !newOptionText || newOptionText === optionText}
+              onClick={handleSubmit}
             >
               Save changes
             </button>

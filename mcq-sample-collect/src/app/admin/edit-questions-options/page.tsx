@@ -1,13 +1,15 @@
 'use server';
 
+import { redirect } from 'next/navigation';
+
 import Header from '@/components/header';
-import Loading from '@/components/loading';
-import { getHistoricalMCQs } from '@/utils/get-epa-data';
+import { supabase_authorize } from '@/utils/async-util';
 
 import QuestionList from './question-list';
 
 export default async function Account() {
-  const mcqs = await getHistoricalMCQs();
+  const authorized = await supabase_authorize(['mcqs_options.select', 'mcqs_options.insert']);
+  if (!authorized) redirect('/no-auth');
 
   return (
     <div className='d-flex flex-column min-vh-100'>
@@ -15,7 +17,7 @@ export default async function Account() {
         <Header />
       </div>
       <div className='container p-5' style={{ maxWidth: '720px' }}>
-        {mcqs ? <QuestionList mcqs={mcqs} /> : <Loading />}
+        <QuestionList />
       </div>
     </div>
   );

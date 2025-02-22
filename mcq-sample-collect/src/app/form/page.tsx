@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Header from '@/components/header';
 import Loading from '@/components/loading';
-import { getEPAData } from '@/utils/get-epa-data';
+import { getEPAKFDescs, getLatestMCQs } from '@/utils/get-epa-data';
 import { createClient } from '@/utils/supabase/client';
-import { DevLevel, EPAData, MCQ } from '@/utils/types';
+import { DevLevel, MCQ, type EPAKFDesc } from '@/utils/types';
 import { getDevLevelInt, getRandomChoicesFromOptions, getRandomItem } from '@/utils/util';
 
 import { insert } from './actions';
@@ -18,7 +18,8 @@ export default function Form() {
   const [userID, setUserID] = useState<string | null>(null);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [formData, setFormData] = useState<EPAData | undefined>(undefined);
+  const [descData, setDescData] = useState<EPAKFDesc | undefined>(undefined);
+  const [mcqData, setMCQData] = useState<MCQ[] | undefined>(undefined);
 
   const [question, setQuestion] = useState<MCQ | undefined>(undefined);
   const [choices, setChoices] = useState<{ [key: string]: boolean }>({});
@@ -33,36 +34,38 @@ export default function Form() {
     };
 
     getUserId().then((id) => setUserID(id));
+    getEPAKFDescs().then((data) => setDescData(data));
+    getLatestMCQs().then((data) => setMCQData(data));
   }, []);
 
-  useEffect(() => {
-    getEPAData()
-      .then((data) => setFormData(data))
-      .catch((err) => console.error(err));
-  }, []);
+  // useEffect(() => {
+  //   getEPAData()
+  //     .then((data) => setFormData(data))
+  //     .catch((err) => console.error(err));
+  // }, []);
 
   const getNewQuestion = useCallback(() => {
     setLoading(true);
-    if (formData?.mcq) {
-      const question = getRandomItem(formData.mcq);
+    if (mcqData) {
+      const question = getRandomItem(mcqData);
       setQuestion(question);
       if (question) setChoices(getRandomChoicesFromOptions(question.options));
       setLoading(false);
     }
-  }, [formData]);
+  }, [mcqData]);
 
   useEffect(() => {
     getNewQuestion();
-  }, [formData, getNewQuestion]);
+  }, [getNewQuestion]);
 
   const desc = useMemo(() => {
     return {
       epa: question?.epa,
       kf: question?.kf,
-      epa_desc: formData?.epa_desc[question?.epa ?? 0],
-      kf_desc: formData?.kf_desc[question?.kf ?? 0],
+      epa_desc: descData?.epa_desc[question?.epa ?? 0],
+      kf_desc: descData?.kf_desc[question?.kf ?? 0],
     };
-  }, [formData, question]);
+  }, [descData, question]);
 
   const submit = async () => {
     if (!question) return;
@@ -91,7 +94,7 @@ export default function Form() {
         </div>
         <div className='row flex-grow-1'>
           <div className='container px-5 pt-3 text-center' style={{ maxWidth: '720px' }}>
-            {loading || !formData ? <Loading /> : <Question question={question} choices={choices} />}
+            {loading || !question ? <Loading /> : <Question question={question} choices={choices} />}
           </div>
         </div>
         <div className='row sticky-bottom'>
