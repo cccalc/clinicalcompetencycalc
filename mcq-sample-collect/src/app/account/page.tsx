@@ -10,12 +10,10 @@ export default async function Account() {
 
   const {
     data: { user },
-    error,
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error(error);
-  }
+  if (userError) console.error(userError);
 
   return (
     <div className='d-flex flex-column min-vh-100'>
@@ -23,7 +21,11 @@ export default async function Account() {
         <Header />
       </div>
       <div className='container p-5' style={{ maxWidth: '720px' }}>
-        <AccountForm user={user} />
+        {userError ? (
+          <div className='alert alert-danger'>An error occurred: {userError.message}</div>
+        ) : (
+          <AccountForm user={user} />
+        )}
       </div>
     </div>
   );

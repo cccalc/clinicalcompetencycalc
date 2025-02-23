@@ -4,23 +4,24 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Header from '@/components/header';
 import Loading from '@/components/loading';
-import { getEPAData } from '@/utils/get-epa-data';
+import { getEPAKFDescs, getLatestMCQs } from '@/utils/get-epa-data';
 import { createClient } from '@/utils/supabase/client';
-import { DevLevel, EPAData, MCQ } from '@/utils/types';
-import { getDevLevelInt, getRandomChoicesFromOptions, getRandomItem } from '@/utils/util';
+import { DevLevel, MCQ, type EPAKFDesc } from '@/utils/types';
+import { getDevLevelInt, getRandomItem } from '@/utils/util';
 
-import { insert } from './actions';
 import EpaKfDesc from './epa-kf-desc';
 import Question from './question';
 import SubmitButtons from './submit-buttons';
+import { submitSample } from './actions';
 
 export default function Form() {
   const [userID, setUserID] = useState<string | null>(null);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [formData, setFormData] = useState<EPAData | undefined>(undefined);
+  const [descData, setDescData] = useState<EPAKFDesc | undefined>(undefined);
+  const [mcqData, setMCQData] = useState<MCQ[] | undefined>(undefined);
 
-  const [question, setQuestion] = useState<MCQ | undefined>(undefined);
+  const [questions, setQuestions] = useState<MCQ[]>([]);
   const [choices, setChoices] = useState<{ [key: string]: boolean }>({});
   const [devLevel, setDevLevel] = useState<DevLevel>('none');
 
@@ -33,43 +34,61 @@ export default function Form() {
     };
 
     getUserId().then((id) => setUserID(id));
+    getEPAKFDescs().then((data) => setDescData(data));
+    getLatestMCQs().then((data) => setMCQData(data));
   }, []);
 
-  useEffect(() => {
-    getEPAData()
-      .then((data) => setFormData(data))
-      .catch((err) => console.error(err));
-  }, []);
+  const randomizeQuestionChoices = (options: { [key: string]: string }): { [key: string]: boolean } => {
+    const keys = Object.keys(options);
+    const length = keys.length;
+    let choices = {};
 
-  const getNewQuestion = useCallback(() => {
-    setLoading(true);
-    if (formData?.mcq) {
-      const question = getRandomItem(formData.mcq);
-      setQuestion(question);
-      if (question) setChoices(getRandomChoicesFromOptions(question.options));
-      setLoading(false);
+    // If options is empty, return an empty object
+    if (length === 0) return {};
+
+    // Randomly select choices from options
+    // Ensure at least one choice and <= 50% of the options are selected
+    // Accept when selected == 50% for case of 2 options
+    let selectedCount = 0;
+    while (selectedCount === 0 || selectedCount / length > 0.5) {
+      choices = keys.reduce((o, k) => ({ ...o, [k]: Math.random() < 0.5 }), {});
+      selectedCount = Object.values(choices).filter((v) => v).length;
     }
-  }, [formData]);
+
+    return choices;
+  };
+
+  const getNewQuestions = useCallback(() => {
+    setLoading(true);
+    if (mcqData && descData) {
+      const kf = getRandomItem(Object.keys(descData.kf_desc));
+      const qs = mcqData.filter((q) => q.kf === kf);
+      setQuestions(qs);
+      if (qs.length > 0)
+        setChoices(qs.map((q) => randomizeQuestionChoices(q.options)).reduce((a, o) => Object.assign(a, o), {}));
+    }
+    setLoading(false);
+  }, [descData, mcqData]);
 
   useEffect(() => {
-    getNewQuestion();
-  }, [formData, getNewQuestion]);
+    getNewQuestions();
+  }, [getNewQuestions]);
 
   const desc = useMemo(() => {
     return {
-      epa: question?.epa,
-      kf: question?.kf,
-      epa_desc: formData?.epa_desc[question?.epa ?? 0],
-      kf_desc: formData?.kf_desc[question?.kf ?? 0],
+      epa: questions[0] ? questions[0].epa : '',
+      kf: questions[0] ? questions[0].kf : '',
+      epa_desc: descData?.epa_desc[questions[0] ? questions[0].epa : 0] ?? '',
+      kf_desc: descData?.kf_desc[questions[0] ? questions[0].kf : 0] ?? '',
     };
-  }, [formData, question]);
+  }, [descData, questions]);
 
-  const submit = async () => {
-    if (!question) return;
+  const handleSumbit = async () => {
+    if (!questions) return;
     if (Object.keys(choices).length === 0) return;
     if (!userID) return;
 
-    const tableName = 'mcq_kf' + question.kf.replace(/\./g, '_');
+    const tableName = 'mcq_kf' + questions[0].kf.replace(/\./g, '_');
 
     const row = {
       user_id: userID,
@@ -78,8 +97,8 @@ export default function Form() {
       dev_level: getDevLevelInt(devLevel),
     };
 
-    const success = insert(tableName, row);
-    if (await success) getNewQuestion();
+    const success = submitSample(tableName, row);
+    if (await success) getNewQuestions();
   };
 
   return (
@@ -91,12 +110,20 @@ export default function Form() {
         </div>
         <div className='row flex-grow-1'>
           <div className='container px-5 pt-3 text-center' style={{ maxWidth: '720px' }}>
-            {loading || !formData ? <Loading /> : <Question question={question} choices={choices} />}
+            {loading || questions.length === 0 ? (
+              <Loading />
+            ) : (
+              questions.map((q, i) => <Question key={i} question={q} choices={choices} />)
+            )}
           </div>
         </div>
         <div className='row sticky-bottom'>
           {loading || (
-            <SubmitButtons skip={getNewQuestion} submit={submit} devLevel={{ set: setDevLevel, val: devLevel }} />
+            <SubmitButtons
+              skip={getNewQuestions}
+              submit={handleSumbit}
+              devLevel={{ set: setDevLevel, val: devLevel }}
+            />
           )}
         </div>
       </div>

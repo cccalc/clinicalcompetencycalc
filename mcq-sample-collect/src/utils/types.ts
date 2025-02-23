@@ -1,7 +1,6 @@
-export type EPAData = {
+export type EPAKFDesc = {
   epa_desc: { [key: string]: string };
   kf_desc: { [key: string]: string };
-  mcq: MCQ[];
 };
 
 export type MCQ = {

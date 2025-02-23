@@ -11,19 +11,6 @@ export function getRandomItem<T>(list: T[]): T | undefined {
 }
 
 /**
- * Generates random choices from a given set of MCQ options.
- * @param options - The options at `MCQ['options']`.
- * @returns An object with the option keys and boolean values indicating if the option is selected.
- */
-export function getRandomChoicesFromOptions(options: { [key: string]: string }): { [key: string]: boolean } {
-  let choices;
-  do {
-    choices = Object.keys(options).reduce((o, k) => ({ ...o, [k]: Math.random() < 0.5 }), {});
-  } while (Object.values(choices).every((v) => !v));
-  return choices;
-}
-
-/**
  * Converts DevLevel to integer for database storage.
  * @param {DevLevel} devLevel - The development level.
  * @returns The mapping is as follows:

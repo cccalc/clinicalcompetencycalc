@@ -1,10 +1,9 @@
 'use client';
 import Loading from '@/components/loading';
+import { supabase_authorize } from '@/utils/async-util';
 import { createClient } from '@/utils/supabase/client';
 import { type User } from '@supabase/supabase-js';
 import { useCallback, useEffect, useState } from 'react';
-
-// ...
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient({ db: { schema: 'public' } });
@@ -12,6 +11,11 @@ export default function AccountForm({ user }: { user: User | null }) {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [displayname, setDisplayname] = useState<string | null>(null);
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    supabase_authorize(['mcqs_options.select', 'mcqs_options.insert']).then((result) => setAuthorized(result));
+  }, [user, supabase]);
 
   const getProfile = useCallback(async () => {
     try {
@@ -67,6 +71,13 @@ export default function AccountForm({ user }: { user: User | null }) {
   return (
     <>
       <form id='account-form' className='pb-3'>
+        <h3 className='mb-3'>Account details</h3>
+        <div className='form-floating'>
+          <input id='uid' className='form-control-plaintext' placeholder='uid' value={user?.id} readOnly />
+          <label htmlFor='uid' className='form-label'>
+            User ID
+          </label>
+        </div>
         <div className='form-floating mb-3'>
           <input id='email' className='form-control-plaintext' placeholder='email' value={user?.email} readOnly />
           <label htmlFor='email' className='form-label'>
@@ -94,6 +105,18 @@ export default function AccountForm({ user }: { user: User | null }) {
           </button>
         </div>
       </div>
+      {authorized && (
+        <>
+          <hr className='my-5' />
+          <h3 className='mb-3'>Admin functions</h3>
+          <div className='mb-3'>
+            <a className='btn btn-primary' href='/admin/edit-questions-options'>
+              Edit questions and options
+            </a>
+          </div>
+        </>
+      )}
+      <hr className='my-5' />
       <div className='mb-3'>
         <form action='/auth/signout' method='post'>
           <button className='btn btn-danger' type='submit'>
