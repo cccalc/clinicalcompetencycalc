@@ -1,22 +1,15 @@
-import fs from 'fs';
-import path from 'path';
+import { redirect } from 'next/navigation';
 
-import yaml from 'js-yaml';
+import { createClient } from '@/utils/supabase/server';
 
-import { FormDataYAML } from '@/data/types';
+export default async function Home() {
+  const supabase = await createClient();
 
-import Content from './content';
+  const { data, error } = await supabase.auth.getUser();
 
-export default function Home() {
-  const filePath = path.join(process.cwd(), 'src/data/form-data.yaml');
-  let formData: FormDataYAML | undefined = undefined;
-
-  try {
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    formData = yaml.load(fileContents) as FormDataYAML;
-  } catch (e) {
-    console.log(e);
+  if (error || !data?.user) {
+    redirect('/login');
+  } else {
+    redirect('/form');
   }
-
-  return <Content formData={formData} />;
 }
