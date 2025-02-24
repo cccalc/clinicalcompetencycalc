@@ -1,3 +1,5 @@
+'use client';
+
 import Header from '@/components/header';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
