@@ -10,6 +10,6 @@ export default async function Home() {
   if (error || !data?.user) {
     redirect('/login');
   } else {
-    redirect('/form');
+    redirect('/dashboard');
   }
 }
