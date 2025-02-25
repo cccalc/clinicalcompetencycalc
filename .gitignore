@@ -54,3 +54,13 @@ Thumbs.db
 
 # Local files
 local/
+
+# Temporary files
+*.tmp
+
+# Backup files
+*~
+*.bak
+
+# Environment files
+.env
