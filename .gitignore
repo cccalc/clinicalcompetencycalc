@@ -54,3 +54,6 @@ Thumbs.db
 
 # Local files
 local/
+
+# Node modules
+./node_modules/
