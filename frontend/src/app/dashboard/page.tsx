@@ -4,15 +4,18 @@ import Header from '@/components/header';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
+const supabase = createClient();
+
 const Dashboard = () => {
   const [displayName, setDisplayName] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const supabase = createClient();
       const { data, error } = await supabase.auth.getUser();
       if (data?.user) {
         setDisplayName(data.user.user_metadata.full_name || data.user.email);
+      } else if (error) {
+        console.error('Error fetching user:', error.message || error);
       }
     };
 

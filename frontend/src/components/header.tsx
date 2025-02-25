@@ -4,6 +4,7 @@ import Image from 'next/image';
 import logo from '@/components/ccc-logo-color.svg'; // Update the path to your logo
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { isAdmin } from '@/utils/supabase/roles';
 
 const supabase = createClient();
 
@@ -14,37 +15,41 @@ const Header = () => {
   const [email, setEmail] = useState('');
   const [originalDisplayName, setOriginalDisplayName] = useState('');
   const [isChanged, setIsChanged] = useState(false);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const fetchProfile = useCallback(async () => {
     try {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+      const { data, error } = await supabase.auth.getUser();
       if (error) throw error;
-      if (!user) throw new Error('No user');
+      if (!data?.user) throw new Error('No user');
 
-      if (user.email) setEmail(user.email);
-      else console.log('No email found');
+      setEmail(data.user.email ?? '');
 
       const {
-        data,
+        data: profileData,
         error: profileError,
         status,
-      } = await supabase.from('profiles').select('display_name').eq('id', user.id).single();
+      } = await supabase.from('profiles').select('display_name').eq('id', data.user.id).single();
 
       if (profileError && status !== 406) {
         console.log(profileError);
         throw profileError;
       }
 
-      if (data) {
-        setDisplayName(data.display_name);
-        setOriginalDisplayName(data.display_name);
+      if (profileData) {
+        setDisplayName(profileData.display_name);
+        setOriginalDisplayName(profileData.display_name);
       }
+
+      const isAdminUser = await isAdmin(data.user.id);
+      setIsAdminUser(isAdminUser);
     } catch (error) {
-      console.error('Error loading user data:', error);
+      if (error instanceof Error) {
+        console.error('Error loading user data:', error.message);
+      } else {
+        console.error('Error loading user data:', String(error));
+      }
       alert(`Error loading user data: ${JSON.stringify(error)}`);
     }
   }, []);
@@ -71,15 +76,12 @@ const Header = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
+      const { data, error } = await supabase.auth.getUser();
       if (error) throw error;
-      if (!user) throw new Error('No user');
+      if (!data?.user) throw new Error('No user');
 
       const updates = {
-        id: user.id,
+        id: data.user.id,
         display_name: displayName,
         updated_at: new Date().toISOString(),
       };
@@ -91,7 +93,11 @@ const Header = () => {
       setIsChanged(false);
       alert('Profile updated successfully');
     } catch (error) {
-      console.error('Error updating profile:', error);
+      if (error instanceof Error) {
+        console.error('Error updating profile:', error.message);
+      } else {
+        console.error('Error updating profile:', String(error));
+      }
       alert(`Error updating profile: ${JSON.stringify(error)}`);
     }
   };
@@ -121,21 +127,43 @@ const Header = () => {
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
         <nav className='d-flex gap-3 align-items-center'>
-          <Link
-            href='/dashboard'
-            className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-          >
-            Dashboard
-          </Link>
-          <Link
-            href='/form-requests'
-            className={`btn ${pathname === '/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-          >
-            Form Requests
-          </Link>
-          <Link href='/report' className={`btn ${pathname === '/report' ? 'btn-secondary' : 'btn-outline-secondary'}`}>
-            Report
-          </Link>
+          {isAdminUser ? (
+            <>
+              <Link
+                href='/admin-dashboard'
+                className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              >
+                Admin Dashboard
+              </Link>
+              <Link
+                href='/all-reports'
+                className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              >
+                All Reports
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href='/dashboard'
+                className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href='/form-requests'
+                className={`btn ${pathname === '/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              >
+                Form Requests
+              </Link>
+              <Link
+                href='/report'
+                className={`btn ${pathname === '/report' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              >
+                Report
+              </Link>
+            </>
+          )}
           <div className='dropdown' ref={profileMenuRef}>
             <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
               <i className='bi bi-person-circle'></i>
