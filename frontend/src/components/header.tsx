@@ -25,8 +25,8 @@ const Header = () => {
       if (error) throw error;
       if (!user) throw new Error('No user');
 
-      if (!user.email) throw new Error('No email');
-      else setEmail(user.email);
+      if (user.email) setEmail(user.email);
+      else console.log('No email found');
 
       const {
         data,
@@ -148,7 +148,11 @@ const Header = () => {
                   </button>
                 </li>
                 <li>
-                  <button className='dropdown-item'>Logout</button>
+                  <form action='/auth/signout' method='post'>
+                    <button className='dropdown-item' type='submit'>
+                      Logout
+                    </button>
+                  </form>
                 </li>
               </ul>
             )}
