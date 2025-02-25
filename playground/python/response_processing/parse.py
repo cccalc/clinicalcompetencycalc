@@ -9,13 +9,18 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint)
 
 def parse_sentences_t5(sentences):
   """
-  Return a list of random ingredients as strings.
+  This Python function takes a list of sentences, tokenizes them using a
+  tokenizer, generates simpler sentences using a model, and returns the simplified
+  sentences as a string separated by newlines.
 
-  :param sentences: Optional "kind" of ingredients.
-  :type sentences: list[str] or None
-  :return: The ingredients list.
-  :rtype: list[str]
-
+  :param sentences: The `parse_sentences_t5` function takes a string of sentences
+  as input, tokenizes the sentences using a tokenizer, generates simpler versions
+  of the sentences using a T5 model, and then returns the simplified sentences as
+  a single string separated by double newline characters
+  :return: The function `parse_sentences_t5` takes a string of sentences as input,
+  tokenizes the sentences using a T5 model, generates simplified versions of the
+  sentences, and returns the simplified sentences as a single string separated by
+  newline characters ("\n\n").
   """
   complex_sentences = sent_tokenize(sentences)
 

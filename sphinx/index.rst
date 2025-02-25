@@ -6,9 +6,9 @@
 Clinical Competency Calculator documentation
 =============================================
 
-.. Add your content using ``reStructuredText`` syntax. See the
-.. `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-.. documentation for details.
+Add your content using ``reStructuredText`` syntax. See the
+`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
+documentation for details.
 
 Check out the :doc:`usage` section for further information.
 
