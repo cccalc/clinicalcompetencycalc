@@ -5,11 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import logo from '@/components/ccc-logo-color.svg'; // Update the path to your logo
+import logo from '@/components/ccc-logo-color.svg';
 import { supabase_authorize } from '@/utils/async-util';
 import { createClient } from '@/utils/supabase/client';
-
-// import { isAdmin } from '@/utils/supabase/roles';
 
 const supabase = createClient();
 
@@ -146,7 +144,7 @@ const Header = () => {
                 href='/admin-dashboard'
                 className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
-                Admin Dashboard
+                All Users
               </Link>
               <Link
                 href='/all-reports'

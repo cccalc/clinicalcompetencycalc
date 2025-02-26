@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { createClient } from '@/utils/supabase/client';
 
-// import { isAdmin } from '@/utils/supabase/roles';
-
 const supabase = createClient();
 
 const AdminDashboard = () => {
@@ -19,7 +17,6 @@ const AdminDashboard = () => {
   }
 
   const [users, setUsers] = useState<User[]>([]);
-  // const [authorized, setAuthorized] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
@@ -34,35 +31,11 @@ const AdminDashboard = () => {
     };
 
     fetchUsers();
-
-    // const checkAdmin = async () => {
-    //   const { data, error } = await supabase.auth.getUser();
-    //   if (error) {
-    //     console.error('Error fetching user:', error);
-    //     router.push('/login');
-    //     return;
-    //   }
-    //   if (!data?.user) {
-    //     router.push('/login');
-    //     return;
-    //   }
-
-    //   const isAdminUser = await isAdmin(data.user.id);
-    //   if (!isAdminUser) {
-    //     router.push('/dashboard');
-    //   } else {
-    //     fetchUsers();
-    //   }
-    // };
-
-    // checkAdmin();
   }, [router]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
-  // const filteredUsers = users.filter((user) => user.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className='container'>
@@ -83,7 +56,6 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {/* {filteredUsers.map((user) => ( */}
           {users.map((user) => (
             <tr key={user.id}>
               <td>{user.user_id}</td>
