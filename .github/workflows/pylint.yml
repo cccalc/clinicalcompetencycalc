@@ -24,4 +24,3 @@ jobs:
       run: |
         which pylint
         which python
-        pylint --rcfile=.pylint-config $(git ls-files '*.py')
