@@ -68,3 +68,6 @@ server/socketio/node_modules/
 
 # Environment files
 .env
+
+# Python venv
+.venv/
