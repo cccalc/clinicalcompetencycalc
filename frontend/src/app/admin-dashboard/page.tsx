@@ -1,3 +1,5 @@
+'use client';
+
 import AdminDashboard from '@/components/adminDashboard';
 
 const AdminDashboardPage = () => {
