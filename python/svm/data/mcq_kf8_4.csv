@@ -1,0 +1,8 @@
+id,created_at,user_id,c8_4_1,c8_4_2,c8_4_3,c8_4_4,c8_4_5,dev_level
+1,2025-02-18T12:14:26.48+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,False,False,True,False,1
+2,2025-02-18T12:21:01.258+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,False,True,True,False,2
+3,2025-02-18T14:06:53.126+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,False,True,4
+4,2025-02-18T14:34:20.772+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,False,True,True,False,2
+5,2025-02-19T16:58:30.254+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,True,True,False,False,1
+6,2025-02-21T14:54:16.114+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,False,False,True,False,1
+7,2025-02-24T19:08:28.689+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,True,False,4
