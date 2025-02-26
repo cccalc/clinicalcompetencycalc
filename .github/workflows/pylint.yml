@@ -21,4 +21,4 @@ jobs:
         find . -name "requirements.txt" -execdir pip install -r requirements.txt \; -execdir pip install pylint \;
     - name: Analyzing the code with pylint
       run: |
-        python =pylint --rcfile=.pylint-config $(git ls-files '*.py')
+        pylint --rcfile=.pylint-config $(git ls-files '*.py')
