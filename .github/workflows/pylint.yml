@@ -18,7 +18,7 @@ jobs:
       run: |
         python3.12 -m venv .venv
         . .venv/bin/activate
-        find . -name "requirements.txt" -execdir pip install -r requirements.txt 
+        find . -name "requirements.txt" -execdir pip install -r requirements.txt \;
         pip install pylint
     - name: Analyzing the code with pylint
       run: |
