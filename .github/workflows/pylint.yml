@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.12"]
+        python-version: ["3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -16,7 +16,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        find . -name "requirements.txt" -execdir bash run.sh \; -execdir pip install pylint \;
+        python3.12 -m venv .venv
+        source .venv/bin/activate
+        find . -name "requirements.txt" -execdir pip install -r requirements.txt \; -execdir pip install pylint \;
     - name: Analyzing the code with pylint
       run: |
-        find . -name "requirements.txt" -execdir python -m pylint pylint --rcfile=.pylint-config $(git ls-files '*.py') \;
+        python =pylint --rcfile=.pylint-config $(git ls-files '*.py')

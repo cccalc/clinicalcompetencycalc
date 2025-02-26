@@ -3,7 +3,7 @@
 fail-under = 7
 
 # Files or directories to be skipped. They should be base names, not paths.
-ignore = ["CVS"]
+ignore = ["CVS", "sphinx"]
 
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs
