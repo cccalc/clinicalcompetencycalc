@@ -1,7 +1,9 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { isAdmin } from '@/utils/supabase/roles';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const supabase = createClient();
 
