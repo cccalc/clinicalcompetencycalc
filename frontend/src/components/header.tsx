@@ -132,12 +132,12 @@ const Header = () => {
 
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
-      <div className='container mx-auto d-flex justify-content-between align-items-center'>
+      <div className='container mx-auto d-flex justify-content-between align-items-center flex-wrap'>
         <Link href='/' className='d-flex align-items-center text-decoration-none'>
           <Image src={logo} alt='Logo' width={40} height={40} />
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
-        <nav className='d-flex gap-3 align-items-center'>
+        <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user_roleAuthorized ? (
             <>
               <Link
