@@ -20,6 +20,7 @@ const supabase = createClient();
  */
 const Header = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
