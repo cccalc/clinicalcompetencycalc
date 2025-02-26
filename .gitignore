@@ -64,3 +64,6 @@ local/
 
 # Environment files
 .env
+
+# Python venv
+.venv/
