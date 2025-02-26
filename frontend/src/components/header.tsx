@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import logo from '@/components/ccc-logo-color.svg';
@@ -13,7 +13,6 @@ const supabase = createClient();
 
 const Header = () => {
   const pathname = usePathname();
-  const router = useRouter();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -141,39 +140,39 @@ const Header = () => {
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user_roleAuthorized ? (
             <>
-              <button
-                onClick={() => router.push('/admin-dashboard', undefined, { shallow: true })}
+              <Link
+                href='/admin-dashboard'
                 className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
                 All Users
-              </button>
-              <button
-                onClick={() => router.push('/all-reports', undefined, { shallow: true })}
+              </Link>
+              <Link
+                href='/all-reports'
                 className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
                 All Reports
-              </button>
+              </Link>
             </>
           ) : (
             <>
-              <button
-                onClick={() => router.push('/dashboard', undefined, { shallow: true })}
+              <Link
+                href='/dashboard'
                 className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
                 Dashboard
-              </button>
-              <button
-                onClick={() => router.push('/form-requests', undefined, { shallow: true })}
+              </Link>
+              <Link
+                href='/form-requests'
                 className={`btn ${pathname === '/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
                 Form Requests
-              </button>
-              <button
-                onClick={() => router.push('/report', undefined, { shallow: true })}
+              </Link>
+              <Link
+                href='/report'
                 className={`btn ${pathname === '/report' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
                 Report
-              </button>
+              </Link>
             </>
           )}
           <div className='dropdown' ref={profileMenuRef}>
