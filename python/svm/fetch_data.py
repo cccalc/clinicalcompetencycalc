@@ -1,30 +1,63 @@
 """
-This module fetches data from a Supabase database and exports it to a CSV file.
+fetch_data.py
 
-The main function loads environment variables, connects to the Supabase database, fetches data from
-specified tables, and exports the data to CSV files.
+This script fetches data from a Supabase database and exports it to CSV files.
+It uses the Supabase client to connect to the database and retrieve data from specified tables.
+The script requires the following environment variables to be set:
+- SUPABASE_URL: The URL of the Supabase database.
+- SUPABASE_SERVICE_ROLE_KEY: The service role key for accessing the Supabase database.
 
-Functions:
-  main() -> None: Main function that orchestrates the data fetching and exporting process.
-  fetchData(supabase: Client, table: str): Fetches all data from a specified table in the Supabase 
-  database.
+Usage:
+python fetch_data.py <folder>
+
+Arguments:
+- folder: The folder where the CSV files will be saved.
+
+Dependencies:
+- dotenv
+- os
+- pandas
+- re
+- supabase
+- sys
 """
 
 import os
 import re
+import sys
 
 import pandas as pd
 from dotenv import load_dotenv
 from supabase import Client, create_client
 
 
-def main() -> None:
-  """main function"""
+def main(argv: list) -> None:
+  """
+  Main function to fetch data from Supabase and export it to CSV files.
+
+  :param argv: Command line arguments.
+  :type argv: list
+  :raises ValueError: If the required environment variables are not set.
+  :raises SystemExit: If the incorrect number of arguments is provided.
+  """
+
+  # Check if the correct number of arguments is provided
+  if len(argv) != 2:
+    print("Usage: python fetch_data.py <folder>")
+    sys.exit(1)
+  folder = argv[1]
+  # Create the folder if it doesn't exist
+  os.makedirs(folder, exist_ok=True)
+
   # Load environment variables from .env file
   load_dotenv()
 
   url: str = os.environ.get("SUPABASE_URL")
   key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+
+  if url is None or key is None:
+    raise ValueError("Supabase URL or key not found in environment variables.")
+
   supabase: Client = create_client(url, key)
 
   response = supabase.schema("public")              \
@@ -33,34 +66,32 @@ def main() -> None:
                      .single().execute()
 
   kf_descriptions = response.data["kf_descriptions"]
-  table_names = ['mcq_kf' + re.sub(r'\.', '_', kf)
-                 for kf in [*kf_descriptions.keys()]]
+  table_names = ['mcq_kf' + re.sub(r'\.', '_', kf) for kf in [*kf_descriptions.keys()]]
 
-  data = fetchData(supabase, table_names[0])
-  # export data to csv
-  df = pd.DataFrame(data)
-  df.to_csv(f"data/{table_names[0]}.csv", index=False)
+  for table in table_names:
+    data = fetchData(supabase, table)
+    print(f"Fetched {len(data)} rows from table {table}")
+    df = pd.DataFrame(data)
+    df.to_csv(f"{folder}/{table}.csv", index=False)
 
 
-def fetchData(supabase: Client, table: str):
+def fetchData(supabase: Client, table: str) -> list:
   """
-  This Python function fetches all data from a specified table in a Supabase
-  database.
+  Fetches all data from a specified table in the Supabase database.
 
-  :param supabase: The `supabase` parameter is an instance of the Supabase client
-  that is used to interact with the Supabase database. It allows you to perform
-  operations such as querying data, inserting data, updating data, and deleting
-  data from your database
+  :param supabase: The Supabase client object.
   :type supabase: Client
-  :param table: The `table` parameter in the `fetchData` function is a string that
-  represents the name of the table from which you want to fetch data
+
+  :param table: The name of the table to fetch data from. This table should be in the "trainingdata"
+  schema.
   :type table: str
-  :return: The function `fetchData` is returning the data fetched from the
-  Supabase database table specified by the `table` parameter.
+
+  :returns: A list of dictionaries containing the data from the specified table.
+  :rtype: list
   """
   response = supabase.schema("trainingdata").table(table).select("*").execute()
   return response.data
 
 
 if __name__ == "__main__":
-  main()
+  main(sys.argv)
