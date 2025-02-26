@@ -22,4 +22,6 @@ jobs:
         pip install pylint
     - name: Analyzing the code with pylint
       run: |
+        which pylint
+        which python
         pylint --rcfile=.pylint-config $(git ls-files '*.py')
