@@ -5,8 +5,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
   }
 }
 
@@ -39,4 +39,26 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+header {
+  background-color: white;
+  color: gray;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header a {
+  color: inherit;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+header a:hover {
+  background-color: #f0f0f0;
+}
+
+header a.active {
+  background-color: #e0e0e0;
 }
