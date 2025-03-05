@@ -1,5 +1,8 @@
+"""
+This module contains the training script for the BERT model.
+"""
+
 import os
-import shutil
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -15,11 +18,38 @@ def main() -> None:
   """Main function."""
   tf.get_logger().setLevel('ERROR')
 
-  AUTOTUNE = tf.data.AUTOTUNE
-  batch_size = 32
-  seed = 42
-
   data_dir = os.path.join(os.getcwd(), 'data', 'keras')
+  train_ds, val_ds, test_ds, class_names = loadLatestDataset(data_dir, batch_size=32, seed=42)
+
+  tfhub_handle_encoder = 'https://tfhub.dev/google/experts/bert/pubmed/2'
+  tfhub_handle_preprocess = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
+
+  classifier_model = buildClassifierModel(tfhub_handle_encoder, tfhub_handle_preprocess)
+
+  history = trainModel(train_ds, val_ds, classifier_model, epochs=5, init_lr=3e-5)
+
+
+def loadLatestDataset(
+    data_dir: str, batch_size=32, seed=42
+) -> tuple[tf.data.Dataset, tf.data.Dataset, tf.data.Dataset, list[str]]:
+  """
+  Loads the latest dataset from the specified directory.
+
+  :param data_dir:
+  :type data_dir: str
+
+  :param batch_size:
+  :type batch_size: int
+
+  :param seed:
+  :type seed: int
+
+  :return:
+  :rtype: tuple[tf.data.Dataset, tf.data.Dataset, tf.data.Dataset, list[str]]
+  """
+
+  autotune = tf.data.AUTOTUNE
+
   latest_folder = max([f for f in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, f))])
   latest_dir = os.path.join(data_dir, latest_folder)
 
@@ -29,8 +59,11 @@ def main() -> None:
       validation_split=0.2,
       subset='training',
       seed=seed)
-  train_ds = raw_train_ds.cache().prefetch(buffer_size=AUTOTUNE)
-  class_names = raw_train_ds.class_names
+
+  def oneHotLabels(x, y):
+    return x, tf.one_hot(y, depth=len(raw_train_ds.class_names))
+
+  train_ds = raw_train_ds.map(oneHotLabels).cache().prefetch(buffer_size=autotune)
 
   raw_val_ds = tf.keras.utils.text_dataset_from_directory(
       os.path.join(latest_dir, 'train'),
@@ -38,25 +71,14 @@ def main() -> None:
       validation_split=0.2,
       subset='validation',
       seed=seed)
-  val_ds = raw_val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+  val_ds = raw_val_ds.map(oneHotLabels).cache().prefetch(buffer_size=autotune)
 
   raw_test_ds = tf.keras.utils.text_dataset_from_directory(
       os.path.join(latest_dir, 'test'),
       batch_size=batch_size)
-  test_ds = raw_test_ds.cache().prefetch(buffer_size=AUTOTUNE)
+  test_ds = raw_test_ds.map(oneHotLabels).cache().prefetch(buffer_size=autotune)
 
-  tfhub_handle_encoder = 'https://tfhub.dev/google/experts/bert/pubmed/2'
-  tfhub_handle_preprocess = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
-
-  # bert_preprocess_model = hub.KerasLayer(tfhub_handle_preprocess)
-  # bert_model = hub.KerasLayer(tfhub_handle_encoder)
-
-  text_test = ['Demonstrates situational awareness when discussing patients']
-  # text_preprocessed = bert_preprocess_model(text_test)
-
-  classifier_model = buildClassifierModel(tfhub_handle_encoder, tfhub_handle_preprocess)
-  bert_raw_result = classifier_model(tf.constant(text_test))
-  print(tf.sigmoid(bert_raw_result))
+  return train_ds, val_ds, test_ds, raw_test_ds.class_names
 
 
 def buildClassifierModel(tfhub_handle_encoder: str, tfhub_handle_preprocess: str) -> tf.keras.Model:
@@ -65,8 +87,10 @@ def buildClassifierModel(tfhub_handle_encoder: str, tfhub_handle_preprocess: str
 
   :param tfhub_handle_encoder:
   :type tfhub_handle_encoder: str
+
   :param tfhub_handle_preprocess:
   :type tfhub_handle_preprocess: str
+
   :return:
   :rtype: tf.keras.Model
   """
@@ -78,8 +102,30 @@ def buildClassifierModel(tfhub_handle_encoder: str, tfhub_handle_preprocess: str
   outputs = encoder(encoder_inputs)
   net = outputs['pooled_output']
   net = tf.keras.layers.Dropout(0.1)(net)
-  net = tf.keras.layers.Dense(1, activation=None, name='classifier')(net)
+  net = tf.keras.layers.Dense(4, activation='softmax', name='classifier')(net)
   return tf.keras.Model(text_input, net)
+
+
+def trainModel(
+    train_ds: tf.data.Dataset, val_ds: tf.data.Dataset, model: tf.keras.Model, epochs=5, init_lr=3e-5
+) -> tf.keras.callbacks.History:
+  loss = tf.keras.losses.CategoricalCrossentropy()
+  metrics = tf.metrics.CategoricalAccuracy()
+
+  steps_per_epoch = tf.data.experimental.cardinality(train_ds).numpy()
+  num_train_steps = steps_per_epoch * epochs
+  num_warmup_steps = int(0.1*num_train_steps)
+
+  optimizer = optimization.create_optimizer(
+      init_lr=init_lr,
+      num_train_steps=num_train_steps,
+      num_warmup_steps=num_warmup_steps,
+      optimizer_type='adamw')
+
+  model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
+
+  print('Training model')
+  return model.fit(x=train_ds, validation_data=val_ds, epochs=epochs)
 
 
 if __name__ == '__main__':
