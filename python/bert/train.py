@@ -9,7 +9,7 @@ import tensorflow_hub as hub
 import tensorflow_text as text
 from official.nlp import optimization  # to create AdamW optimizer
 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 os.environ['TF_USE_LEGACY_KERAS'] = '1'
 
@@ -27,6 +27,11 @@ def main() -> None:
   classifier_model = buildClassifierModel(tfhub_handle_encoder, tfhub_handle_preprocess)
 
   history = trainModel(train_ds, val_ds, classifier_model, epochs=5, init_lr=3e-5)
+
+  loss, accuracy = classifier_model.evaluate(test_ds)
+  print(f'Loss: {loss}, Accuracy: {accuracy}')
+
+  plotHistory(history)
 
 
 def loadLatestDataset(
@@ -109,6 +114,23 @@ def buildClassifierModel(tfhub_handle_encoder: str, tfhub_handle_preprocess: str
 def trainModel(
     train_ds: tf.data.Dataset, val_ds: tf.data.Dataset, model: tf.keras.Model, epochs=5, init_lr=3e-5
 ) -> tf.keras.callbacks.History:
+  """
+  Trains the model using the specified datasets.
+
+  :param train_ds: Description
+  :type train_ds: 
+  :param val_ds: Description
+  :type val_ds: 
+  :param model: Description
+  :type model: 
+  :param epochs: Description
+  :type epochs: 
+  :param init_lr: Description
+  :type init_lr: 
+  :return: Description
+  :rtype: Any
+  """
+
   loss = tf.keras.losses.CategoricalCrossentropy()
   metrics = tf.metrics.CategoricalAccuracy()
 
@@ -126,6 +148,46 @@ def trainModel(
 
   print('Training model')
   return model.fit(x=train_ds, validation_data=val_ds, epochs=epochs)
+
+
+def plotHistory(history: tf.keras.callbacks.History) -> None:
+  """
+  Plots the training history.
+
+  :param history: Description
+  :type history: 
+  """
+
+  history_dict = history.history
+  print(history_dict.keys())
+
+  acc = history_dict['categorical_accuracy']
+  val_acc = history_dict['val_categorical_accuracy']
+  loss = history_dict['loss']
+  val_loss = history_dict['val_loss']
+
+  epochs = range(1, len(acc) + 1)
+  fig = plt.figure(figsize=(10, 6))
+  fig.tight_layout()
+
+  plt.subplot(2, 1, 1)
+  # r is for "solid red line"
+  plt.plot(epochs, loss, 'r', label='Training loss')
+  # b is for "solid blue line"
+  plt.plot(epochs, val_loss, 'b', label='Validation loss')
+  plt.title('Training and validation loss')
+  # plt.xlabel('Epochs')
+  plt.ylabel('Loss')
+  plt.legend()
+
+  plt.subplot(2, 1, 2)
+  plt.plot(epochs, acc, 'r', label='Training acc')
+  plt.plot(epochs, val_acc, 'b', label='Validation acc')
+  plt.title('Training and validation accuracy')
+  plt.xlabel('Epochs')
+  plt.ylabel('Accuracy')
+  plt.legend(loc='lower right')
+  plt.show()
 
 
 if __name__ == '__main__':
