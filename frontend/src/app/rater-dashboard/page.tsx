@@ -14,8 +14,12 @@ const RaterDashboard = () => {
       <div className='container'>
         <h1>Rater Dashboard</h1>
         <ul className='list-group'>
-          {requests.map((request) => (
-            <li key={request.id} className='list-group-item'></li>
+          {requests.map((requests) => (
+            <li key={requests.id} className='list-group-item'>
+              <h1>
+                {requests.student_id} || {requests.student_name}
+              </h1>
+            </li>
           ))}
         </ul>
       </div>
