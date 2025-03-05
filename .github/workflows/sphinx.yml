@@ -8,21 +8,25 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - name: Build HTML
-        uses: ammaraskar/sphinx-action@master
-        with:
-          docs-folder: sphinx
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-docs
-          path: sphinx/_build/html/
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: sphinx/build/html
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    - name: Install dependencies
+      run: |
+        find . -name "requirements.txt" -execdir bash run.sh \;
+    - name: Build HTML
+      run: |
+        python -m venv venv
+        ./venv/bin/python -m pip install sphinx
+        ./venv/bin/python -m sphinx -b html sphinx sphinx/_build/html
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-docs
+        path: sphinx/_build/html/
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/chore/cicd/'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: sphinx/_build/html

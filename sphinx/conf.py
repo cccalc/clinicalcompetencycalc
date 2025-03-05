@@ -5,22 +5,28 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import sys
+from pathlib import Path
+#sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'playground/python/response_processing/'))
 
-project = 'CCC Sphinx'
-copyright = '2025, Tyler Price, Jacq Lee, Dylan Colburn, Tyler Muessig'
-author = 'Tyler Price, Jacq Lee, Dylan Colburn, Tyler Muessig'
+project = 'Clinical Compentancy Calculator'
+copyright = '2025, Dylan Colburn, Jacq Li, Tyler Muessig, Tyler Price'
+author = 'Dylan Colburn, Jacq Li, Tyler Muessig, Tyler Price'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc',
-              
+extensions = ['sphinx.ext.doctest',
+              'sphinx.ext.doctest',
+              'sphinx.ext.autodoc',
+              'sphinx.ext.autosummary',
               ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = []
 
-source_dir = './sphinx'
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
