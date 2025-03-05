@@ -21,6 +21,7 @@ const Header = () => {
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const [user_roleAuthorized, setUser_roleAuthorized] = useState(false);
+  const [userRole, setUserRole] = useState('');
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -34,7 +35,7 @@ const Header = () => {
         data: profileData,
         error: profileError,
         status,
-      } = await supabase.from('profiles').select('display_name').eq('id', data.user.id).single();
+      } = await supabase.from('profiles').select('display_name, role').eq('id', data.user.id).single();
 
       if (profileError && status !== 406) {
         console.log(profileError);
@@ -44,10 +45,8 @@ const Header = () => {
       if (profileData) {
         setDisplayName(profileData.display_name);
         setOriginalDisplayName(profileData.display_name);
+        setUserRole(profileData.role);
       }
-
-      // const isAdminUser = await isAdmin(data.user.id);
-      // setIsAdminUser(isAdminUser);
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error loading user data:', error.message);
@@ -140,18 +139,32 @@ const Header = () => {
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user_roleAuthorized ? (
             <>
-              <Link
-                href='/admin-dashboard'
-                className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                All Users
-              </Link>
-              <Link
-                href='/all-reports'
-                className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                All Reports
-              </Link>
+              {userRole === 'admin' && (
+                <>
+                  <Link
+                    href='/admin-dashboard'
+                    className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    All Users
+                  </Link>
+                  <Link
+                    href='/all-reports'
+                    className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    All Reports
+                  </Link>
+                </>
+              )}
+              {userRole === 'rater' && (
+                <>
+                  <Link
+                    href='/rater-dashboard'
+                    className={`btn ${pathname === '/rater-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    Rater Dashboard
+                  </Link>
+                </>
+              )}
             </>
           ) : (
             <>
