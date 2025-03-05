@@ -1,5 +1,4 @@
 import Header from '@/components/header';
-import Link from 'next/link';
 
 const RaterDashboard = () => {
   // Dummy data for student requests
