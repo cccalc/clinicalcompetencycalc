@@ -16,9 +16,9 @@ const RaterDashboard = () => {
         <ul className='list-group'>
           {requests.map((requests) => (
             <li key={requests.id} className='list-group-item'>
-              <h1>
+              <h3>
                 {requests.student_id} || {requests.student_name}
-              </h1>
+              </h3>
             </li>
           ))}
         </ul>
