@@ -3,147 +3,51 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import logo from '@/components/ccc-logo-color.svg';
-import { supabase_authorize } from '@/utils/async-util';
-import { createClient } from '@/utils/supabase/client';
-
-const supabase = createClient();
+import { useUser } from '@/context/UserContext';
 
 const Header = () => {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
-  const [originalDisplayName, setOriginalDisplayName] = useState('');
   const [isChanged, setIsChanged] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const [user_roleAuthorized, setUser_roleAuthorized] = useState(false);
-  const [user_roleRater, setUser_roleRater] = useState(false);
+  const { user, userRoleAuthorized, userRoleRater } = useUser();
 
-  const fetchProfile = useCallback(async () => {
-    try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
-      if (!data?.user) throw new Error('No user');
-
-      setEmail(data.user.email ?? '');
-
-      const {
-        data: profileData,
-        error: profileError,
-        status,
-      } = await supabase.from('profiles').select('display_name').eq('id', data.user.id).single();
-
-      if (profileError && status !== 406) {
-        console.log(profileError);
-        throw profileError;
-      }
-
-      if (profileData) {
-        setDisplayName(profileData.display_name);
-        setOriginalDisplayName(profileData.display_name);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error loading user data:', error.message);
-      } else {
-        console.error('Error loading user data:', String(error));
-      }
-      alert(`Error loading user data: ${JSON.stringify(error)}`);
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.display_name);
+      setEmail(user.email);
     }
-  }, []);
-
-  useEffect(() => {
-    console.log('Checking user role authorization...');
-    supabase_authorize(['user_roles.select', 'user_roles.insert']).then((result) => {
-      setUser_roleAuthorized(result);
-    });
-  }, [email]);
-
-  useEffect(() => {
-    console.log('Checking user role authorization...');
-    supabase_authorize(['form_responses.select', 'form_responses.insert']).then((result) => {
-      setUser_roleRater(result);
-    });
-  }, [email]);
-
-  useEffect(() => {
-    fetchProfile();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        fetchProfile();
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [fetchProfile]);
+  }, [user]);
 
   const toggleProfileMenu = () => {
     setShowProfileMenu(!showProfileMenu);
   };
 
   const handleSaveChanges = async () => {
-    try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
-      if (!data?.user) throw new Error('No user');
-
-      const updates = {
-        id: data.user.id,
-        display_name: displayName,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { error: updateError } = await supabase.from('profiles').upsert(updates);
-      if (updateError) throw updateError;
-
-      setOriginalDisplayName(displayName);
-      setIsChanged(false);
-      alert('Profile updated successfully');
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error updating profile:', error.message);
-      } else {
-        console.error('Error updating profile:', String(error));
-      }
-      alert(`Error updating profile: ${JSON.stringify(error)}`);
-    }
+    // Handle save changes logic here
+    // For example, update the user profile in the database
+    // and then update the context with the new user information
   };
 
   useEffect(() => {
-    setIsChanged(displayName !== originalDisplayName);
-  }, [displayName, originalDisplayName]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
-        setShowProfileMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [profileMenuRef]);
+    setIsChanged(displayName !== user?.display_name);
+  }, [displayName, user?.display_name]);
 
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
       <div className='container mx-auto d-flex justify-content-between align-items-center flex-wrap'>
-        <Link href='/' className='d-flex align-items-center text-decoration-none'>
+        <Link href='/dashboard' className='d-flex align-items-center text-decoration-none'>
           <Image src={logo} alt='Logo' width={40} height={40} />
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
-          {user_roleAuthorized ? (
+          {userRoleAuthorized ? (
             <>
               <Link
                 href='/admin-dashboard'
@@ -158,7 +62,7 @@ const Header = () => {
                 All Reports
               </Link>
             </>
-          ) : user_roleRater ? (
+          ) : userRoleRater ? (
             <>
               <Link
                 href='/rater-dashboard'

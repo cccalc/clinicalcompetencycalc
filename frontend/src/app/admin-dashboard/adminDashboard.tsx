@@ -57,7 +57,7 @@ const AdminDashboard = () => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
+            <tr key={user.user_id}>
               <td>{user.user_id}</td>
               <td>{user.role}</td>
               <td>
