@@ -1,11 +1,11 @@
-import collections
-import matplotlib.pyplot as plt
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torchtext
-import tqdm
+# import collections
+# import matplotlib.pyplot as plt
+# import numpy as np
+# import torch
+# import torch.nn as nn
+# import torch.optim as optim
+# import torchtext
+# import tqdm
 
 
 # def init_seeds(seed):

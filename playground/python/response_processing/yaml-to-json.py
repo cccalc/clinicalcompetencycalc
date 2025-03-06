@@ -1,6 +1,6 @@
-import yaml
-import json
 import sys
+import json
+import yaml
 
 
 def yaml_to_json(yaml_file, json_file):
