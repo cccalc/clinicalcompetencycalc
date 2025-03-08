@@ -90,8 +90,10 @@ const Header = () => {
                 Form Requests
               </Link>
               <Link
-                href='/report'
-                className={`btn ${pathname === '/report' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                href='/dashboard/student/report'
+                className={`btn ${
+                  pathname === '/dashboard/student/report' ? 'btn-secondary' : 'btn-outline-secondary'
+                }`}
               >
                 Report
               </Link>
