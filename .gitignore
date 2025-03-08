@@ -67,3 +67,5 @@ local/
 
 # Python venv
 .venv/
+# Node modules
+./node_modules/

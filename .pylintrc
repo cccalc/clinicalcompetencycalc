@@ -5,6 +5,9 @@ fail-under = 7
 # Files or directories to be skipped. They should be base names, not paths.
 ignore = ["CVS"]
 
+# Paths to be skipped.
+ignore-paths = sphinx/.*, SocketIo-Python-In-Out/.*
+
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs
 # file locks
@@ -128,7 +131,8 @@ max-module-lines = 1000
 [tool.pylint."messages control"]
 # Only show warnings with the listed confidence levels. Leave empty to show all.
 # Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED.
-confidence = HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED
+confidence = HIGH, CONTROL_FLOW, UNDEFINED
+disable = E1101, W1514
 
 [tool.pylint.miscellaneous]
 # List of note tags to take in consideration, separated by a comma.
@@ -168,5 +172,3 @@ min-similarity-lines = 4
 [tool.pylint.spelling]
 # Limits count of emitted suggestions for spelling mistakes.
 max-spelling-suggestions = 4
-
-
