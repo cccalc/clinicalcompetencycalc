@@ -9,6 +9,7 @@ import { Inter } from 'next/font/google';
 
 import BootstrapClient from '@/components/bootstrap-client';
 import { UserProvider } from '../context/UserContext';
+import Header from '@/components/header';
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -35,7 +36,10 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          <Header />
+          {children}
+        </UserProvider>
       </body>
       <BootstrapClient />
     </html>

@@ -1,6 +1,5 @@
 'use client';
 
-import Header from '@/components/header';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -24,7 +23,6 @@ const Dashboard = () => {
 
   return (
     <>
-      <Header />
       <main className='container mx-auto p-4'>
         <h1 className='text-2xl font-bold'>Dashboard</h1>
         <p>Welcome, {displayName}</p>

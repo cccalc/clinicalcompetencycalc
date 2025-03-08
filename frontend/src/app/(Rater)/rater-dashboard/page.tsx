@@ -1,5 +1,3 @@
-import Header from '@/components/header';
-
 const RaterDashboard = () => {
   // Dummy data for student requests
   const requests = [
@@ -10,7 +8,6 @@ const RaterDashboard = () => {
 
   return (
     <>
-      <Header />
       <div className='container'>
         <h1>Rater Dashboard</h1>
         <ul className='list-group'>

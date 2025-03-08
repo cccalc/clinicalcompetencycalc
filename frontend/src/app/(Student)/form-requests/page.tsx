@@ -1,6 +1,5 @@
 'use client';
 
-import Header from '@/components/header';
 import { useState } from 'react';
 
 const FormRequests = () => {
@@ -16,7 +15,6 @@ const FormRequests = () => {
 
   return (
     <>
-      <Header />
       <main className='container mt-5'>
         <h1 className='text-2xl font-bold mb-4'>Form Requests</h1>
         <form onSubmit={handleSubmit} className='space-y-4'>
