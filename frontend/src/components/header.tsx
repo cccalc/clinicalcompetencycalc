@@ -50,8 +50,10 @@ const Header = () => {
           {userRoleAuthorized ? (
             <>
               <Link
-                href='/admin-dashboard'
-                className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                href='/dashboard/admin/userList'
+                className={`btn ${
+                  pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
+                }`}
               >
                 All Users
               </Link>
@@ -65,10 +67,10 @@ const Header = () => {
           ) : userRoleRater ? (
             <>
               <Link
-                href='/rater-dashboard'
-                className={`btn ${pathname === '/rater-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                href='/dashboard'
+                className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               >
-                Rater Dashboard
+                Dashboard
               </Link>
             </>
           ) : (
@@ -80,8 +82,10 @@ const Header = () => {
                 Dashboard
               </Link>
               <Link
-                href='/form-requests'
-                className={`btn ${pathname === '/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                href='/dashboard/student/form-requests'
+                className={`btn ${
+                  pathname === '/dashboard/student/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'
+                }`}
               >
                 Form Requests
               </Link>
