@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { supabase_authorize } from '@/utils/async-util';
@@ -42,7 +42,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return profileData.display_name;
   };
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     setLoading(true);
 
     const {
@@ -75,7 +75,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUserRoleRater(rater);
 
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchUser();
@@ -97,7 +97,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUser]);
 
   return (
     <UserContext.Provider value={{ user, displayName, email, userRoleAuthorized, userRoleRater, loading }}>

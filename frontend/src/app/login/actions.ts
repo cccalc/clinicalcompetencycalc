@@ -15,7 +15,6 @@ export async function login(formData: FormData): Promise<{ alertColor: string; e
     const { error } = await supabase.auth.signInWithPassword(data);
     if (error) throw error;
 
-    // ✅ Return success immediately (client must fetch session manually)
     return { alertColor: 'success', error: '' };
   } catch (error) {
     if (error instanceof AuthError) {
