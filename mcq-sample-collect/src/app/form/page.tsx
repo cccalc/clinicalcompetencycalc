@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Header from '@/components/header';
 import Loading from '@/components/loading';
 import { getEPAKFDescs, getLatestMCQs } from '@/utils/get-epa-data';
-import { createClient } from '@/utils/supabase/client';
 import { DevLevel, MCQ, type EPAKFDesc } from '@/utils/types';
 import { getDevLevelInt, getRandomItem } from '@/utils/util';
 
@@ -15,8 +14,6 @@ import SubmitButtons from './submit-buttons';
 import { submitSample } from './actions';
 
 export default function Form() {
-  const [userID, setUserID] = useState<string | null>(null);
-
   const [loading, setLoading] = useState<boolean>(true);
   const [descData, setDescData] = useState<EPAKFDesc | undefined>(undefined);
   const [mcqData, setMCQData] = useState<MCQ[] | undefined>(undefined);
@@ -26,14 +23,6 @@ export default function Form() {
   const [devLevel, setDevLevel] = useState<DevLevel>('none');
 
   useEffect(() => {
-    const getUserId = async (): Promise<string | null> => {
-      const supabase = createClient({ db: { schema: 'trainingdata' } });
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data?.user) return null;
-      return data.user.id;
-    };
-
-    getUserId().then((id) => setUserID(id));
     getEPAKFDescs().then((data) => setDescData(data));
     getLatestMCQs().then((data) => setMCQData(data));
   }, []);
@@ -86,13 +75,10 @@ export default function Form() {
   const handleSumbit = async () => {
     if (!questions) return;
     if (Object.keys(choices).length === 0) return;
-    if (!userID) return;
 
     const tableName = 'mcq_kf' + questions[0].kf.replace(/\./g, '_');
 
     const row = {
-      user_id: userID,
-      created_at: new Date().toISOString(),
       ...Object.keys(choices).reduce((o, k) => ({ ...o, ['c' + k.replace(/\./g, '_')]: choices[k] }), {}),
       dev_level: getDevLevelInt(devLevel),
     };
