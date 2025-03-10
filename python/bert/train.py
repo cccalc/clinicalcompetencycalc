@@ -6,7 +6,6 @@ import os
 
 import tensorflow as tf
 import tensorflow_hub as hub
-import tensorflow_text as text
 from official.nlp import optimization  # to create AdamW optimizer
 
 import matplotlib.pyplot as plt
@@ -19,7 +18,7 @@ def main() -> None:
   tf.get_logger().setLevel('ERROR')
 
   data_dir = os.path.join(os.getcwd(), 'data', 'keras')
-  train_ds, val_ds, test_ds, class_names = loadLatestDataset(data_dir, batch_size=32, seed=42)
+  train_ds, val_ds, test_ds, _ = loadLatestDataset(data_dir, batch_size=32, seed=42)
 
   tfhub_handle_encoder = 'https://tfhub.dev/google/experts/bert/pubmed/2'
   tfhub_handle_preprocess = 'https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3'
@@ -40,16 +39,16 @@ def loadLatestDataset(
   """
   Loads the latest dataset from the specified directory.
 
-  :param data_dir:
+  :param data_dir: The directory containing the dataset.
   :type data_dir: str
 
-  :param batch_size:
+  :param batch_size: The batch size for sampling from the dataset.
   :type batch_size: int
 
-  :param seed:
+  :param seed: The random seed for shuffling the dataset.
   :type seed: int
 
-  :return:
+  :return: The training, validation, and test datasets, as well as the class names.
   :rtype: tuple[tf.data.Dataset, tf.data.Dataset, tf.data.Dataset, list[str]]
   """
 
@@ -90,13 +89,13 @@ def buildClassifierModel(tfhub_handle_encoder: str, tfhub_handle_preprocess: str
   """
   Builds a classifier model using the BERT encoder and preprocess layers.
 
-  :param tfhub_handle_encoder:
+  :param tfhub_handle_encoder: The URL of the BERT encoder.
   :type tfhub_handle_encoder: str
 
-  :param tfhub_handle_preprocess:
+  :param tfhub_handle_preprocess: The URL of the BERT preprocess layer.
   :type tfhub_handle_preprocess: str
 
-  :return:
+  :return: The classifier model.
   :rtype: tf.keras.Model
   """
 
@@ -112,23 +111,29 @@ def buildClassifierModel(tfhub_handle_encoder: str, tfhub_handle_preprocess: str
 
 
 def trainModel(
-    train_ds: tf.data.Dataset, val_ds: tf.data.Dataset, model: tf.keras.Model, epochs=5, init_lr=3e-5
+    train_ds: tf.data.Dataset, val_ds: tf.data.Dataset, model: tf.keras.Model,
+    epochs=5, init_lr=3e-5
 ) -> tf.keras.callbacks.History:
   """
   Trains the model using the specified datasets.
 
-  :param train_ds: Description
-  :type train_ds: 
-  :param val_ds: Description
-  :type val_ds: 
-  :param model: Description
-  :type model: 
-  :param epochs: Description
-  :type epochs: 
-  :param init_lr: Description
-  :type init_lr: 
-  :return: Description
-  :rtype: Any
+  :param train_ds: The training dataset.
+  :type train_ds: tf.data.Dataset
+
+  :param val_ds: The validation dataset.
+  :type val_ds: tf.data.Dataset
+
+  :param model: The model to be trained.
+  :type model: tf.keras.Model
+
+  :param epochs: The number of epochs to train the model.
+  :type epochs: int
+
+  :param init_lr: The initial learning rate for the optimizer.
+  :type init_lr: float
+
+  :return: The training history.
+  :rtype: tf.keras.callbacks.History
   """
 
   loss = tf.keras.losses.CategoricalCrossentropy()
@@ -154,8 +159,8 @@ def plotHistory(history: tf.keras.callbacks.History) -> None:
   """
   Plots the training history.
 
-  :param history: Description
-  :type history: 
+  :param history: The training history.
+  :type history: tf.keras.callbacks.History
   """
 
   history_dict = history.history
