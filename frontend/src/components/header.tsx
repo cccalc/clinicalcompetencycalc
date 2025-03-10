@@ -11,33 +11,30 @@ import { useUser } from '@/context/UserContext';
 const Header = () => {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [displayName, setDisplayName] = useState('');
-  const [email, setEmail] = useState('');
-  const [isChanged, setIsChanged] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, userRoleAuthorized, userRoleRater } = useUser();
+  const { user, displayName, email, userRoleAuthorized, userRoleRater, loading } = useUser();
+
+  // 🔹 Track display name changes for save button activation
+  const [editedDisplayName, setEditedDisplayName] = useState(displayName);
+  const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setDisplayName(user.display_name);
-      setEmail(user.email);
-    }
-  }, [user]);
+    setEditedDisplayName(displayName);
+  }, [displayName]);
+
+  useEffect(() => {
+    setIsChanged(editedDisplayName !== displayName);
+  }, [editedDisplayName, displayName]);
 
   const toggleProfileMenu = () => {
-    setShowProfileMenu(!showProfileMenu);
+    setShowProfileMenu((prev) => !prev);
   };
 
   const handleSaveChanges = async () => {
-    // Handle save changes logic here
-    // For example, update the user profile in the database
-    // and then update the context with the new user information
+    console.log('Saving new display name:', editedDisplayName);
+    // 🔹 Implement update logic (update Supabase profile)
   };
-
-  useEffect(() => {
-    setIsChanged(displayName !== user?.display_name);
-  }, [displayName, user?.display_name]);
 
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
@@ -47,83 +44,95 @@ const Header = () => {
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
-          {userRoleAuthorized ? (
+          {/* 🔹 Show loading state if still fetching session */}
+          {loading ? (
+            <span>Loading...</span>
+          ) : user ? (
             <>
-              <Link
-                href='/dashboard/admin/userList'
-                className={`btn ${
-                  pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
-                }`}
-              >
-                All Users
-              </Link>
-              <Link
-                href='/all-reports'
-                className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                All Reports
-              </Link>
+              {userRoleAuthorized ? (
+                <>
+                  <Link
+                    href='/dashboard/admin/userList'
+                    className={`btn ${
+                      pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    All Users
+                  </Link>
+                  <Link
+                    href='/all-reports'
+                    className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    All Reports
+                  </Link>
+                </>
+              ) : userRoleRater ? (
+                <Link
+                  href='/dashboard'
+                  className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href='/dashboard'
+                    className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href='/dashboard/student/form-requests'
+                    className={`btn ${
+                      pathname === '/dashboard/student/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Form Requests
+                  </Link>
+                  <Link
+                    href='/dashboard/student/report'
+                    className={`btn ${
+                      pathname === '/dashboard/student/report' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Report
+                  </Link>
+                </>
+              )}
+
+              {/* 🔹 Profile Dropdown */}
+              <div className='dropdown' ref={profileMenuRef}>
+                <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
+                  <i className='bi bi-person-circle'></i>
+                </button>
+                {showProfileMenu && (
+                  <ul className='dropdown-menu dropdown-menu-end show'>
+                    <li className='dropdown-item text-center'>
+                      <strong>{displayName || 'User'}</strong>
+                      <br />
+                      <small className='text-muted'>{email}</small>
+                    </li>
+                    <li>
+                      <button className='dropdown-item' data-bs-toggle='modal' data-bs-target='#profileModal'>
+                        Profile Settings
+                      </button>
+                    </li>
+                    <li>
+                      <form action='/auth/signout' method='post'>
+                        <button className='dropdown-item' type='submit'>
+                          Logout
+                        </button>
+                      </form>
+                    </li>
+                  </ul>
+                )}
+              </div>
             </>
-          ) : userRoleRater ? (
-            <>
-              <Link
-                href='/dashboard'
-                className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                Dashboard
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href='/dashboard'
-                className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href='/dashboard/student/form-requests'
-                className={`btn ${
-                  pathname === '/dashboard/student/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'
-                }`}
-              >
-                Form Requests
-              </Link>
-              <Link
-                href='/dashboard/student/report'
-                className={`btn ${
-                  pathname === '/dashboard/student/report' ? 'btn-secondary' : 'btn-outline-secondary'
-                }`}
-              >
-                Report
-              </Link>
-            </>
-          )}
-          <div className='dropdown' ref={profileMenuRef}>
-            <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
-              <i className='bi bi-person-circle'></i>
-            </button>
-            {showProfileMenu && (
-              <ul className='dropdown-menu dropdown-menu-end show'>
-                <li>
-                  <button className='dropdown-item' data-bs-toggle='modal' data-bs-target='#profileModal'>
-                    Profile Settings
-                  </button>
-                </li>
-                <li>
-                  <form action='/auth/signout' method='post'>
-                    <button className='dropdown-item' type='submit'>
-                      Logout
-                    </button>
-                  </form>
-                </li>
-              </ul>
-            )}
-          </div>
+          ) : null}
         </nav>
       </div>
 
-      {/* Profile Settings Modal */}
+      {/* 🔹 Profile Settings Modal */}
       <div
         className='modal fade'
         id='profileModal'
@@ -149,8 +158,8 @@ const Header = () => {
                     type='text'
                     className='form-control'
                     id='displayName'
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    value={editedDisplayName}
+                    onChange={(e) => setEditedDisplayName(e.target.value)}
                   />
                 </div>
                 <div className='mb-3'>

@@ -1,80 +1,112 @@
 'use client';
 
-import { supabase_authorize } from '@/utils/async-util';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { User } from '@supabase/supabase-js';
+import { supabase_authorize } from '@/utils/async-util';
 
 const supabase = createClient();
 
-interface User {
-  id: string;
-  email: string;
-  display_name: string;
-}
 interface UserContextType {
   user: User | null;
+  displayName: string;
+  email: string;
   userRoleAuthorized: boolean;
   userRoleRater: boolean;
+  loading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
   const [userRoleAuthorized, setUserRoleAuthorized] = useState(false);
   const [userRoleRater, setUserRoleRater] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error('Error fetching user:', error);
-        return;
-      }
-      if (data?.user) {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', data.user.id)
-          .single();
+  // ✅ Fetch user profile from Supabase
+  const fetchUserProfile = async (userId: string) => {
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', userId)
+      .single();
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-          return;
-        }
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      return null;
+    }
 
-        setUser({
-          id: data.user.id,
-          email: data.user.email ?? '',
-          display_name: profileData.display_name,
-        });
+    return profileData.display_name;
+  };
 
-        supabase_authorize(['user_roles.select', 'user_roles.insert']).then((result) => {
-          setUserRoleAuthorized(result);
-        });
-
-        supabase_authorize(['form_responses.select', 'form_responses.insert']).then((result) => {
-          setUserRoleRater(result);
-        });
-      }
-    };
-
-    fetchUser();
+  // ✅ Fetch user details and permissions
+  const fetchUser = async () => {
+    setLoading(true);
 
     const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        fetchUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      setUser(null);
+      setDisplayName('');
+      setEmail('');
+      setUserRoleAuthorized(false);
+      setUserRoleRater(false);
+      setLoading(false);
+      return;
+    }
+
+    const user = session.user;
+    setUser(user);
+    setEmail(user.email ?? '');
+
+    // Fetch display name from profiles table
+    const fetchedDisplayName = await fetchUserProfile(user.id);
+    setDisplayName(fetchedDisplayName ?? '');
+
+    // Fetch user roles
+    const authorized = await supabase_authorize(['user_roles.select', 'user_roles.insert']);
+    setUserRoleAuthorized(authorized);
+
+    const rater = await supabase_authorize(['form_responses.select', 'form_responses.insert']);
+    setUserRoleRater(rater);
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUser();
+
+    // ✅ Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔹 Auth state changed:', event, session);
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchUser(); // Ensure we fetch latest session when user logs in or token refreshes
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setDisplayName('');
+        setEmail('');
+        setUserRoleAuthorized(false);
+        setUserRoleRater(false);
+        setLoading(false);
       }
     });
 
     return () => {
-      subscription.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, []);
 
-  return <UserContext.Provider value={{ user, userRoleAuthorized, userRoleRater }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, displayName, email, userRoleAuthorized, userRoleRater, loading }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUser = () => {

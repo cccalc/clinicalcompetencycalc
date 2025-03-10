@@ -1,8 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-
 import { createClient } from '@/utils/supabase/server';
 import { AuthError } from '@supabase/supabase-js';
 
@@ -17,6 +14,9 @@ export async function login(formData: FormData): Promise<{ alertColor: string; e
   try {
     const { error } = await supabase.auth.signInWithPassword(data);
     if (error) throw error;
+
+    // ✅ Return success immediately (client must fetch session manually)
+    return { alertColor: 'success', error: '' };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.code) {
@@ -30,9 +30,6 @@ export async function login(formData: FormData): Promise<{ alertColor: string; e
     }
     return { alertColor: 'warning', error: 'Something went wrong.' };
   }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
 }
 
 export async function signup(formData: FormData): Promise<{ alertColor: string; error: string }> {
@@ -46,11 +43,17 @@ export async function signup(formData: FormData): Promise<{ alertColor: string; 
   try {
     const { error } = await supabase.auth.signUp(signupData);
     if (error) throw error;
+
+    return { alertColor: 'success', error: '' };
   } catch (error) {
-    if (error instanceof AuthError) return { alertColor: 'danger', error: `${error.code}: ${error.message}` };
+    if (error instanceof AuthError) {
+      return { alertColor: 'danger', error: `${error.code}: ${error.message}` };
+    }
     return { alertColor: 'warning', error: 'Something went wrong.' };
   }
+}
 
-  revalidatePath('/', 'layout');
-  redirect('/postsignup/verify');
+export async function logout(): Promise<void> {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 }
