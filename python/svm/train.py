@@ -1,5 +1,10 @@
 """
 train.py
+
+This script trains a Support Vector Machine (SVM) model on the data in the data directory.
+It reads the data from CSV files, preprocesses it, and trains the model.
+The trained model is then saved to a file in the models directory.
+The script also evaluates the model on a test set and prints the accuracy.
 """
 
 import glob
