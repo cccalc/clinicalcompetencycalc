@@ -19,7 +19,10 @@ export async function supabase_authorize(permissions: string[]): Promise<boolean
       console.error('Error fetching user permissions:', error);
       return false;
     }
-    if (!data) return false;
+    if (!data) {
+      console.error('Error fetching user permissions: No data returned');
+      return false;
+    }
   }
   return true;
 }
