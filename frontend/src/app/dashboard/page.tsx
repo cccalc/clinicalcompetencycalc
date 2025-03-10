@@ -1,33 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import EPAprogress from '@/components/(StudentComponents)/EPAprogress';
-
-const supabase = createClient();
+import { useUser } from '@/context/UserContext';
 
 const Dashboard = () => {
-  const [displayName, setDisplayName] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user) {
-        setDisplayName(data.user.user_metadata.full_name || data.user.email);
-      } else if (error) {
-        console.error('Error fetching user:', error.message || error);
-      }
-    };
-
-    fetchUser();
-  }, []);
+  const { displayName } = useUser();
 
   return (
     <>
       <main className='container mx-auto p-4'>
         <h1 className='text-2xl font-bold'>Dashboard</h1>
         <p>Welcome, {displayName}</p>
-        <EPAprogress />
       </main>
     </>
   );

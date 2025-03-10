@@ -115,7 +115,6 @@ const EPAprogress: React.FC = () => {
                 <div className='text-left' style={{ width: '100px', flexShrink: 0 }}>
                   <h5 className='mb-0'>{epa.epa}</h5>
                 </div>
-                {/* Progress bar container ensuring alignment */}
                 <div className='flex-grow-1'>
                   <div className='progress' style={{ height: '30px', width: '100%' }}>
                     {Object.keys(devLevelColors).map((level) => (
