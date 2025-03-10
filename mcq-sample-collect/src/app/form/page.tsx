@@ -12,8 +12,11 @@ import EpaKfDesc from './epa-kf-desc';
 import Question from './question';
 import SubmitButtons from './submit-buttons';
 import { submitSample } from './actions';
+import { supabase_authorize } from '@/utils/async-util';
 
 export default function Form() {
+  const [authorized, setAuthorized] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [descData, setDescData] = useState<EPAKFDesc | undefined>(undefined);
   const [mcqData, setMCQData] = useState<MCQ[] | undefined>(undefined);
@@ -23,6 +26,7 @@ export default function Form() {
   const [devLevel, setDevLevel] = useState<DevLevel>('none');
 
   useEffect(() => {
+    supabase_authorize(['mcqs_options.select']).then((result) => setAuthorized(result));
     getEPAKFDescs().then((data) => setDescData(data));
     getLatestMCQs().then((data) => setMCQData(data));
   }, []);
@@ -87,6 +91,18 @@ export default function Form() {
     if (await success) getNewQuestions();
   };
 
+  const body = () => {
+    if (loading || questions.length === 0) return <Loading />;
+    if (!authorized)
+      return (
+        <div>
+          You are not authorized to perform this action. If you believe you should have authorization, please contact
+          your administrator.
+        </div>
+      );
+    return questions.map((q, i) => <Question key={i} question={q} choices={choices} />);
+  };
+
   return (
     <>
       <div className='d-flex flex-column min-vh-100'>
@@ -96,11 +112,7 @@ export default function Form() {
         </div>
         <div className='row flex-grow-1'>
           <div className='container px-5 pt-3 text-center' style={{ maxWidth: '720px' }}>
-            {loading || questions.length === 0 ? (
-              <Loading />
-            ) : (
-              questions.map((q, i) => <Question key={i} question={q} choices={choices} />)
-            )}
+            {body()}
           </div>
         </div>
         <div className='row sticky-bottom'>
