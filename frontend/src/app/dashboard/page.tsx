@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import EPAprogress from '@/components/(StudentComponents)/EPAprogress';
 
 const supabase = createClient();
 
@@ -26,6 +27,7 @@ const Dashboard = () => {
       <main className='container mx-auto p-4'>
         <h1 className='text-2xl font-bold'>Dashboard</h1>
         <p>Welcome, {displayName}</p>
+        <EPAprogress />
       </main>
     </>
   );

@@ -13,9 +13,8 @@ const Header = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, displayName, email, userRoleAuthorized, userRoleRater, loading } = useUser();
+  const { user, displayName, email, userRoleAuthorized, userRoleRater } = useUser();
 
-  // 🔹 Track display name changes for save button activation
   const [editedDisplayName, setEditedDisplayName] = useState(displayName);
   const [isChanged, setIsChanged] = useState(false);
 
@@ -62,10 +61,7 @@ const Header = () => {
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
-          {/* 🔹 Show loading state if still fetching session */}
-          {loading ? (
-            <span>Loading...</span>
-          ) : user ? (
+          {user ? (
             <>
               {userRoleAuthorized ? (
                 <>

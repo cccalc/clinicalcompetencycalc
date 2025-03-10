@@ -26,7 +26,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userRoleRater, setUserRoleRater] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch user profile from Supabase
+  // Fetch user profile from Supabase
   const fetchUserProfile = async (userId: string) => {
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
@@ -42,7 +42,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return profileData.display_name;
   };
 
-  // ✅ Fetch user details and permissions
   const fetchUser = async () => {
     setLoading(true);
 
@@ -81,12 +80,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     fetchUser();
 
-    // ✅ Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔹 Auth state changed:', event, session);
-
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        fetchUser(); // Ensure we fetch latest session when user logs in or token refreshes
+        fetchUser();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setDisplayName('');
