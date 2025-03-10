@@ -36,6 +36,24 @@ const Header = () => {
     // 🔹 Implement update logic (update Supabase profile)
   };
 
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    } else {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showProfileMenu]);
+
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
       <div className='container mx-auto d-flex justify-content-between align-items-center flex-wrap'>
@@ -107,10 +125,13 @@ const Header = () => {
                 </button>
                 {showProfileMenu && (
                   <ul className='dropdown-menu dropdown-menu-end show'>
-                    <li className='dropdown-item text-center'>
-                      <strong>{displayName || 'User'}</strong>
+                    <li className='dropdown-item-text text-center no-select'>
+                      <strong className='no-pointer'>{displayName || 'User'}</strong>
                       <br />
-                      <small className='text-muted'>{email}</small>
+                      <small className='text-muted no-pointer'>{email}</small>
+                    </li>
+                    <li>
+                      <hr className='dropdown-divider' />
                     </li>
                     <li>
                       <button className='dropdown-item' data-bs-toggle='modal' data-bs-target='#profileModal'>

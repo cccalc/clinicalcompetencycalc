@@ -62,3 +62,29 @@ header a:hover {
 header a.active {
   background-color: #e0e0e0;
 }
+
+/* Ensure dropdown is mobile responsive and shifts when going off the screen */
+.dropdown-menu {
+  right: 0;
+  left: auto;
+  margin-top: 5px; /* Add some space below the button */
+}
+
+@media (max-width: 576px) {
+  .dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+}
+
+/* Disable text selection and pointer events for email and display name */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.no-pointer {
+  pointer-events: none;
+}
