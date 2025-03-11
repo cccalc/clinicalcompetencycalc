@@ -48,24 +48,18 @@ export default function QuestionList() {
       )}
 
       <EditOptionModal
-        mcqInformation={mcqInformation}
-        setMCQInformation={setMCQInformation}
-        optionMCQ={optionMCQ}
-        optionKey={optionKey}
-        setOptionKey={setOptionKey}
-        optionText={optionText}
-        newOptionText={newOptionText}
-        setNewOptionText={setNewOptionText}
+        mcqInformation={{ get: mcqInformation, set: setMCQInformation }}
+        optionMCQ={{ get: optionMCQ, set: setOptionMCQ }}
+        optionKey={{ get: optionKey, set: setOptionKey }}
+        optionText={{ get: optionText, set: setOptionText }}
+        newOptionText={{ get: newOptionText, set: setNewOptionText }}
       />
       <EditQuestionModal
-        mcqInformation={mcqInformation}
-        setMCQInformation={setMCQInformation}
-        optionMCQ={optionMCQ}
-        optionKey={optionKey}
-        setOptionKey={setOptionKey}
-        optionText={optionText}
-        newOptionText={newOptionText}
-        setNewOptionText={setNewOptionText}
+        mcqInformation={{ get: mcqInformation, set: setMCQInformation }}
+        optionMCQ={{ get: optionMCQ, set: setOptionMCQ }}
+        optionKey={{ get: optionKey, set: setOptionKey }}
+        optionText={{ get: optionText, set: setOptionText }}
+        newOptionText={{ get: newOptionText, set: setNewOptionText }}
       />
     </>
   );
