@@ -55,5 +55,17 @@ Thumbs.db
 # Local files
 local/
 
+# Temporary files
+*.tmp
+
+# Backup files
+*~
+*.bak
+
+# Environment files
+.env
+
+# Python venv
+.venv/
 # Node modules
 ./node_modules/
