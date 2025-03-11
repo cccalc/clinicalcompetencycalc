@@ -3,59 +3,58 @@
 import { cache, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import React from 'react';
 
-import Loading from '@/components/loading';
 import { getHistoricalMCQs } from '@/utils/get-epa-data';
 import { createClient } from '@/utils/supabase/client';
 import type { Tables } from '@/utils/supabase/database.types';
-import type { MCQ } from '@/utils/types';
+import type { MCQ, OptHistoryInstance } from '@/utils/types';
 
 import { getUpdaterDetails, submitNewOption } from './actions';
 import { renderOption, renderQuestion } from './render-spans';
+import EditOptionModalChangesList from './edit-option-modal-changes-list';
 
 const getCachedUpdaterDetails = cache(getUpdaterDetails);
 
 export default function EditOptionModal({
   mcqInformation,
-  setMCQInformation,
   optionMCQ,
   optionKey,
-  setOptionKey,
   optionText,
   newOptionText,
-  setNewOptionText,
 }: {
-  mcqInformation: Tables<'mcqs_options'>[] | null;
-  setMCQInformation: Dispatch<SetStateAction<Tables<'mcqs_options'>[] | null>>;
-  optionMCQ: MCQ | null;
-  optionKey: string | null;
-  setOptionKey: Dispatch<SetStateAction<string | null>>;
-  optionText: string | null;
-  newOptionText: string | null;
-  setNewOptionText: Dispatch<SetStateAction<string | null>>;
-}) {
-  type OptHistoryInstance = {
-    updated_at: Date;
-    updated_by: string;
-    updater_display_name?: string | null;
-    updater_email?: string | null;
-    option: string;
+  mcqInformation: {
+    get: Tables<'mcqs_options'>[] | null;
+    set: Dispatch<SetStateAction<Tables<'mcqs_options'>[] | null>>;
   };
-
+  optionMCQ: {
+    get: MCQ | null;
+    set: Dispatch<SetStateAction<MCQ | null>>;
+  };
+  optionKey: {
+    get: string | null;
+    set: Dispatch<SetStateAction<string | null>>;
+  };
+  optionText: {
+    get: string | null;
+    set: Dispatch<SetStateAction<string | null>>;
+  };
+  newOptionText: {
+    get: string | null;
+    set: Dispatch<SetStateAction<string | null>>;
+  };
+}) {
   const supabase = createClient();
 
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [optionHistory, setOptionHistory] = useState<OptHistoryInstance[] | null>(null);
 
-  // on render, get historical MCQs
   useEffect(() => {
-    (async () => setMCQInformation((await getHistoricalMCQs()) ?? null))();
     // add event listener when modal is closed
     document.getElementById('edit-option-modal')?.addEventListener('hide.bs.modal', () => {
-      setOptionKey(null);
+      optionKey.set(null);
       if (document.getElementById('option-changes-list')?.classList.contains('show'))
         document.getElementById('option-changes-list-button')?.click();
     });
-  }, [setMCQInformation, setOptionKey]);
+  }, [optionKey]);
 
   // on change of selected option, get historical change data
   useEffect(() => {
@@ -63,15 +62,17 @@ export default function EditOptionModal({
       setLoadingHistory(true);
       setOptionHistory(null);
 
-      if (optionKey === null) {
+      if (optionKey.get === null) {
         setLoadingHistory(false);
         return;
       }
 
-      let history = mcqInformation?.map((mcqMeta) => ({
+      let history = mcqInformation.get?.map((mcqMeta) => ({
         updated_at: new Date(mcqMeta.updated_at),
         updated_by: mcqMeta.updated_by ?? '',
-        option: (mcqMeta.data as MCQ[]).filter((mcq) => mcq.options[optionKey ?? ''])[0]?.options[optionKey ?? ''],
+        option: (mcqMeta.data as MCQ[]).filter((mcq) => mcq.options[optionKey.get ?? ''])[0]?.options[
+          optionKey.get ?? ''
+        ],
       }));
 
       const updaterIDs = Array.from(new Set(history?.map((h) => h.updated_by)));
@@ -104,8 +105,8 @@ export default function EditOptionModal({
   };
 
   const handleSubmit = async () => {
-    submitNewOption(optionKey!, newOptionText!);
-    (async () => setMCQInformation((await getHistoricalMCQs()) ?? null))();
+    submitNewOption(optionKey.get!, newOptionText.get!);
+    (async () => mcqInformation.set((await getHistoricalMCQs()) ?? null))();
   };
 
   return (
@@ -129,7 +130,7 @@ export default function EditOptionModal({
             <p>
               <strong>Question:</strong>
               <br />
-              {optionMCQ ? renderQuestion(optionMCQ.kf, optionMCQ.question) : ''}
+              {optionMCQ.get ? renderQuestion(optionMCQ.get.kf, optionMCQ.get.question) : ''}
             </p>
 
             <hr />
@@ -137,7 +138,7 @@ export default function EditOptionModal({
             <p>
               <strong>Old option:</strong>
               <br />
-              {renderOption(optionKey ?? '', optionText ?? '')}
+              {renderOption(optionKey.get ?? '', optionText.get ?? '')}
             </p>
             <p className='fw-bold mb-1'>New option:</p>
             <div className='mb-3'>
@@ -146,55 +147,17 @@ export default function EditOptionModal({
                 className='form-control'
                 type='text'
                 placeholder='Option text'
-                onChange={(e) => setNewOptionText(e.target.value)}
+                onChange={(e) => newOptionText.set(e.target.value)}
               />
             </div>
 
             <hr className='my-4' />
 
-            <div className='accordion' id='changes'>
-              <div className='accordion-item'>
-                <h2 className='accordion-header' id='changes-heading'>
-                  <button
-                    className='accordion-button collapsed bg-body-secondary p-3'
-                    id='option-changes-list-button'
-                    type='button'
-                    data-bs-toggle='collapse'
-                    data-bs-target='#option-changes-list'
-                    aria-expanded='false'
-                    aria-controls='collapse'
-                  >
-                    Past changes to this option
-                  </button>
-                </h2>
-
-                <div id='option-changes-list' className='accordion-collapse collapse' aria-labelledby='changes-heading'>
-                  <div className='accordion-body p-0'>
-                    {loadingHistory ? (
-                      <div className='m-3'>
-                        <Loading />
-                      </div>
-                    ) : (
-                      <ul className='list-group list-group-flush rounded-bottom'>
-                        {filterHistory(optionHistory ?? []).map((h, i) => (
-                          <li className='list-group-item' key={i}>
-                            <div className='mb-1'>
-                              <span className='badge bg-body-secondary text-dark me-2'>
-                                {h.updated_at.toLocaleDateString()}
-                              </span>
-                              <span className='badge bg-body-secondary text-dark'>
-                                by {h.updater_display_name ?? h.updater_email ?? h.updated_by}
-                              </span>
-                            </div>
-                            <div>{h.option}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <EditOptionModalChangesList
+              loadingHistory={loadingHistory}
+              optionHistory={optionHistory}
+              filterHistory={filterHistory}
+            />
           </div>
 
           <div className='modal-footer'>
@@ -205,7 +168,13 @@ export default function EditOptionModal({
               type='button'
               className='btn btn-primary'
               data-bs-dismiss='modal'
-              disabled={!optionMCQ || !optionKey || !optionText || !newOptionText || newOptionText === optionText}
+              disabled={
+                !optionMCQ.get ||
+                !optionKey.get ||
+                !optionText.get ||
+                !newOptionText.get ||
+                newOptionText.get === optionText.get
+              }
               onClick={handleSubmit}
             >
               Save changes
