@@ -20,6 +20,5 @@ jobs:
         . .venv/bin/activate
         find . -name "requirements.txt" -execdir pip install -r requirements.txt \;
         pip install pylint
-        pylint --rcfile=.pylintrc $(git ls-files '*.py') --output=recent-lint.txt
-        cat recent-lint.txt
+        pylint --rcfile=.pylintrc $(git ls-files '*.py')
         deactivate
