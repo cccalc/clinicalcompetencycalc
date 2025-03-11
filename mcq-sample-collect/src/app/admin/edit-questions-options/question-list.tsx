@@ -7,8 +7,9 @@ import { getHistoricalMCQs } from '@/utils/get-epa-data';
 import type { Tables } from '@/utils/supabase/database.types';
 import type { MCQ } from '@/utils/types';
 
-import EditModal from './edit-modal';
-import { renderOption, renderQuestion } from './render-spans';
+import EditOptionModal from './edit-option-modal';
+import EditQuestionModal from './edit-question-modal';
+import QuestionItem from './question-list-item';
 
 export default function QuestionList() {
   const [mcqInformation, setMCQInformation] = useState<Tables<'mcqs_options'>[] | null>(null);
@@ -23,7 +24,7 @@ export default function QuestionList() {
     fetchMCQs();
   }, []);
 
-  const handleClick = (mcq: MCQ, key: string, text: string) => {
+  const handleOptionClick = (mcq: MCQ, key: string, text: string) => {
     setOptionMCQ(mcq);
     setOptionKey(key);
     setOptionText(text);
@@ -41,47 +42,22 @@ export default function QuestionList() {
       ) : (
         <div className='accordion' id='question-list'>
           {(mcqInformation[0].data as MCQ[]).map((mcq, i) => (
-            <div className='accordion-item' key={i}>
-              <h4 className='accordion-header' id={`heading-${i}`}>
-                <button
-                  className='accordion-button collapsed gap-1'
-                  type='button'
-                  data-bs-toggle='collapse'
-                  data-bs-target={`#collapse-${i}`}
-                  aria-expanded='false'
-                  aria-controls={`collapse-${i}`}
-                >
-                  {renderQuestion(mcq.kf, mcq.question)}
-                </button>
-              </h4>
-              <div
-                id={`collapse-${i}`}
-                className='accordion-collapse collapse bg-body-secondary'
-                aria-labelledby={`heading-${i}`}
-                data-bs-parent='#question-list'
-              >
-                <ul className='list-group p-2'>
-                  {Object.entries(mcq.options).map(([key, value]) => (
-                    <li className='list-group-item pe-2 d-flex justify-content-between align-items-center' key={key}>
-                      {renderOption(key, value)}
-                      <button
-                        className='btn'
-                        data-bs-toggle='modal'
-                        data-bs-target='#edit-modal'
-                        onClick={() => handleClick(mcq, key, value)}
-                      >
-                        <i className='bi bi-pencil'></i>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <QuestionItem key={i} i={i} mcq={mcq} handleOptionClick={handleOptionClick} />
           ))}
         </div>
       )}
 
-      <EditModal
+      <EditOptionModal
+        mcqInformation={mcqInformation}
+        setMCQInformation={setMCQInformation}
+        optionMCQ={optionMCQ}
+        optionKey={optionKey}
+        setOptionKey={setOptionKey}
+        optionText={optionText}
+        newOptionText={newOptionText}
+        setNewOptionText={setNewOptionText}
+      />
+      <EditQuestionModal
         mcqInformation={mcqInformation}
         setMCQInformation={setMCQInformation}
         optionMCQ={optionMCQ}

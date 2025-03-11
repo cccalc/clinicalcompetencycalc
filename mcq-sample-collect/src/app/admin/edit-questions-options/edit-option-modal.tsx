@@ -14,7 +14,7 @@ import { renderOption, renderQuestion } from './render-spans';
 
 const getCachedUpdaterDetails = cache(getUpdaterDetails);
 
-export default function EditModal({
+export default function EditOptionModal({
   mcqInformation,
   setMCQInformation,
   optionMCQ,
@@ -50,10 +50,10 @@ export default function EditModal({
   useEffect(() => {
     (async () => setMCQInformation((await getHistoricalMCQs()) ?? null))();
     // add event listener when modal is closed
-    document.getElementById('edit-modal')?.addEventListener('hide.bs.modal', () => {
+    document.getElementById('edit-option-modal')?.addEventListener('hide.bs.modal', () => {
       setOptionKey(null);
-      if (document.getElementById('changes-list')?.classList.contains('show'))
-        document.getElementById('changes-list-button')?.click();
+      if (document.getElementById('option-changes-list')?.classList.contains('show'))
+        document.getElementById('option-changes-list-button')?.click();
     });
   }, [setMCQInformation, setOptionKey]);
 
@@ -62,6 +62,11 @@ export default function EditModal({
     const fetchHistory = async () => {
       setLoadingHistory(true);
       setOptionHistory(null);
+
+      if (optionKey === null) {
+        setLoadingHistory(false);
+        return;
+      }
 
       let history = mcqInformation?.map((mcqMeta) => ({
         updated_at: new Date(mcqMeta.updated_at),
@@ -104,12 +109,20 @@ export default function EditModal({
   };
 
   return (
-    <div className='modal fade' id='edit-modal' tabIndex={-1} aria-labelledby='edit-modal-label' aria-hidden='true'>
+    <div
+      className='modal fade'
+      id='edit-option-modal'
+      tabIndex={-1}
+      aria-labelledby='edit-option-modal-label'
+      aria-hidden='true'
+    >
       <div className='modal-dialog modal-dialog-centered modal-dialog-scrollable'>
         <div className='modal-content'>
           <div className='modal-header'>
-            <h5 className='modal-title'>Edit option</h5>
-            <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            <h1 className='modal-title h5' id='edit-option-modal-label'>
+              Edit option
+            </h1>
+            <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close' />
           </div>
 
           <div className='modal-body'>
@@ -144,10 +157,10 @@ export default function EditModal({
                 <h2 className='accordion-header' id='changes-heading'>
                   <button
                     className='accordion-button collapsed bg-body-secondary p-3'
-                    id='changes-list-button'
+                    id='option-changes-list-button'
                     type='button'
                     data-bs-toggle='collapse'
-                    data-bs-target='#changes-list'
+                    data-bs-target='#option-changes-list'
                     aria-expanded='false'
                     aria-controls='collapse'
                   >
@@ -155,7 +168,7 @@ export default function EditModal({
                   </button>
                 </h2>
 
-                <div id='changes-list' className='accordion-collapse collapse' aria-labelledby='changes-heading'>
+                <div id='option-changes-list' className='accordion-collapse collapse' aria-labelledby='changes-heading'>
                   <div className='accordion-body p-0'>
                     {loadingHistory ? (
                       <div className='m-3'>

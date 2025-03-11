@@ -10,6 +10,7 @@
     "load_supabase_types": "npx supabase gen types typescript --project-id speeohoyelvckretnfao -s \"trainingdata,public\" > ./src/utils/supabase/database.types.ts"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.5",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "bootstrap": "^5.3.3",
