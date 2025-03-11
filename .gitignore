@@ -71,3 +71,5 @@ server/socketio/node_modules/
 
 # Python venv
 .venv/
+server/socketio/node_modules/
+server/express/node_modules/
