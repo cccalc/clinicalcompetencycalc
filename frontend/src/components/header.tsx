@@ -31,7 +31,6 @@ const Header = () => {
   };
 
   const handleSaveChanges = async () => {
-    console.log('Saving new display name:', editedDisplayName);
     // 🔹 Implement update logic (update Supabase profile)
   };
 
@@ -81,12 +80,22 @@ const Header = () => {
                   </Link>
                 </>
               ) : userRoleRater ? (
-                <Link
-                  href='/dashboard'
-                  className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    href='/dashboard'
+                    className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href='/dashboard/rater/form'
+                    className={`btn ${
+                      pathname === '/dashboard/rater/form' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Rater Form
+                  </Link>
+                </>
               ) : (
                 <>
                   <Link
