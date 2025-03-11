@@ -56,4 +56,5 @@ Thumbs.db
 local/
 
 # Node modules
-./node_modules/
+server/socketio/node_modules/
+server/express/node_modules/
