@@ -7,12 +7,12 @@ const supabase = createClient();
 
 /**
  * AdminDashboard Component
- * 
+ *
  * Provides a user interface for administrators to manage users:
  * - View all users
  * - Search/filter users by name/email/role
  * - Edit user roles
- * 
+ *
  * Data is fetched from Supabase using an RPC function and table queries.
  */
 const AdminDashboard = () => {
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
-  const [selectedUser, setSelectedUser] = useState<User & { account_status: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<(User & { account_status: string }) | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchUsers();
     fetchRoles();
-  })
+  });
 
   const fetchUsers = async () => {
     try {
@@ -61,9 +61,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, account_status');
+      const { data: profiles, error: profilesError } = await supabase.from('profiles').select('id, account_status');
 
       if (profilesError) {
         console.error('Error fetching account statuses:', profilesError);
@@ -105,11 +103,11 @@ const AdminDashboard = () => {
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
-    console.log("Updating role for user:", selectedUser.user_id, "to role:", selectedUser.role);
+    console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
 
     const { error } = await supabase
       .from('user_roles') // Updating the correct table
-      .update({ role: selectedUser.role }) 
+      .update({ role: selectedUser.role })
       .eq('user_id', selectedUser.user_id); // Match by user_id
 
     if (error) {
@@ -169,11 +167,7 @@ const AdminDashboard = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select
-          className='form-select w-25'
-          value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
-        >
+        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
           <option value=''>All Roles</option>
           {roles.map((role) => (
             <option key={role} value={role}>
@@ -196,10 +190,7 @@ const AdminDashboard = () => {
         </thead>
         <tbody>
           {filteredUsers.map((user) => (
-            <tr
-              key={user.user_id}
-              className={user.account_status === 'Deactivated' ? 'deactivated' : ''}
-            >
+            <tr key={user.user_id} className={user.account_status === 'Deactivated' ? 'deactivated' : ''}>
               <td>{user.display_name}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
