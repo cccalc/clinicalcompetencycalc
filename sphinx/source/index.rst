@@ -21,5 +21,7 @@ Contents
 .. toctree::
 
    intro
-   usage
+   model_doc
+   svm
+   bert
    api
