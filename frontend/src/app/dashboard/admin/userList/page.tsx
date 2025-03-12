@@ -30,6 +30,9 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
+  const [currentPermissions, setCurrentPermissions] = useState<string[]>([]);
+  const [availablePermissions, setAvailablePermissions] = useState<string[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
@@ -78,32 +81,61 @@ const AdminDashboard = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleEdit = (user: User) => {
+  const handleRoleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRole(e.target.value);
+  };
+
+  const handleEdit = async (user: User) => {
     setSelectedUser(user);
     setShowModal(true);
+
+    const { data: rolePermissions, error: rolePermissionsError } = await supabase.rpc('fetch_role_permissions', {
+      role: user.role,
+    });
+    if (rolePermissionsError) {
+      console.error('Error fetching role permissions:', rolePermissionsError);
+    } else {
+      setCurrentPermissions(rolePermissions.map((permission: Permission) => permission.permission));
+      setAvailablePermissions(
+        permissions.filter((permission) => !rolePermissions.map((p: Permission) => p.permission).includes(permission))
+      );
+    }
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
+    setCurrentPermissions([]);
+    setAvailablePermissions([]);
   };
 
   const filteredUsers = users.filter(
     (user) =>
-      (user.display_name && user.display_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedRole === '' || user.role === selectedRole)
   );
 
   return (
     <div className='container'>
       <h1 className='my-4'>Admin Dashboard</h1>
-      <input
-        type='text'
-        className='form-control mb-4'
-        placeholder='Search users...'
-        value={searchTerm}
-        onChange={handleSearch}
-      />
+      <div className='mb-4'>
+        <input
+          type='text'
+          className='form-control mb-2'
+          placeholder='Search users...'
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+        <select className='form-select' value={selectedRole} onChange={handleRoleFilter}>
+          <option value=''>All Roles</option>
+          {roles.map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
+        </select>
+      </div>
       <table className='table table-striped'>
         <thead>
           <tr>
@@ -161,17 +193,37 @@ const AdminDashboard = () => {
                       </select>
                     </div>
                     <div className='mb-3'>
-                      <label htmlFor='formPermissions' className='form-label'>
-                        Permissions
+                      <label htmlFor='formCurrentPermissions' className='form-label'>
+                        Current Permissions
                       </label>
                       <select
-                        id='formPermissions'
+                        id='formCurrentPermissions'
                         className='form-select'
                         multiple
-                        value={permissions}
-                        onChange={(e) => setPermissions(Array.from(e.target.selectedOptions, (option) => option.value))}
+                        value={currentPermissions}
+                        readOnly
                       >
-                        {permissions.map((permission) => (
+                        {currentPermissions.map((permission) => (
+                          <option key={permission} value={permission}>
+                            {permission}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className='mb-3'>
+                      <label htmlFor='formAvailablePermissions' className='form-label'>
+                        Available Permissions
+                      </label>
+                      <select
+                        id='formAvailablePermissions'
+                        className='form-select'
+                        multiple
+                        value={availablePermissions}
+                        onChange={(e) =>
+                          setAvailablePermissions(Array.from(e.target.selectedOptions, (option) => option.value))
+                        }
+                      >
+                        {availablePermissions.map((permission) => (
                           <option key={permission} value={permission}>
                             {permission}
                           </option>
