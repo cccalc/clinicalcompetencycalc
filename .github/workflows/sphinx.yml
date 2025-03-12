@@ -12,19 +12,9 @@ jobs:
       with:
         persist-credentials: false
 
-    - name: Install dependencies
+    - name: Install dependencies and build HTML
       run: |
-          python -m venv .venv  # Create a virtual environment
-          source .venv/bin/activate  # Activate the virtual environment
-          python -m pip install --upgrade pip
-          pip install sphinx
-          pip install furo
-          find . -name "requirements.txt" -execdir pip install -r requirements.txt \;
-
-    - name: Build HTML
-      run: |
-          source .venv/bin/activate  # Reactivate venv
-          sphinx-build -b html sphinx/source sphinx/build/html/
+          bash sphinx/reqs_and_build.sh
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
