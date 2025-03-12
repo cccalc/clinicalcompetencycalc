@@ -15,7 +15,7 @@ exclude_dirs = {".venv"}
 # Recursively find all directories containing Python files, excluding unwanted folders
 for path in docs_root.rglob("*.py"):
     if not any(excluded in path.parts for excluded in exclude_dirs):
-        sys.path.insert(0, str(path.parent))
+        sys.path.insert(0, str(path.parent.parent))
 
 # Remove duplicates
 sys.path = list(dict.fromkeys(sys.path))
