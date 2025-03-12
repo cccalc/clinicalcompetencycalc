@@ -1,27 +1,28 @@
 'use client';
 
-import { cache, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { cache, useEffect, useId, useState, type Dispatch, type SetStateAction } from 'react';
 import React from 'react';
 
 import { getHistoricalMCQs } from '@/utils/get-epa-data';
 import { createClient } from '@/utils/supabase/client';
 import type { Tables } from '@/utils/supabase/database.types';
-import type { MCQ, OptHistoryInstance } from '@/utils/types';
+import type { MCQ, changeHistoryInstance } from '@/utils/types';
 
 import { getUpdaterDetails, submitNewOption } from './actions';
 import { renderOption, renderQuestion } from './render-spans';
-import EditOptionModalChangesList from './edit-option-modal-changes-list';
+import EditModalChangesList from './edit-modal-changes-list';
+import { filterHistory } from './utils';
 
 const getCachedUpdaterDetails = cache(getUpdaterDetails);
 
 export default function EditOptionModal({
-  mcqInformation,
+  mcqsInformation,
   optionMCQ,
   optionKey,
   optionText,
   newOptionText,
 }: {
-  mcqInformation: {
+  mcqsInformation: {
     get: Tables<'mcqs_options'>[] | null;
     set: Dispatch<SetStateAction<Tables<'mcqs_options'>[] | null>>;
   };
@@ -45,16 +46,18 @@ export default function EditOptionModal({
   const supabase = createClient();
 
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [optionHistory, setOptionHistory] = useState<OptHistoryInstance[] | null>(null);
+  const [optionHistory, setOptionHistory] = useState<changeHistoryInstance[] | null>(null);
+
+  const accordionID = useId();
 
   useEffect(() => {
     // add event listener when modal is closed
     document.getElementById('edit-option-modal')?.addEventListener('hide.bs.modal', () => {
       optionKey.set(null);
-      if (document.getElementById('option-changes-list')?.classList.contains('show'))
-        document.getElementById('option-changes-list-button')?.click();
+      if (document.getElementById(`${accordionID}-list`)?.classList.contains('show'))
+        document.getElementById(`${accordionID}-list-button`)?.click();
     });
-  }, [optionKey]);
+  }, [accordionID, optionKey]);
 
   // on change of selected option, get historical change data
   useEffect(() => {
@@ -62,52 +65,48 @@ export default function EditOptionModal({
       setLoadingHistory(true);
       setOptionHistory(null);
 
-      if (optionKey.get === null) {
+      // If no option is selected, exit
+      if (!optionKey.get || !mcqsInformation.get) {
         setLoadingHistory(false);
         return;
       }
 
-      let history = mcqInformation.get?.map((mcqMeta) => ({
-        updated_at: new Date(mcqMeta.updated_at),
-        updated_by: mcqMeta.updated_by ?? '',
-        option: (mcqMeta.data as MCQ[]).filter((mcq) => mcq.options[optionKey.get ?? ''])[0]?.options[
-          optionKey.get ?? ''
-        ],
-      }));
+      // Fetch historical changes for the selected option
+      let history = mcqsInformation.get.map((mcqsMetaRow) => ({
+        updated_at: new Date(mcqsMetaRow.updated_at),
+        updated_by: mcqsMetaRow.updated_by ?? 'unknown updater',
+        text: (mcqsMetaRow.data as MCQ[]).find((mcq) => mcq.options[optionKey.get!])!.options[optionKey.get!],
+      })) satisfies changeHistoryInstance[];
 
+      // Fetch updater for each history instance
       const updaterIDs = Array.from(new Set(history?.map((h) => h.updated_by)));
       const updaterDetails = await Promise.all(
         updaterIDs?.map(async (id) => await getCachedUpdaterDetails(id ?? '')) ?? []
       );
 
-      history = history?.map((h) => {
+      history = history.map((h) => {
         const updater = updaterDetails?.find((u) => u?.id === h.updated_by);
         return {
           ...h,
           updater_display_name: updater?.display_name,
           updater_email: updater?.email,
-        };
+        } satisfies changeHistoryInstance;
       });
-      setOptionHistory(history ?? null);
 
+      setOptionHistory(history);
       setLoadingHistory(false);
     };
 
     fetchHistory();
-  }, [mcqInformation, optionKey, supabase]);
-
-  const filterHistory = (history: OptHistoryInstance[]) => {
-    if (history.length === 0) return history;
-    const filtered = history.filter(
-      (h, i) => (history[i + 1] && h.option !== history[i + 1].option) || i === history.length - 1
-    );
-    return filtered.length === 0 ? history.slice(history.length - 1) : filtered;
-  };
+  }, [mcqsInformation, optionKey, supabase]);
 
   const handleSubmit = async () => {
     submitNewOption(optionKey.get!, newOptionText.get!);
-    (async () => mcqInformation.set((await getHistoricalMCQs()) ?? null))();
+    (async () => mcqsInformation.set((await getHistoricalMCQs()) ?? null))();
   };
+
+  const submitDisabled =
+    !optionMCQ.get || !optionKey.get || !optionText.get || !newOptionText.get || newOptionText.get === optionText.get;
 
   return (
     <div
@@ -153,10 +152,10 @@ export default function EditOptionModal({
 
             <hr className='my-4' />
 
-            <EditOptionModalChangesList
+            <EditModalChangesList
               loadingHistory={loadingHistory}
-              optionHistory={optionHistory}
-              filterHistory={filterHistory}
+              history={filterHistory(optionHistory ?? [])}
+              useID={accordionID}
             />
           </div>
 
@@ -168,13 +167,7 @@ export default function EditOptionModal({
               type='button'
               className='btn btn-primary'
               data-bs-dismiss='modal'
-              disabled={
-                !optionMCQ.get ||
-                !optionKey.get ||
-                !optionText.get ||
-                !newOptionText.get ||
-                newOptionText.get === optionText.get
-              }
+              disabled={submitDisabled}
               onClick={handleSubmit}
             >
               Save changes

@@ -7,10 +7,12 @@ export default function QuestionItem({
   i,
   mcq,
   handleOptionClick,
+  handleQuestionClick,
 }: {
   i: number;
   mcq: MCQ;
   handleOptionClick: (mcq: MCQ, key: string, text: string) => void;
+  handleQuestionClick: (mcq: MCQ) => void;
 }) {
   return (
     <div className='accordion-item'>
@@ -33,7 +35,12 @@ export default function QuestionItem({
         data-bs-parent='#question-list'
       >
         <div className='d-flex justify-content-end'>
-          <button className='btn btn-link m-2 mb-0'>
+          <button
+            className='btn btn-link m-2 mb-0'
+            onClick={() => handleQuestionClick(mcq)}
+            data-bs-toggle='modal'
+            data-bs-target='#edit-question-modal'
+          >
             <span className='me-2'>Edit question</span>
             <i className='bi bi-pencil'></i>
           </button>
