@@ -6,7 +6,7 @@ import pandas as pd
 def loadLatestCSV(directory: str) -> tuple[str, pd.DataFrame]:
   """
   Load the latest CSV file from a given directory into a pandas DataFrame.
-  The CSV filename is expected to be in the format `yymmdd.csv`, and contain the comment string and
+  The CSV filename is expected to be in the format ``yymmdd.csv``, and contain the comment string and
   an integer class (0=remedial, ..., 3=entrustable).
 
   :param directory: The directory containing the CSV files.
@@ -23,26 +23,26 @@ def loadLatestCSV(directory: str) -> tuple[str, pd.DataFrame]:
 def exportKerasFolder(df: pd.DataFrame, destination: str, **kwargs) -> None:
   """
   Export the DataFrame to a folder in Keras format.
-  The folder will be compatible with `keras.utils.text_dataset_from_directory`.
-  The directory structure will be as follows:
-  ```
-  train/
-  ├── remedial/
-  │   ├── 0.txt
-  │   ├── 1.txt
-  │   └── ...
-  ├── early_dev/
-  │   ├── 0.txt
-  │   ├── 1.txt
-  │   └── ...
-  └── ...
-  test/
-  ├── remedial/
-  │   ├── 0.txt
-  │   ├── 1.txt
-  │   └── ...
-  └── ...
-  ```
+  The folder will be compatible with ``keras.utils.text_dataset_from_directory``.
+  The directory structure will be as follows::
+    
+    train/
+    ├── remedial/
+    │   ├── 0.txt
+    │   ├── 1.txt
+    │   └── ...
+    ├── early_dev/
+    │   ├── 0.txt
+    │   ├── 1.txt
+    │   └── ...
+    └── ...
+    test/
+    ├── remedial/
+    │   ├── 0.txt
+    │   ├── 1.txt
+    │   └── ...
+    └── ...
+    
   where each class is a folder, and each file is a text file containing the description.
 
   :param df: The DataFrame to export.
