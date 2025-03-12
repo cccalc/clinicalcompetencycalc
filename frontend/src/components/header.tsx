@@ -93,7 +93,7 @@ const Header = () => {
                       pathname === '/dashboard/rater/form' ? 'btn-secondary' : 'btn-outline-secondary'
                     }`}
                   >
-                    Rater Form
+                    Form
                   </Link>
                 </>
               ) : (

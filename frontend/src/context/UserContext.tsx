@@ -71,7 +71,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const authorized = await supabase_authorize(['user_roles.select', 'user_roles.insert']);
     setUserRoleAuthorized(authorized);
 
-    const rater = await supabase_authorize(['form_responses.select', 'form_responses.insert']);
+    const rater = await supabase_authorize(['form_responses.select', 'form_responses.insert', 'mcqs_options.select']);
     setUserRoleRater(rater);
 
     setLoading(false);
