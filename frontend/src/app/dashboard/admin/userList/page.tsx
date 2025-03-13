@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
 import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
@@ -20,37 +19,22 @@ const AdminDashboard = () => {
     role: string;
   }
 
-  interface Permission {
-    permission: string;
-  }
-
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
-  const [currentPermissions, setCurrentPermissions] = useState<string[]>([]);
-  const [availablePermissions, setAvailablePermissions] = useState<string[]>([]);
-  const [selectedRole, setSelectedRole] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
     const fetchUsers = async () => {
       const { data, error } = await supabase.rpc('fetch_users');
-
       if (error) {
         console.error('Error fetching users:', error);
       } else {
-        setUsers(
-          data.map((user: User) => ({
-            id: user.id,
-            user_id: user.user_id,
-            email: user.email || '',
-            role: user.role,
-            display_name: user.display_name || '',
-          }))
-        );
+        setUsers(data);
       }
     };
 
@@ -63,83 +47,21 @@ const AdminDashboard = () => {
       }
     };
 
-    const fetchPermissions = async () => {
-      const { data, error } = await supabase.from('permissions').select('permission');
-      if (error) {
-        console.error('Error fetching permissions:', error);
-      } else {
-        setPermissions(data.map((permission: Permission) => permission.permission));
-      }
-    };
-
     fetchUsers();
     fetchRoles();
-    fetchPermissions();
   }, [router]);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleRoleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedRole(e.target.value);
-  };
-
-  const handleEdit = async (user: User) => {
-    setSelectedUser(user);
-    setShowModal(true);
-
-    const { data: rolePermissions, error: rolePermissionsError } = await supabase.rpc('fetch_role_permissions', {
-      role: user.role,
-    });
-    if (rolePermissionsError) {
-      console.error('Error fetching role permissions:', rolePermissionsError);
-    } else {
-      setCurrentPermissions(rolePermissions.map((permission: Permission) => permission.permission));
-      setAvailablePermissions(
-        permissions.filter((permission) => !rolePermissions.map((p: Permission) => p.permission).includes(permission))
-      );
-    }
-  };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
-    setCurrentPermissions([]);
-    setAvailablePermissions([]);
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedRole === '' || user.role === selectedRole)
-  );
-
   return (
-    <div className='container'>
-      <h1 className='my-4'>Admin Dashboard</h1>
-      <div className='mb-4'>
-        <input
-          type='text'
-          className='form-control mb-2'
-          placeholder='Search users...'
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-        <select className='form-select' value={selectedRole} onChange={handleRoleFilter}>
-          <option value=''>All Roles</option>
-          {roles.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
-          ))}
-        </select>
-      </div>
-      <table className='table table-striped'>
-        <thead>
+    <div className='container text-center'>
+      <h1 className='my-4 text-primary fw-bold'>Admin Dashboard</h1>
+      <table className='table table-hover shadow rounded bg-white'>
+        <thead className='table-dark'>
           <tr>
-            <th>ID</th>
             <th>Display Name</th>
             <th>Email</th>
             <th>Role</th>
@@ -147,95 +69,101 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <tr key={user.user_id}>
-              <td>{user.user_id}</td>
               <td>{user.display_name}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
               <td>
-                <button className='btn btn-primary btn-sm' onClick={() => handleEdit(user)}>
+                <button
+                  className='btn btn-primary btn-sm me-2'
+                  onClick={() => {
+                    setSelectedUser(user);
+                    setShowModal(true);
+                  }}
+                >
                   Edit
                 </button>
-                <button className='btn btn-danger btn-sm'>Remove</button>
+                <button
+                  className='btn btn-danger btn-sm'
+                  onClick={() => {
+                    setSelectedUser(user);
+                    setShowDeleteModal(true);
+                  }}
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      {showModal && (
+      {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
-            <div className='modal-content'>
-              <div className='modal-header'>
+            <div className='modal-content rounded shadow-lg'>
+              <div className='modal-header bg-primary text-white'>
                 <h5 className='modal-title'>Edit User</h5>
                 <button type='button' className='btn-close' onClick={handleCloseModal}></button>
               </div>
-              <div className='modal-body'>
-                {selectedUser && (
-                  <form>
-                    <div className='mb-3'>
-                      <label htmlFor='formRole' className='form-label'>
-                        Role
-                      </label>
-                      <select
-                        id='formRole'
-                        className='form-select'
-                        value={selectedUser.role}
-                        onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
-                      >
-                        {roles.map((role) => (
-                          <option key={role} value={role}>
-                            {role}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className='mb-3'>
-                      <label htmlFor='formCurrentPermissions' className='form-label'>
-                        Current Permissions
-                      </label>
-                      <select
-                        id='formCurrentPermissions'
-                        className='form-select'
-                        multiple
-                        value={currentPermissions}
-                        disabled
-                      >
-                        {currentPermissions.map((permission) => (
-                          <option key={permission} value={permission}>
-                            {permission}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className='mb-3'>
-                      <label htmlFor='formAvailablePermissions' className='form-label'>
-                        Available Permissions
-                      </label>
-                      <select
-                        id='formAvailablePermissions'
-                        className='form-select'
-                        multiple
-                        value={availablePermissions}
-                        onChange={(e) =>
-                          setAvailablePermissions(Array.from(e.target.selectedOptions, (option) => option.value))
-                        }
-                      >
-                        {availablePermissions.map((permission) => (
-                          <option key={permission} value={permission}>
-                            {permission}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </form>
-                )}
+              <div className='modal-body text-start'>
+                <div className='p-3 border rounded mb-3'>
+                  <p className='mb-2'>
+                    <strong>ID:</strong> {selectedUser.user_id}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Display Name:</strong> {selectedUser.display_name}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Email:</strong> {selectedUser.email}
+                  </p>
+                </div>
+                <div className='p-3 border rounded'>
+                  <label htmlFor='formRole' className='form-label fw-bold'>
+                    Role
+                  </label>
+                  <select
+                    id='formRole'
+                    className='form-select shadow-sm'
+                    value={selectedUser.role}
+                    onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
+                  >
+                    {roles.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className='modal-footer'>
                 <button type='button' className='btn btn-secondary' onClick={handleCloseModal}>
                   Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDeleteModal && selectedUser && (
+        <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
+          <div className='modal-dialog'>
+            <div className='modal-content rounded shadow-lg'>
+              <div className='modal-header bg-danger text-white'>
+                <h5 className='modal-title'>Confirm Delete</h5>
+                <button type='button' className='btn-close' onClick={() => setShowDeleteModal(false)}></button>
+              </div>
+              <div className='modal-body text-center'>
+                <p>
+                  Are you sure you want to delete <strong>{selectedUser.display_name}</strong>?
+                </p>
+              </div>
+              <div className='modal-footer'>
+                <button type='button' className='btn btn-secondary' onClick={() => setShowDeleteModal(false)}>
+                  Cancel
+                </button>
+                <button type='button' className='btn btn-danger'>
+                  Delete
                 </button>
               </div>
             </div>
