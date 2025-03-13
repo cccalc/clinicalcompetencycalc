@@ -17,7 +17,6 @@ export async function getUpdaterDetails(
 
   if (fetchProfileError) {
     console.error('Error fetching updater details:', fetchProfileError);
-    return null;
   }
 
   const { data: emailData, error: fetchEmailError } = await supabase
@@ -26,18 +25,16 @@ export async function getUpdaterDetails(
 
   if (fetchEmailError) {
     console.error('Error fetching updater email:', fetchEmailError);
-    return null;
   }
 
   if (!emailData || emailData.length === 0) {
     console.error('No email data found for updater ID:', id);
-    return null;
   }
 
   return {
     id,
     display_name: profileData?.display_name ?? null,
-    email: emailData,
+    email: emailData ?? null,
   };
 }
 
