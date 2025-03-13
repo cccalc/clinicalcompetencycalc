@@ -65,7 +65,8 @@ export default function EditQuestionModal({
       let history = mcqsInformation.get.map((mcqsMetaRow) => ({
         updated_at: new Date(mcqsMetaRow.updated_at),
         updated_by: mcqsMetaRow.updated_by ?? 'unknown updater',
-        text: (mcqsMetaRow.data as MCQ[]).find((mcq) => mcq.options[questionMCQ.get!.options[0]])!.question,
+        text: (mcqsMetaRow.data as MCQ[]).find((mcq) => mcq.options[Object.keys(questionMCQ.get!.options)[0]])!
+          .question,
       })) satisfies changeHistoryInstance[];
 
       // Fetch updater for each history instance
