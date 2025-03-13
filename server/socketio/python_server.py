@@ -51,14 +51,14 @@ def connect(sid, environ):
   print(f'Python server connected to a client: {sid}')
 
 @SERVER_SIO.event
-def message(sid, data):
+def message(SIO, data):
   """Handles incoming messages from clients connected to the Python server."""
   print('\nMessage from Node.js:', data)
 
   if data != "forwarded":
     SIO.emit('message', "forwarded")
 
-def send_message():
+def sendMessage():
   """Continuously prompts the user to enter a message and sends it to the Node.js server."""
   while True:
     msg = input('Enter a message: ')
@@ -66,7 +66,7 @@ def send_message():
     SIO.emit('message', msg)
 
 if __name__ == '__main__':
-  threading.Thread(target=send_message, daemon=True).start()
+  threading.Thread(target=sendMessage, daemon=True).start()
 
   SIO.connect('http://localhost:3000')
 
