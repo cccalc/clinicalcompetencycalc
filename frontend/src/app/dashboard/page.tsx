@@ -23,8 +23,7 @@ const Dashboard = () => {
   return (
     <>
       <main className='container mx-auto p-4'>
-        <h1 className='text-2xl font-bold'>Dashboard</h1>
-        <p>Welcome, {displayName}</p>
+        <p className='h5'>Welcome, {displayName}</p>
         <Suspense fallback={<div>Loading...</div>}>{renderDashboard()}</Suspense>
       </main>
     </>
