@@ -46,6 +46,7 @@ def disconnect():
   CONNECTED.clear()
 
 
+
 def sendMessage():
   """Continuously prompts the user to enter a message and sends it to the Node.js server."""
   while True:
