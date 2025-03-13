@@ -3,7 +3,7 @@
 import { lazy, Suspense } from 'react';
 import { useUser } from '@/context/UserContext';
 
-const AdminDashboard = lazy(() => import('@/components/(AdminComponents)/adminDashboard'));
+const AdminDashboardPage = lazy(() => import('@/components/(AdminComponents)/adminDashboard'));
 const RaterDashboard = lazy(() => import('@/components/(RaterComponents)/raterDashboard'));
 const StudentDashboard = lazy(() => import('@/components/(StudentComponents)/studentDashboard'));
 
@@ -12,7 +12,7 @@ const Dashboard = () => {
 
   const renderDashboard = () => {
     if (userRoleAuthorized) {
-      return <AdminDashboard />;
+      return <AdminDashboardPage />;
     } else if (userRoleRater) {
       return <RaterDashboard />;
     } else {
