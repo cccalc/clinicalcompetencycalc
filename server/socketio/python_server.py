@@ -45,18 +45,6 @@ def disconnect():
   print('Disconnected from Node.js server')
   CONNECTED.clear()
 
-@SERVER_SIO.event
-def connect(sid, environ):
-  """Handles the event when a client connects to the Python server."""
-  print(f'Python server connected to a client: {sid}')
-
-@SERVER_SIO.event
-def message(SIO, data):
-  """Handles incoming messages from clients connected to the Python server."""
-  print('\nMessage from Node.js:', data)
-
-  if data != "forwarded":
-    SIO.emit('message', "forwarded")
 
 def sendMessage():
   """Continuously prompts the user to enter a message and sends it to the Node.js server."""
