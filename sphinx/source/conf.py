@@ -15,7 +15,7 @@ exclude_dirs = {".venv"}
 # Recursively find all directories containing Python files, excluding unwanted folders
 for path in docs_root.rglob("*.py"):
     if not any(excluded in path.parts for excluded in exclude_dirs):
-        sys.path.insert(0, str(path.parent))
+        sys.path.insert(0, str(path.parent.parent))
 
 # Remove duplicates
 sys.path = list(dict.fromkeys(sys.path))
@@ -24,9 +24,9 @@ sys.path = list(dict.fromkeys(sys.path))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'CCC'
-copyright = '2025, Tyler'
-author = 'Tyler'
-release = '0.1'
+copyright = '2025, Dylan Colburn, Jacq Lee, Tyler Muessig, Tyler Price'
+author = 'Dylan Colburn, Jacq Lee, Tyler Muessig, Tyler Price'
+release = '0.41'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

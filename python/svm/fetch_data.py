@@ -82,8 +82,9 @@ def fetchData(supabase: Client, table: str) -> list:
   :param supabase: The Supabase client object.
   :type supabase: Client
 
-  :param table: The name of the table to fetch data from. This table should be in the "trainingdata"
-  schema.
+  :param table:
+    The name of the table to fetch data from. This table should be in the \"trainingdata\" 
+    schema.
   :type table: str
 
   :returns: A list of dictionaries containing the data from the specified table.
