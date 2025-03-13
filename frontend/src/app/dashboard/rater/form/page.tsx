@@ -47,7 +47,6 @@ export default function RaterFormsPage() {
           ...mcq,
           epa: parseInt(mcq.epa, 10),
         })) as KeyFunction[];
-        console.log('Key Function Data:', formattedKFData);
         setKFData(formattedKFData);
       }
       setLoading(false);
