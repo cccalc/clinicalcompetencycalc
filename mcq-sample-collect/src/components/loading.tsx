@@ -1,4 +1,6 @@
-export default function Loading() {
+import { memo } from "react";
+
+const Loading = memo(function Loading() {
   return (
     <div className='d-flex justify-content-center align-items-center' style={{ height: '100%' }}>
       <div className='spinner-border' role='status'>
@@ -6,4 +8,6 @@ export default function Loading() {
       </div>
     </div>
   );
-}
+});
+
+export default Loading;

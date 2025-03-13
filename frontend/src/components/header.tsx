@@ -1,12 +1,15 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import logo from '@/components/ccc-logo-color.svg'; // Update the path to your logo
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { supabase_authorize } from '@/utils/async-util';
 import { createClient } from '@/utils/supabase/client';
-import { isAdmin } from '@/utils/supabase/roles';
+
+// import { isAdmin } from '@/utils/supabase/roles';
 
 const supabase = createClient();
 
@@ -17,8 +20,9 @@ const Header = () => {
   const [email, setEmail] = useState('');
   const [originalDisplayName, setOriginalDisplayName] = useState('');
   const [isChanged, setIsChanged] = useState(false);
-  const [isAdminUser, setIsAdminUser] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  const [user_roleAuthorized, setUser_roleAuthorized] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -44,8 +48,8 @@ const Header = () => {
         setOriginalDisplayName(profileData.display_name);
       }
 
-      const isAdminUser = await isAdmin(data.user.id);
-      setIsAdminUser(isAdminUser);
+      // const isAdminUser = await isAdmin(data.user.id);
+      // setIsAdminUser(isAdminUser);
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error loading user data:', error.message);
@@ -55,6 +59,13 @@ const Header = () => {
       alert(`Error loading user data: ${JSON.stringify(error)}`);
     }
   }, []);
+
+  useEffect(() => {
+    console.log('Checking user role authorization...');
+    supabase_authorize(['user_roles.select', 'user_roles.insert']).then((result) => {
+      setUser_roleAuthorized(result);
+    });
+  }, [email]);
 
   useEffect(() => {
     fetchProfile();
@@ -129,7 +140,7 @@ const Header = () => {
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
         <nav className='d-flex gap-3 align-items-center'>
-          {isAdminUser ? (
+          {user_roleAuthorized ? (
             <>
               <Link
                 href='/admin-dashboard'

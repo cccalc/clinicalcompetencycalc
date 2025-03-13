@@ -1,0 +1,6 @@
+id,created_at,user_id,c6_1_1,c6_1_2,c6_1_3,c6_1_4,c6_1_5,c6_1_6,dev_level
+1,2025-02-18T13:39:23.031+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,True,False,False,2
+3,2025-02-21T15:01:37.156+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,True,False,True,3
+4,2025-02-21T15:30:17.845+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,False,False,False,True,4
+5,2025-02-21T18:11:27.746+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,False,False,False,False,False,1
+6,2025-02-24T18:40:47.278+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,False,False,False,False,2

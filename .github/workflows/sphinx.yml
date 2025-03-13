@@ -1,4 +1,4 @@
-name: 'Sphinx: Render docs'
+name: "Sphinx: Render docs"
 
 on: push
 
@@ -11,22 +11,34 @@ jobs:
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
     - name: Install dependencies
       run: |
-        find . -name "requirements.txt" -execdir bash run.sh \;
-    - name: Build HTML
+        pip install --upgrade pip
+        pip install --no-deps -r python/svm/requirements.txt
+        pip install --no-deps -r python/bert/requirements.txt
+        pip install sphinx
+        pip install furo
+
+    - name: Build Sphinx documentation
       run: |
-        python -m venv venv
-        ./venv/bin/python -m pip install sphinx
-        ./venv/bin/python -m sphinx -b html sphinx sphinx/_build/html
+        sphinx-build -v -b html sphinx/source sphinx/build/html/
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: html-docs
-        path: sphinx/_build/html/
+        path: sphinx/build/html/
+
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/chore/cicd/'
+      if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: sphinx/_build/html
+        publish_dir: sphinx/build/html
