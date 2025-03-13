@@ -101,8 +101,9 @@ export default function EditOptionModal({
   }, [mcqsInformation, optionKey, supabase]);
 
   const handleSubmit = async () => {
-    submitNewOption(optionKey.get!, newOptionText.get!);
-    (async () => mcqsInformation.set((await getHistoricalMCQs()) ?? null))();
+    submitNewOption(optionKey.get!, newOptionText.get!).then(() =>
+      getHistoricalMCQs().then((mcqs) => mcqsInformation.set(mcqs ?? null))
+    );
   };
 
   const submitDisabled =

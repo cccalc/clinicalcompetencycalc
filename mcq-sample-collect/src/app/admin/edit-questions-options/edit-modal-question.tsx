@@ -8,7 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 import type { Tables } from '@/utils/supabase/database.types';
 import type { MCQ, changeHistoryInstance } from '@/utils/types';
 
-import { getUpdaterDetails } from './actions';
+import { getUpdaterDetails, submitNewQuestion } from './actions';
 import { renderQuestion } from './render-spans';
 import EditModalChangesList from './edit-modal-changes-list';
 import { filterHistory } from './utils';
@@ -92,8 +92,9 @@ export default function EditQuestionModal({
   }, [mcqsInformation, questionMCQ, supabase]);
 
   const handleSubmit = async () => {
-    // submitNewOption(optionKey.get!, newOptionText.get!);
-    (async () => mcqsInformation.set((await getHistoricalMCQs()) ?? null))();
+    submitNewQuestion(questionMCQ.get!, newQuestionText.get!).then(() =>
+      getHistoricalMCQs().then((mcqs) => mcqsInformation.set(mcqs ?? null))
+    );
   };
 
   const submitDisabled = !questionMCQ.get || !newQuestionText.get || newQuestionText.get === questionMCQ.get.question;
@@ -103,7 +104,7 @@ export default function EditQuestionModal({
       className='modal fade'
       id='edit-question-modal'
       tabIndex={-1}
-      aria-labelledby='edit-question-modal-label'
+      aria-labelledby={`edit-question-modal-label`}
       aria-hidden='true'
     >
       <div className='modal-dialog modal-dialog-centered modal-dialog-scrollable'>
@@ -123,11 +124,11 @@ export default function EditQuestionModal({
             </p>
             <p className='fw-bold mb-1'>New question:</p>
             <div className='mb-3'>
-              <input
-                id='new-option'
+              <textarea
+                id='new-question'
                 className='form-control'
-                type='text'
-                placeholder='Option text'
+                rows={2}
+                placeholder='Question text'
                 onChange={(e) => newQuestionText.set(e.target.value)}
               />
             </div>

@@ -40,7 +40,7 @@ export default function QuestionList() {
   const handleQuestionClick = (mcq: MCQ) => {
     setQuestionMCQ(mcq);
     setNewQuestionText(mcq.question);
-    document.querySelectorAll('input[id="new-question"]').forEach((el) => {
+    document.querySelectorAll('textarea[id="new-question"]').forEach((el) => {
       (el as HTMLInputElement).value = mcq.question;
     });
   };

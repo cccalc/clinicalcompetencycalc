@@ -8,16 +8,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import BootstrapClient from '@/components/bootstrap-client';
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
+import { ReactScan } from '@/components/react-scan';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -45,6 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
+      <ReactScan />
       <body className={inter.className}>{children}</body>
       <BootstrapClient />
     </html>
