@@ -1,7 +1,7 @@
-import threading
+
 import socketio
 import eventlet
-
+import threading
 
 sio = socketio.Client()
 server_sio = socketio.Server()
