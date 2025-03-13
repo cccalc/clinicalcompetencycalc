@@ -1,16 +1,16 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="./">
+<html class="no-js" lang="en" data-content_root="../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API" href="api.html" /><link rel="prev" title="Introduction" href="intro.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="svm.train" href="svm.train.html" /><link rel="prev" title="svm.predict" href="svm.predict.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Usage - CCC 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=371b9111" />
+        <title>svm.fetch_data - CCC 0.41 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=371b9111" />
     
     
 
@@ -167,7 +167,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">CCC 0.1 documentation</div></a>
+      <a href="../index.html"><div class="brand">CCC 0.41 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -188,21 +188,29 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">CCC 0.1 documentation</span>
+  <span class="sidebar-brand-text">CCC 0.41 documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model_doc.html">AI and ML implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../svm.html">SVM Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bert.html">BERT Documentation</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="svm.predict.html">svm.predict</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">svm.fetch_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svm.train.html">svm.train</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bert.csv_to_keras.html">bert.csv_to_keras</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -223,7 +231,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/usage.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/generated/svm.fetch_data.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -243,8 +251,38 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
+          <section id="module-svm.fetch_data">
+<span id="svm-fetch-data"></span><h1>svm.fetch_data<a class="headerlink" href="#module-svm.fetch_data" title="Link to this heading">¶</a></h1>
+<p>fetch_data.py</p>
+<p>This script fetches data from a Supabase database and exports it to CSV files.
+It uses the Supabase client to connect to the database and retrieve data from specified tables.
+The script requires the following environment variables to be set:
+- SUPABASE_URL: The URL of the Supabase database.
+- SUPABASE_SERVICE_ROLE_KEY: The service role key for accessing the Supabase database.</p>
+<p>Usage:
+python fetch_data.py &lt;folder&gt;</p>
+<p>Arguments:
+- folder: The folder where the CSV files will be saved.</p>
+<p>Dependencies:
+- dotenv
+- os
+- pandas
+- re
+- supabase
+- sys</p>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../svm.html#svm.fetch_data.fetchData" title="svm.fetch_data.fetchData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchData</span></code></a>(supabase, table)</p></td>
+<td><p>Fetches all data from a specified table in the Supabase database.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../svm.html#svm.fetch_data.main" title="svm.fetch_data.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>(argv)</p></td>
+<td><p>Main function to fetch data from Supabase and export it to CSV files.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 
         </article>
@@ -252,23 +290,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="api.html">
+          <a class="next-page" href="svm.train.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">API</div>
+                <div class="title">svm.train</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="intro.html">
+          <a class="prev-page" href="svm.predict.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Introduction</div>
+                <div class="title">svm.predict</div>
                 
               </div>
             </a>
@@ -276,7 +314,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Tyler
+                Copyright &#169; 2025, Dylan Colburn, Jacq Lee, Tyler Muessig, Tyler Price
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -296,9 +334,9 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=2709fde1"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+</div><script src="../_static/documentation_options.js?v=24ed8042"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
     </body>
 </html>

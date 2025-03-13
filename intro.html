@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Usage" href="usage.html" /><link rel="prev" title="Welcome to CCC’s documentation!" href="index.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="AI and ML implementation" href="model_doc.html" /><link rel="prev" title="Welcome to CCC’s documentation!" href="index.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Introduction - CCC 0.1 documentation</title>
+        <title>Introduction - CCC 0.41 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -167,7 +167,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">CCC 0.1 documentation</div></a>
+      <a href="index.html"><div class="brand">CCC 0.41 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -191,7 +191,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">CCC 0.1 documentation</span>
+  <span class="sidebar-brand-text">CCC 0.41 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -201,8 +201,16 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_doc.html">AI and ML implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="svm.html">SVM Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bert.html">BERT Documentation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/svm.predict.html">svm.predict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/svm.fetch_data.html">svm.fetch_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/svm.train.html">svm.train</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/bert.csv_to_keras.html">bert.csv_to_keras</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -237,7 +245,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -254,6 +262,25 @@ reported by raters. Administrators will also be able to filter low-quality
 feedback. All of these options will be implemented to allow students, raters,
 and administrators to access them via any device that has a modern web browser,
 such as smartphones, laptops, and desktop computers.</p>
+<section id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Link to this heading">¶</a></h2>
+<p>The purpose of the software requirements document is to create a comprehensive outline of the
+Clinical Competency Calculator (CCC) for the development team, project advisors, faculty advisors,
+stakeholders, and members of the Hershey Medical team that will be maintaining this software. This
+outline will describe the functions and high-level requirements of the CCC. The target audience is
+expected to know technical terminology related to software development.</p>
+</section>
+<section id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Link to this heading">¶</a></h2>
+<p>This document specifies the CCC as software designed to be used for the appraisal of students
+undergoing clerkship at Hershey Medical, as is to be utilized by the Department of Family Medicine.
+The CCC will provide a means of collecting feedback from raters on the competencies of students
+and performing useful, actionable analyses thereon. The CCC is not designed to interface with
+existing Hershey Medical systems or engage in information exchange therewith. The CCC is also
+not designed for utilization by other departments within Hershey Medical; should this software be
+used outside of the stated scope, further requirement elicitation should be carried out and relevant
+issues addressed.</p>
+</section>
 </section>
 
         </article>
@@ -261,12 +288,12 @@ such as smartphones, laptops, and desktop computers.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="usage.html">
+          <a class="next-page" href="model_doc.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Usage</div>
+                <div class="title">AI and ML implementation</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -285,7 +312,7 @@ such as smartphones, laptops, and desktop computers.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Tyler
+                Copyright &#169; 2025, Dylan Colburn, Jacq Lee, Tyler Muessig, Tyler Price
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -299,13 +326,33 @@ such as smartphones, laptops, and desktop computers.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#purpose">Purpose</a></li>
+<li><a class="reference internal" href="#scope">Scope</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=2709fde1"></script>
+</div><script src="_static/documentation_options.js?v=24ed8042"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
