@@ -56,9 +56,36 @@ const AdminDashboard = () => {
     setSelectedUser(null);
   };
 
+  const filteredUsers = users.filter(
+    (user) =>
+      (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedRole === '' || user.role === selectedRole)
+  );
+
   return (
     <div className='container text-center'>
       <h1 className='my-4 text-primary fw-bold'>Admin Dashboard</h1>
+
+      {/* Search and Filter Bar */}
+      <div className='mb-3 d-flex justify-content-between'>
+        <input
+          type='text'
+          className='form-control me-2'
+          placeholder='Search by name or email...'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+          <option value=''>All Roles</option>
+          {roles.map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <table className='table table-hover shadow rounded bg-white'>
         <thead className='table-dark'>
           <tr>
@@ -69,7 +96,7 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <tr key={user.user_id}>
               <td>{user.display_name}</td>
               <td>{user.email}</td>
@@ -98,6 +125,7 @@ const AdminDashboard = () => {
           ))}
         </tbody>
       </table>
+
       {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -145,6 +173,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+
       {showDeleteModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
