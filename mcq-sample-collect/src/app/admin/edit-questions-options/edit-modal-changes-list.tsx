@@ -1,7 +1,9 @@
+import { memo } from 'react';
+
 import Loading from '@/components/loading';
 import type { changeHistoryInstance } from '@/utils/types';
 
-export default function EditModalChangesList({
+const EditModalChangesList = memo(function EditModalChangesList({
   loadingHistory,
   history,
   useID,
@@ -57,4 +59,6 @@ export default function EditModalChangesList({
       </div>
     </div>
   );
-}
+});
+
+export default EditModalChangesList;

@@ -4,7 +4,6 @@ import { cache, useEffect, useId, useState, type Dispatch, type SetStateAction }
 import React from 'react';
 
 import { getHistoricalMCQs } from '@/utils/get-epa-data';
-import { createClient } from '@/utils/supabase/client';
 import type { Tables } from '@/utils/supabase/database.types';
 import type { MCQ, changeHistoryInstance } from '@/utils/types';
 
@@ -33,8 +32,6 @@ export default function EditQuestionModal({
     set: Dispatch<SetStateAction<string | null>>;
   };
 }) {
-  const supabase = createClient();
-
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [questionHistory, setQuestionHistory] = useState<changeHistoryInstance[] | null>(null);
 
@@ -52,6 +49,7 @@ export default function EditQuestionModal({
   // on change of selected option, get historical change data
   useEffect(() => {
     const fetchHistory = async () => {
+      console.log('fetchHistory');
       setLoadingHistory(true);
       setQuestionHistory(null);
 
@@ -89,7 +87,7 @@ export default function EditQuestionModal({
     };
 
     fetchHistory();
-  }, [mcqsInformation, questionMCQ, supabase]);
+  }, [mcqsInformation.get, questionMCQ.get]);
 
   const handleSubmit = async () => {
     submitNewQuestion(questionMCQ.get!, newQuestionText.get!).then(() =>
