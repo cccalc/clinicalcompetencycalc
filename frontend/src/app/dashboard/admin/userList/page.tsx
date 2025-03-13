@@ -201,7 +201,7 @@ const AdminDashboard = () => {
                         className='form-select'
                         multiple
                         value={currentPermissions}
-                        readOnly
+                        disabled
                       >
                         {currentPermissions.map((permission) => (
                           <option key={permission} value={permission}>
