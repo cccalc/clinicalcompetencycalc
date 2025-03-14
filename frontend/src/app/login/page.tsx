@@ -64,8 +64,8 @@ export default function Login() {
         await supabase.auth.getSession();
         await new Promise((resolve) => setTimeout(resolve, 300));
 
-        localStorage.setItem('redirectToDashboard', 'true');
         window.location.reload();
+        localStorage.setItem('redirectToDashboard', 'true');
       }
     }
   };
