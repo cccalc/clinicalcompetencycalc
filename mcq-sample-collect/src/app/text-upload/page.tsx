@@ -12,7 +12,7 @@ export default async function TextUpload() {
     <div className='container-lg p-5'>
       <h3 className='mb-3'>Upload text samples</h3>
       <p className='mb-3'>
-        Please upload a CSV file with <code>text</code>, <code>epa</code>, and <code>label</code> columns.
+        Please upload a CSV file with <code>text</code>, <code>epa</code>, and <code>level</code> columns.
       </p>
       <FileInputForm />
     </div>
