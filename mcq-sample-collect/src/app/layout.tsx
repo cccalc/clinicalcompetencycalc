@@ -9,8 +9,6 @@ import { Inter } from 'next/font/google';
 
 import BootstrapClient from '@/components/bootstrap-client';
 
-// import { ReactScan } from '@/components/react-scan';
-
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -37,7 +35,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      {/* <ReactScan /> */}
       <body className={inter.className}>{children}</body>
       <BootstrapClient />
     </html>
