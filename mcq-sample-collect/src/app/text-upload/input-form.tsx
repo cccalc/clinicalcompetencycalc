@@ -89,15 +89,13 @@ export default function FileInputForm() {
             <tr>
               <th scope='col'>text</th>
               <th scope='col'>epa</th>
-              <th scope='col'>label</th>
+              <th scope='col'>level</th>
             </tr>
           </thead>
           <tbody>
             {parsedData.map((row, index) => (
               <tr key={index}>
-                <td>
-                  <span>{row.text}</span>
-                </td>
+                <td>{row.text}</td>
                 <td>{row.epa}</td>
                 <td>{row.level}</td>
               </tr>
