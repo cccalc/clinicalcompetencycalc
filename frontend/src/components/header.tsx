@@ -62,10 +62,7 @@ const Header = () => {
     if (!user) return; // Ensure user is authenticated
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ display_name: editedDisplayName })
-        .eq('id', user.id); 
+      const { error } = await supabase.from('profiles').update({ display_name: editedDisplayName }).eq('id', user.id);
 
       if (error) throw error;
 
