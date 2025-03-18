@@ -13,6 +13,7 @@ interface UserContextType {
   email: string;
   userRoleAuthorized: boolean;
   userRoleRater: boolean;
+  userRoleStudent: boolean;
   loading: boolean;
 }
 
@@ -24,6 +25,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [email, setEmail] = useState('');
   const [userRoleAuthorized, setUserRoleAuthorized] = useState(false);
   const [userRoleRater, setUserRoleRater] = useState(false);
+  const [userRoleStudent, setUserRoleStudent] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Fetch user profile from Supabase
@@ -74,6 +76,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const rater = await supabase_authorize(['form_responses.select', 'form_responses.insert', 'mcqs_options.select']);
     setUserRoleRater(rater);
 
+    const student = await supabase_authorize(['form_responses.select']);
+    setUserRoleStudent(student);
+
     setLoading(false);
   }, []);
 
@@ -100,7 +105,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchUser]);
 
   return (
-    <UserContext.Provider value={{ user, displayName, email, userRoleAuthorized, userRoleRater, loading }}>
+    <UserContext.Provider
+      value={{ user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent, loading }}
+    >
       {children}
     </UserContext.Provider>
   );
