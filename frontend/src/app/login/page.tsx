@@ -62,7 +62,6 @@ export default function Login() {
       if (!error) {
         // ✅ Ensure session updates properly
         await supabase.auth.getSession();
-        await new Promise((resolve) => setTimeout(resolve, 300));
 
         window.location.reload();
         localStorage.setItem('redirectToDashboard', 'true');
