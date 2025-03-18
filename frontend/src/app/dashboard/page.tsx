@@ -8,14 +8,14 @@ const RaterDashboard = lazy(() => import('@/components/(RaterComponents)/raterDa
 const StudentDashboard = lazy(() => import('@/components/(StudentComponents)/studentDashboard'));
 
 const Dashboard = () => {
-  const { userRoleAuthorized, userRoleRater, displayName } = useUser();
+  const { userRoleAuthorized, userRoleRater, displayName, userRoleStudent } = useUser();
 
   const renderDashboard = () => {
     if (userRoleAuthorized) {
       return <AdminDashboardPage />;
     } else if (userRoleRater) {
       return <RaterDashboard />;
-    } else {
+    } else if (userRoleStudent) {
       return <StudentDashboard />;
     }
   };
