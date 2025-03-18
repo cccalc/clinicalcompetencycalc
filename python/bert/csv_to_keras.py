@@ -55,15 +55,18 @@ def exportKerasFolder(df: pd.DataFrame, destination: str, **kwargs) -> None:
   :type destination: str
   """
 
+  text_col_label = kwargs.get('text_col_label', 'text')
+  level_col_label = kwargs.get('level_col_label', 'dev_level')
+
   training_split = kwargs.get('training_split', 0.8)
   class_names = ['remedial', 'early_dev', 'developing', 'entrustable']
 
   # split dataframe into classes, keeping only the "description" column
-  classes = df['class'].unique()
+  classes = df[level_col_label].unique()
   class_dfs = {}
   for c in classes:
-    class_df = df[df['class'] == c]
-    class_df = class_df[['description']]
+    class_df = df[df[level_col_label] == c]
+    class_df = class_df[[text_col_label]]
     class_dfs[c] = class_df
 
   # create the directory structure
@@ -82,12 +85,12 @@ def exportKerasFolder(df: pd.DataFrame, destination: str, **kwargs) -> None:
     # write the training set to files
     for i, row in train_df.iterrows():
       with open(os.path.join(destination, 'train', class_names[c], f'{i}.txt'), 'w') as f:
-        f.write(row['description'])
+        f.write(row[text_col_label])
 
     # write the testing set to files
     for i, row in test_df.iterrows():
       with open(os.path.join(destination, 'test', class_names[c], f'{i}.txt'), 'w') as f:
-        f.write(row['description'])
+        f.write(row[text_col_label])
 
 
 def main() -> None:
