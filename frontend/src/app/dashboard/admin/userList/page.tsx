@@ -196,6 +196,7 @@ const AdminDashboard = () => {
                 <button type='button' className='btn btn-secondary' onClick={handleCloseModal}>
                   Close
                 </button>
+                <button type='button' className='btn btn-primary' onClick={updateUserRole}>Save</button>
               </div>
             </div>
           </div>
