@@ -1,76 +1,15 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { FaSortUp, FaSortDown } from 'react-icons/fa';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/utils/supabase/client'; 
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  /* Dummy data for student requests with notes
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      student_name: 'John Doe',
-      student_email: 'john.doe@example.com',
-      date_requested: '2025-03-10',
-      notes: 'Evaluate me on EPA 1 and 3. I have been struggling with patient handoffs and need detailed feedback.',
-    },
-    {
-      id: 2,
-      student_name: 'Jane Smith',
-      student_email: 'jane.smith@example.com',
-      date_requested: '2025-03-12',
-      notes: 'I need feedback on procedural skills.',
-    },
-    {
-      id: 3,
-      student_name: 'Alice Johnson',
-      student_email: 'alice.johnson@example.com',
-      date_requested: '2025-03-11',
-      notes: 'Focus on clinical reasoning.',
-    },
-    {
-      id: 4,
-      student_name: 'Bob Brown',
-      student_email: 'bob.brown@example.com',
-      date_requested: '2025-03-09',
-      notes: 'Would like evaluation on patient communication.',
-    },
-    {
-      id: 5,
-      student_name: 'Charlie Davis',
-      student_email: 'charlie.davis@example.com',
-      date_requested: '2025-03-08',
-      notes: 'Need detailed feedback on EPA 4.',
-    },
-    {
-      id: 6,
-      student_name: 'David Edwards',
-      student_email: 'david.edwards@example.com',
-      date_requested: '2025-03-07',
-      notes: 'Looking for feedback on bedside manner.',
-    },
-    {
-      id: 7,
-      student_name: 'Ella Foster',
-      student_email: 'ella.foster@example.com',
-      date_requested: '2025-03-06',
-      notes: 'Evaluate my ability to perform under pressure.',
-    },
-  ]);
-*/
-
-
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(); 
 
 interface FormRequest {
   id: string;
   created_at: string;
   student_id: string;
+  display_name?: string; 
   notes: string;
 }
 
@@ -80,22 +19,48 @@ const RaterDashboard = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
-    const fetchFormRequests = async () => {
-      const { data, error } = await supabase.from('form_requests').select('*');
-    
-      if (error) {
-        console.error('Error fetching form requests:', error.message);
-      } else if (!data || data.length === 0) {
-        console.warn('Warning: No form requests returned.');
-      } else {
-        console.log('Fetched form requests:', data);
-        setFormRequests(data);
+    const fetchFormRequestsWithNames = async () => {
+
+      const { data: formRequests, error: formError } = await supabase
+        .from('form_requests')
+        .select('*');
+
+      if (formError) {
+        console.error('Error fetching form requests:', formError.message);
+        setLoading(false);
+        return;
       }
-    
+
+      if (!formRequests || formRequests.length === 0) {
+        console.warn('Warning: No form requests returned.');
+        setLoading(false);
+        return;
+      }
+
+      const studentIds = formRequests.map((req) => req.student_id);
+
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', studentIds);
+
+      if (profileError) {
+        console.error('Error fetching profiles:', profileError.message);
+        setLoading(false);
+        return;
+      }
+
+      const requestsWithNames = formRequests.map((request) => ({
+        ...request,
+        display_name: profiles.find((profile) => profile.id === request.student_id)?.display_name || 'Unknown',
+      }));
+
+      console.log('Fetched form requests with names:', requestsWithNames);
+      setFormRequests(requestsWithNames);
       setLoading(false);
     };
-    
-    fetchFormRequests();
+
+    fetchFormRequestsWithNames();
   }, []);
 
   const toggleSortOrder = () => {
@@ -131,7 +96,8 @@ const RaterDashboard = () => {
                 className="list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm"
               >
                 <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h4 className="fw-bold text-dark">Student ID: {request.student_id}</h4>
+               
+                  <h4 className="fw-bold text-dark">Student: {request.display_name}</h4>
                 </div>
                 <div
                   className="border rounded p-2 bg-light"
