@@ -5,12 +5,11 @@ import { useState } from 'react';
 const FormRequests = () => {
   const [faculty, setFaculty] = useState<string>('');
   const [details, setDetails] = useState<string>('');
+  const [goals, setGoals] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Faculty:', faculty);
-    console.log('Details:', details);
+    // Here you would typically handle the form submission, e.g., sending data to a server
   };
 
   return (
@@ -37,13 +36,26 @@ const FormRequests = () => {
           </div>
           <div className='mb-3'>
             <label htmlFor='details' className='form-label'>
-              Briefly describe the relevant activity or additional details
+              Briefly describe the relevant activity
             </label>
             <textarea
               id='details'
               name='details'
               value={details}
               onChange={(e) => setDetails(e.target.value)}
+              rows={4}
+              className='form-control'
+            />
+          </div>
+          <div className='mb-3'>
+            <label htmlFor='goals' className='form-label'>
+              What I&apos;d like feedback on
+            </label>
+            <textarea
+              id='goals'
+              name='goals'
+              value={goals}
+              onChange={(e) => setGoals(e.target.value)}
               rows={4}
               className='form-control'
             />

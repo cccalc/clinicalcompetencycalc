@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-// Expanded dummy notifications
+// dummy notifications
 const sampleNotifications = [
   { id: 1, type: 'Bias Alert', message: 'Possible rater bias detected in feedback.', timestamp: '10 mins ago' },
   { id: 2, type: 'Feedback Submitted', message: 'A new feedback form has been submitted.', timestamp: '30 mins ago' },

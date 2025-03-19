@@ -31,7 +31,7 @@ const Header = () => {
   };
 
   const handleSaveChanges = async () => {
-    // 🔹 Implement update logic (update Supabase profile)
+    // Implement update logic (update Supabase profile)
   };
 
   useEffect(() => {
