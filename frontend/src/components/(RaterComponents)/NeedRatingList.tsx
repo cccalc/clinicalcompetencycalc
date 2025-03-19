@@ -30,7 +30,7 @@ const RaterDashboard = () => {
 
       const { data: formRequests, error: formError } = await supabase
         .from('form_requests')
-        .select('*');
+        .select('*')
         .eq('completed_by', user.id); 
 
       if (formError) {
