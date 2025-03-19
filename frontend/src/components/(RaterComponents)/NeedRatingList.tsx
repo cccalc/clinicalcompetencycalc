@@ -10,6 +10,7 @@ const RaterDashboard = () => {
       student_email: 'john.doe@example.com',
       date_requested: '2025-03-10',
       notes: 'Evaluate me on EPA 1 and 3. I have been struggling with patient handoffs and need detailed feedback.',
+      goals: 'Improve patient handoff skills.',
     },
     {
       id: 2,
@@ -17,6 +18,7 @@ const RaterDashboard = () => {
       student_email: 'jane.smith@example.com',
       date_requested: '2025-03-12',
       notes: 'I need feedback on procedural skills.',
+      goals: 'Enhance procedural skills.',
     },
     {
       id: 3,
@@ -24,6 +26,7 @@ const RaterDashboard = () => {
       student_email: 'alice.johnson@example.com',
       date_requested: '2025-03-11',
       notes: 'Focus on clinical reasoning.',
+      goals: 'Improve clinical reasoning.',
     },
     {
       id: 4,
@@ -31,6 +34,7 @@ const RaterDashboard = () => {
       student_email: 'bob.brown@example.com',
       date_requested: '2025-03-09',
       notes: 'Would like evaluation on patient communication.',
+      goals: 'Better patient communication.',
     },
     {
       id: 5,
@@ -38,6 +42,7 @@ const RaterDashboard = () => {
       student_email: 'charlie.davis@example.com',
       date_requested: '2025-03-08',
       notes: 'Need detailed feedback on EPA 4.',
+      goals: 'Master EPA 4.',
     },
     {
       id: 6,
@@ -45,6 +50,7 @@ const RaterDashboard = () => {
       student_email: 'david.edwards@example.com',
       date_requested: '2025-03-07',
       notes: 'Looking for feedback on bedside manner.',
+      goals: 'Improve bedside manner.',
     },
     {
       id: 7,
@@ -52,6 +58,7 @@ const RaterDashboard = () => {
       student_email: 'ella.foster@example.com',
       date_requested: '2025-03-06',
       notes: 'Evaluate my ability to perform under pressure.',
+      goals: 'Perform better under pressure.',
     },
   ]);
 
@@ -106,8 +113,22 @@ const RaterDashboard = () => {
                     padding: '10px',
                   }}
                 >
-                  <div className='text-secondary fw-bold mb-1'>Notes:</div>
+                  <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
                   <span>{request.notes || 'No notes provided'}</span>
+                </div>
+                <div
+                  className='border rounded p-2 bg-light'
+                  style={{
+                    flex: '2',
+                    minHeight: '100%',
+                    overflowY: 'auto',
+                    fontSize: '14px',
+                    marginLeft: '10px',
+                    padding: '10px',
+                  }}
+                >
+                  <div className='text-secondary fw-bold mb-1'>Stated Goals:</div>
+                  <span>{request.goals || 'No notes provided'}</span>
                 </div>
                 <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
                   <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
