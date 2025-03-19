@@ -1,7 +1,9 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import { FaSortUp, FaSortDown } from 'react-icons/fa';
 import { createClient } from '@/utils/supabase/client'; 
+import { useUser } from '@/context/UserContext'; 
 
 const supabase = createClient(); 
 
@@ -10,20 +12,26 @@ interface FormRequest {
   created_at: string;
   student_id: string;
   display_name?: string; 
+  completed_by: string;
   notes: string;
 }
 
 const RaterDashboard = () => {
+  const { user } = useUser(); 
   const [formRequests, setFormRequests] = useState<FormRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
+    if (!user) return; 
+
     const fetchFormRequestsWithNames = async () => {
+      setLoading(true);
 
       const { data: formRequests, error: formError } = await supabase
         .from('form_requests')
         .select('*');
+        .eq('completed_by', user.id); 
 
       if (formError) {
         console.error('Error fetching form requests:', formError.message);
@@ -38,7 +46,6 @@ const RaterDashboard = () => {
       }
 
       const studentIds = formRequests.map((req) => req.student_id);
-
       const { data: profiles, error: profileError } = await supabase
         .from('profiles')
         .select('id, display_name')
@@ -55,13 +62,12 @@ const RaterDashboard = () => {
         display_name: profiles.find((profile) => profile.id === request.student_id)?.display_name || 'Unknown',
       }));
 
-      console.log('Fetched form requests with names:', requestsWithNames);
       setFormRequests(requestsWithNames);
       setLoading(false);
     };
 
     fetchFormRequestsWithNames();
-  }, []);
+  }, [user]); 
 
   const toggleSortOrder = () => {
     const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
@@ -96,8 +102,7 @@ const RaterDashboard = () => {
                 className="list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm"
               >
                 <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-               
-                  <h4 className="fw-bold text-dark">Student: {request.display_name}</h4>
+                  <h4 className="fw-bold text-dark"> {request.display_name}</h4>
                 </div>
                 <div
                   className="border rounded p-2 bg-light"
