@@ -88,11 +88,11 @@ const RaterDashboard = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <div className="card p-3 border-0 bg-light">
-        <h1 className="mb-3 text-center text-primary">Rater Dashboard</h1>
-        <div className="d-flex justify-content-end mb-2">
-          <button className="btn btn-secondary" onClick={toggleSortOrder}>
+    <div className='container mt-4'>
+      <div className='card p-3 border-0 bg-light'>
+        <h1 className='mb-3 text-center text-primary'>Rater Dashboard</h1>
+        <div className='d-flex justify-content-end mb-2'>
+          <button className='btn btn-secondary' onClick={toggleSortOrder}>
             Sort by Date Requested {sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />}
           </button>
         </div>
@@ -101,14 +101,14 @@ const RaterDashboard = () => {
             {formRequests.map((request) => (
               <div
                 key={request.id}
-                className="list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm"
+                className='list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm'
               >
                 <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <h4 className='fw-bold text-dark'> {request.display_name}</h4>
                   <p className='text-muted small mb-0'>{request.email}</p>
                 </div>
                 <div
-                  className="border rounded p-2 bg-light"
+                  className='border rounded p-2 bg-light'
                   style={{
                     flex: '2',
                     minHeight: '100%',
@@ -118,6 +118,12 @@ const RaterDashboard = () => {
                     padding: '10px',
                   }}
                 >
+                  <div className='text-secondary fw-bold mb-1'>Notes:</div>
+                  <span>{request.notes || 'No notes provided'}</span>
+                </div>
+                <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
+                  <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
+                  <small className='text-muted mt-2'>{new Date(request.created_at).toLocaleString()}</small>
                   <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
                   <span>{request.notes || 'No notes provided'}</span>
                 </div>
