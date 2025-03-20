@@ -135,7 +135,7 @@ const RaterDashboard = () => {
                 </div>
                 <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
                   <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
-                  <small className='text-muted mt-2'>{request.completed_by}</small>
+                  <small className="text-muted mt-2">{new Date(request.created_at).toLocaleString()}</small>
                 </div>
               </div>
             ))}
