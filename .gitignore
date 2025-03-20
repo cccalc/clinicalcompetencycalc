@@ -57,3 +57,4 @@ local/
 
 # Node modules
 ./node_modules/
+server/socketio/node_modules/

@@ -56,6 +56,34 @@ const AdminDashboard = () => {
     setSelectedUser(null);
   };
 
+  const updateUserRole = async () => {
+    if (!selectedUser) return;
+
+    console.log("Updating role for user:", selectedUser.user_id, "to role:", selectedUser.role);
+
+    const { error } = await supabase
+      .from('user_roles') // Updating the correct table
+      .update({ role: selectedUser.role }) 
+      .eq('user_id', selectedUser.user_id); // Match by user_id
+
+    if (error) {
+      console.error('Error updating role:', error);
+      return;
+    }
+
+    console.log("Role update successful!");
+
+    // Fetch updated users after role update
+    const { data, error: fetchError } = await supabase.rpc('fetch_users');
+    if (fetchError) {
+      console.error('Error fetching updated users:', fetchError);
+    } else {
+      setUsers(data);
+    }
+
+    setShowModal(false);
+  };
+
   const filteredUsers = users.filter(
     (user) =>
       (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,7 +159,7 @@ const AdminDashboard = () => {
           <div className='modal-dialog'>
             <div className='modal-content rounded shadow-lg'>
               <div className='modal-header bg-primary text-white'>
-                <h5 className='modal-title'>Edit User</h5>
+                <h5 className='modal-title'>Edit User Role</h5>
                 <button type='button' className='btn-close' onClick={handleCloseModal}></button>
               </div>
               <div className='modal-body text-start'>
@@ -168,6 +196,7 @@ const AdminDashboard = () => {
                 <button type='button' className='btn btn-secondary' onClick={handleCloseModal}>
                   Close
                 </button>
+                <button type='button' className='btn btn-primary' onClick={updateUserRole}>Save</button>
               </div>
             </div>
           </div>
