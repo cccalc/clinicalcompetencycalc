@@ -62,7 +62,6 @@ export default function Login() {
       if (!error) {
         // ✅ Ensure session updates properly
         await supabase.auth.getSession();
-        await new Promise((resolve) => setTimeout(resolve, 300));
 
         window.location.reload();
         localStorage.setItem('redirectToDashboard', 'true');
@@ -77,7 +76,6 @@ export default function Login() {
           <Image className='mb-3' src={logo} height={32} alt='CCC logo' />
         </span>
         <h1 className='fs-2'>Clinical Competency Calculator</h1>
-        <p className='fs-3'>MCQ Sample Collection</p>
       </div>
       <form id='login-form' className='needs-validation' noValidate onSubmit={(e) => e.preventDefault()}>
         {/* Email Input */}

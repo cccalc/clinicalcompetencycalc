@@ -7,6 +7,8 @@ import { useUser } from '@/context/UserContext';
 
 const supabase = createClient(); 
 
+const RaterDashboard = () => {
+
 interface FormRequest {
   id: string;
   created_at: string;
@@ -121,6 +123,26 @@ const RaterDashboard = () => {
                 <div className="d-flex flex-column justify-content-between align-items-end" style={{ flex: '1' }}>
                   <button className="btn btn-primary btn-md mb-2">Evaluate</button>
                   <small className="text-muted mt-2">{new Date(request.created_at).toLocaleString()}</small>
+                  <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
+                  <span>{request.notes || 'No notes provided'}</span>
+                </div>
+                <div
+                  className='border rounded p-2 bg-light'
+                  style={{
+                    flex: '2',
+                    minHeight: '100%',
+                    overflowY: 'auto',
+                    fontSize: '14px',
+                    marginLeft: '10px',
+                    padding: '10px',
+                  }}
+                >
+                  <div className='text-secondary fw-bold mb-1'>Stated Goals:</div>
+                  <span>{request.goals || 'No notes provided'}</span>
+                </div>
+                <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
+                  <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
+                  <small className='text-muted mt-2'>{request.date_requested}</small>
                 </div>
               </div>
             ))}

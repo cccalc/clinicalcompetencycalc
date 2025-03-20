@@ -13,7 +13,7 @@ const Header = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, displayName, email, userRoleAuthorized, userRoleRater } = useUser();
+  const { user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent } = useUser();
 
   const [editedDisplayName, setEditedDisplayName] = useState(displayName);
   const [isChanged, setIsChanged] = useState(false);
@@ -31,7 +31,7 @@ const Header = () => {
   };
 
   const handleSaveChanges = async () => {
-    // 🔹 Implement update logic (update Supabase profile)
+    // Implement update logic (update Supabase profile)
   };
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const Header = () => {
                     Form
                   </Link>
                 </>
-              ) : (
+              ) : userRoleStudent ? (
                 <>
                   <Link
                     href='/dashboard'
@@ -121,7 +121,7 @@ const Header = () => {
                     Report
                   </Link>
                 </>
-              )}
+              ) : null}
 
               {/* 🔹 Profile Dropdown */}
               <div className='dropdown' ref={profileMenuRef}>
