@@ -14,6 +14,7 @@ interface UserContextType {
   userRoleAuthorized: boolean;
   userRoleRater: boolean;
   userRoleStudent: boolean;
+  userRoleDev: boolean;
   loading: boolean;
 }
 
@@ -26,6 +27,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userRoleAuthorized, setUserRoleAuthorized] = useState(false);
   const [userRoleRater, setUserRoleRater] = useState(false);
   const [userRoleStudent, setUserRoleStudent] = useState(false);
+  const [userRoleDev, setUserRoleDev] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Fetch user profile from Supabase
@@ -57,6 +59,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setEmail('');
       setUserRoleAuthorized(false);
       setUserRoleRater(false);
+      setUserRoleStudent(false);
+      setUserRoleDev(false);
       setLoading(false);
       return;
     }
@@ -70,6 +74,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setDisplayName(fetchedDisplayName ?? '');
 
     // Fetch user roles
+    const dev = await supabase_authorize([
+      'user_roles.select',
+      'user_roles.insert',
+      'user_roles.delete',
+      'user_roles.update',
+      'form_responses.select',
+      'form_responses.insert',
+      'mcqs_options.select',
+      'mcqs_options.update',
+      'mcqs_options.delete',
+      'mcqs_options.insert',
+      'form_responses.update',
+      'form_responses.delete',
+    ]);
+    setUserRoleDev(dev);
+
     const authorized = await supabase_authorize(['user_roles.select', 'user_roles.insert']);
     setUserRoleAuthorized(authorized);
 
@@ -95,6 +115,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setEmail('');
         setUserRoleAuthorized(false);
         setUserRoleRater(false);
+        setUserRoleStudent(false);
+        setUserRoleDev(false);
         setLoading(false);
       }
     });
@@ -106,7 +128,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent, loading }}
+      value={{ user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent, userRoleDev, loading }}
     >
       {children}
     </UserContext.Provider>
