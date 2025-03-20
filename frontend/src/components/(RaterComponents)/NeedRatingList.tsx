@@ -135,11 +135,7 @@ const RaterDashboard = () => {
                 </div>
                 <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
                   <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
-<<<<<<< HEAD
                   <small className='text-muted mt-2'>{new Date(request.created_at).toLocaleString()}</small>
-=======
-                  <small className='text-muted mt-2'>{request.created_at}</small>
->>>>>>> 4929d39834d7cedae2d97ee6ae5b799b8d435625
                 </div>
               </div>
             ))}
