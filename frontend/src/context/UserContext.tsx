@@ -118,9 +118,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUserRoleRater(role === 'rater');
     setUserRoleStudent(role === 'student');
 
-    const student = await supabase_authorize(['form_responses.select']);
-    setUserRoleStudent(student);
-
     setLoading(false);
   }, []);
 
