@@ -13,7 +13,7 @@ const Header = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const { user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent } = useUser();
+  const { user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent, userRoleDev } = useUser();
 
   const [editedDisplayName, setEditedDisplayName] = useState(displayName);
   const [isChanged, setIsChanged] = useState(false);
@@ -62,7 +62,7 @@ const Header = () => {
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user ? (
             <>
-              {userRoleAuthorized ? (
+              {userRoleAuthorized || userRoleDev ? (
                 <>
                   <Link
                     href='/dashboard/admin/userList'
@@ -79,7 +79,7 @@ const Header = () => {
                     All Reports
                   </Link>
                 </>
-              ) : userRoleRater ? (
+              ) : userRoleRater || userRoleDev ? (
                 <>
                   <Link
                     href='/dashboard'
@@ -96,7 +96,7 @@ const Header = () => {
                     Form
                   </Link>
                 </>
-              ) : userRoleStudent ? (
+              ) : userRoleStudent || userRoleDev ? (
                 <>
                   <Link
                     href='/dashboard'
