@@ -43,6 +43,14 @@ const Dashboard = () => {
       return <RaterDashboard />;
     } else if (userRoleStudent) {
       return <StudentDashboard />;
+    } else if (userRoleDev) {
+      return (
+        <>
+          <AdminDashboardPage />
+          <RaterDashboard />
+          <StudentDashboard />
+        </>
+      );
     }
 
     return <p>No role assigned.</p>;
