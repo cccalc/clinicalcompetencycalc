@@ -118,12 +118,6 @@ const RaterDashboard = () => {
                     padding: '10px',
                   }}
                 >
-                  <div className='text-secondary fw-bold mb-1'>Notes:</div>
-                  <span>{request.notes || 'No notes provided'}</span>
-                </div>
-                <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
-                  <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
-                  <small className='text-muted mt-2'>{new Date(request.created_at).toLocaleString()}</small>
                   <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
                   <span>{request.notes || 'No notes provided'}</span>
                 </div>
