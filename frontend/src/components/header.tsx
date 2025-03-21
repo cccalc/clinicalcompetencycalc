@@ -179,7 +179,6 @@ const Header = () => {
                   </Link>
                 </>
               )}
-
               {/* 🔹 Profile Dropdown */}
               <div className='dropdown' ref={profileMenuRef}>
                 <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
