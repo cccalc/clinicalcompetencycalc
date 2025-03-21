@@ -107,6 +107,9 @@ const RaterDashboard = () => {
                   <h4 className='fw-bold text-dark'> {request.display_name}</h4>
                   <p className='text-muted small mb-0'>{request.email}</p>
                 </div>
+                <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <h4 className='fw-bold text-dark'>{request.email}</h4>
+                </div>
                 <div
                   className='border rounded p-2 bg-light'
                   style={{
