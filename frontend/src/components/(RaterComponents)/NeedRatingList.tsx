@@ -56,11 +56,11 @@ const RaterDashboard = () => {
       }
 
       const requests = formRequests.map((request) => {
-        const student = users.find((user: { user_id: string; }) => user.user_id === request.student_id);
+        const student = users.find((user: { user_id: string }) => user.user_id === request.student_id);
         return {
           ...request,
           display_name: student?.display_name || 'Unknown',
-          email: student?.email ,
+          email: student?.email,
         };
       });
 
@@ -103,11 +103,9 @@ const RaterDashboard = () => {
                 key={request.id}
                 className='list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm'
               >
-                <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <h4 className='fw-bold text-dark'> {request.display_name}</h4>
-                </div>
-                <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h4 className='fw-bold text-dark'>{request.email}</h4>
+                  <p className='text-muted small mb-0'>{request.email}</p>
                 </div>
                 <div
                   className='border rounded p-2 bg-light'
