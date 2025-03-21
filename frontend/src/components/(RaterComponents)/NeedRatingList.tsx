@@ -13,6 +13,7 @@ const RaterDashboard = () => {
     created_at: string;
     student_id: string;
     display_name?: string;
+    email?: string;
     completed_by: string;
     notes: string;
     goals: string;
@@ -26,7 +27,7 @@ const RaterDashboard = () => {
   useEffect(() => {
     if (!user) return;
 
-    const fetchFormRequestsWithNames = async () => {
+    const fetchFormRequests = async () => {
       setLoading(true);
 
       const { data: formRequests, error: formError } = await supabase
@@ -46,28 +47,28 @@ const RaterDashboard = () => {
         return;
       }
 
-      const studentIds = formRequests.map((req) => req.student_id);
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, display_name')
-        .in('id', studentIds);
+      const { data: users, error: userError } = await supabase.rpc('fetch_users');
 
-      if (profileError) {
-        console.error('Error fetching profiles:', profileError.message);
+      if (userError) {
+        console.error('Error fetching users:', userError.message);
         setLoading(false);
         return;
       }
 
-      const requestsWithNames = formRequests.map((request) => ({
-        ...request,
-        display_name: profiles.find((profile) => profile.id === request.student_id)?.display_name || 'Unknown',
-      }));
+      const requests = formRequests.map((request) => {
+        const student = users.find((user: { user_id: string; }) => user.user_id === request.student_id);
+        return {
+          ...request,
+          display_name: student?.display_name || 'Unknown',
+          email: student?.email ,
+        };
+      });
 
-      setFormRequests(requestsWithNames);
+      setFormRequests(requests);
       setLoading(false);
     };
 
-    fetchFormRequestsWithNames();
+    fetchFormRequests();
   }, [user]);
 
   const toggleSortOrder = () => {
@@ -104,6 +105,9 @@ const RaterDashboard = () => {
               >
                 <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <h4 className='fw-bold text-dark'> {request.display_name}</h4>
+                </div>
+                <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <h4 className='fw-bold text-dark'>{request.email}</h4>
                 </div>
                 <div
                   className='border rounded p-2 bg-light'
