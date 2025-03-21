@@ -62,41 +62,7 @@ const Header = () => {
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user ? (
             <>
-              {userRoleAuthorized || userRoleDev ? (
-                <>
-                  <Link
-                    href='/dashboard/admin/userList'
-                    className={`btn ${
-                      pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
-                    }`}
-                  >
-                    All Users
-                  </Link>
-                  <Link
-                    href='/all-reports'
-                    className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                  >
-                    All Reports
-                  </Link>
-                </>
-              ) : userRoleRater || userRoleDev ? (
-                <>
-                  <Link
-                    href='/dashboard'
-                    className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href='/dashboard/rater/form'
-                    className={`btn ${
-                      pathname === '/dashboard/rater/form' ? 'btn-secondary' : 'btn-outline-secondary'
-                    }`}
-                  >
-                    Form
-                  </Link>
-                </>
-              ) : userRoleStudent || userRoleDev ? (
+              {(userRoleStudent || userRoleDev) && (
                 <>
                   <Link
                     href='/dashboard'
@@ -121,7 +87,39 @@ const Header = () => {
                     Report
                   </Link>
                 </>
-              ) : null}
+              )}
+
+              {(userRoleAuthorized || userRoleDev) && (
+                <>
+                  <Link
+                    href='/dashboard/admin/userList'
+                    className={`btn ${
+                      pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    All Users
+                  </Link>
+                  <Link
+                    href='/all-reports'
+                    className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    All Reports
+                  </Link>
+                </>
+              )}
+
+              {(userRoleRater || userRoleDev) && (
+                <>
+                  <Link
+                    href='/dashboard/rater/form'
+                    className={`btn ${
+                      pathname === '/dashboard/rater/form' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Form
+                  </Link>
+                </>
+              )}
 
               {/* 🔹 Profile Dropdown */}
               <div className='dropdown' ref={profileMenuRef}>
