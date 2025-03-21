@@ -56,6 +56,16 @@ const Dashboard = () => {
     return <p>No role assigned.</p>;
   };
 
+  const renderDashboard = () => {
+    if (userRoleAuthorized) {
+      return <AdminDashboardPage />;
+    } else if (userRoleRater) {
+      return <RaterDashboard />;
+    } else if (userRoleStudent) {
+      return <StudentDashboard />;
+    }
+  };
+
   return (
     <main className='container mx-auto p-4'>
       {/* Greeting */}
