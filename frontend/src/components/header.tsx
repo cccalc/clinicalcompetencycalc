@@ -18,6 +18,11 @@ const Header = () => {
   const [editedDisplayName, setEditedDisplayName] = useState(displayName);
   const [isChanged, setIsChanged] = useState(false);
 
+  const isDev = userRoleDev;
+  const isOnlyStudent = userRoleStudent && !isDev && !userRoleRater && !userRoleAuthorized;
+  const isOnlyRater = userRoleRater && !isDev && !userRoleAuthorized;
+  const isOnlyAuthorized = userRoleAuthorized && !isDev && !userRoleRater && !userRoleStudent;
+
   useEffect(() => {
     setEditedDisplayName(displayName);
   }, [displayName]);
@@ -62,7 +67,7 @@ const Header = () => {
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user ? (
             <>
-              {(userRoleStudent || userRoleDev) && (
+              {(isOnlyStudent || isDev) && (
                 <>
                   <Link
                     href='/dashboard'
@@ -88,8 +93,7 @@ const Header = () => {
                   </Link>
                 </>
               )}
-
-              {(userRoleAuthorized || userRoleDev) && (
+              {(isOnlyAuthorized || isDev) && (
                 <>
                   <Link
                     href='/dashboard/admin/userList'
@@ -107,8 +111,7 @@ const Header = () => {
                   </Link>
                 </>
               )}
-
-              {(userRoleRater || userRoleDev) && (
+              {(isOnlyRater || isDev) && (
                 <>
                   <Link
                     href='/dashboard/rater/form'
@@ -120,7 +123,6 @@ const Header = () => {
                   </Link>
                 </>
               )}
-
               {/* 🔹 Profile Dropdown */}
               <div className='dropdown' ref={profileMenuRef}>
                 <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
