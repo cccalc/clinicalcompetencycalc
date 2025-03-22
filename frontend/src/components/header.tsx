@@ -21,7 +21,7 @@ const Header = () => {
   const isDev = userRoleDev;
   const isOnlyStudent = userRoleStudent && !isDev && !userRoleRater && !userRoleAuthorized;
   const isOnlyRater = userRoleRater && !isDev && !userRoleAuthorized;
-  const isOnlyAuthorized = userRoleAuthorized && !isDev && !userRoleRater && !userRoleStudent;
+  const isOnlyAuthorized = userRoleAuthorized && !isDev;
 
   useEffect(() => {
     setEditedDisplayName(displayName);
