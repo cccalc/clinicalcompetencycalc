@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image in /frontend
-      run: docker build ./frontend --file ./frontend/Dockerfile --tag frontend-image:$(date +%s)
+      run: docker build ./frontend --file ./frontend/Dockerfile --tag frontend-image:latest
