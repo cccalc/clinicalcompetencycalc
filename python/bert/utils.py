@@ -62,6 +62,37 @@ def querySupabase(verbose: bool = False) -> pd.DataFrame:
   return df
 
 
+def equalizeClasses(
+    df: pd.DataFrame,
+    level_col_label: str = 'dev_level',
+    verbose: bool = False,
+) -> pd.DataFrame:
+  '''
+  Equalizes the number of samples in each class.
+
+  :param df: The DataFrame to equalize.
+  :type df: DataFrame
+
+  :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
+  :type level_col_label: str
+
+  :param verbose: If True, print verbose output. Defaults to False.
+  :type verbose: bool
+
+  :return: The equalized DataFrame.
+  :rtype: DataFrame
+  '''
+
+  # get the number of samples in each class
+  min_rows = min(df[level_col_label].value_counts())
+
+  if verbose:
+    print(f'Equalizing {len(df)} samples to {min_rows} samples per class...')
+
+  # equalize the number of samples in each class
+  return df.groupby(level_col_label).apply(lambda x: x.sample(min_rows, random_state=42))
+
+
 def exportKerasFolder(
     df: pd.DataFrame,
     destination: str,
@@ -97,16 +128,22 @@ def exportKerasFolder(
 
   :param df: The DataFrame to export.
   :type df: DataFrame
+
   :param destination: The destination folder.
   :type destination: str
+
   :param training_split: The split ratio for training and testing. Defaults to 0.8.
   :type training_split: float
+
   :param text_col_label: The label of the text column. Defaults to ``'text'``.
   :type text_col_label: str
+
   :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
   :type level_col_label: str
+
   :param verbose: If True, print verbose output. Defaults to False.
   :type verbose: bool
+
   :param force: If True, force overwrite the destination folder. Defaults to False.
   :type force: bool
   '''

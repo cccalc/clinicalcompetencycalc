@@ -3,12 +3,11 @@ Converts the supabase dataset to a keras dataset.
 '''
 
 import os
-import sys
 
 import argparse
 import pandas as pd
 
-from utils import querySupabase
+from utils import equalizeClasses, exportKerasFolder, querySupabase
 
 
 def main(args: argparse.Namespace) -> None:
@@ -19,7 +18,7 @@ def main(args: argparse.Namespace) -> None:
   dataset_name = args.ds_name
   if dataset_name is None:
     yymmdd = pd.Timestamp.now().strftime('%y%m%d')
-    dataset_name = f'{yymmdd}-{args.split}'
+    dataset_name = f'{yymmdd}-{args.split * 100:.0f}'
     if args.equalize:
       dataset_name += '-eq'
 
@@ -30,10 +29,20 @@ def main(args: argparse.Namespace) -> None:
   if not 0 <= training_split <= 1:
     raise ValueError("Training split must be between 0 and 1.")
 
+  if verbose:
+    print(f'Creating dataset {dataset_name}...')
+
   df = querySupabase(verbose=verbose)
 
+  if args.equalize:
+    df = equalizeClasses(df, verbose=verbose)
+
   keras_directory = os.path.join(os.getcwd(), 'data', 'keras', dataset_name)
-  # exportKerasFolder(df, keras_directory, training_split=training_split)
+  exportKerasFolder(df, keras_directory, training_split=training_split,
+                    verbose=verbose, force=force)
+
+  if verbose:
+    print(f'Dataset {dataset_name} created at {keras_directory}')
 
 
 if __name__ == "__main__":
