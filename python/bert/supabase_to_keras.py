@@ -37,6 +37,9 @@ def main(args: argparse.Namespace) -> None:
   if args.equalize:
     df = equalizeClasses(df, verbose=verbose)
 
+  if args.no_export:
+    return
+
   keras_directory = os.path.join(os.getcwd(), 'data', 'keras', dataset_name)
   exportKerasFolder(df, keras_directory, training_split=training_split,
                     verbose=verbose, force=force)
@@ -59,5 +62,7 @@ if __name__ == "__main__":
                       help='custom dataset name; default is yymmdd-split[-eq]')
   parser.add_argument('--equalize',
                       help='equalize the number of samples in each class', action='store_true')
+  parser.add_argument('--no-export',
+                      help='do not export the dataset', action='store_true')
 
   main(parser.parse_args())
