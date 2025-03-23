@@ -1,3 +1,7 @@
+'''
+Converts the supabase dataset to a keras dataset.
+'''
+
 import os
 import sys
 
@@ -7,7 +11,11 @@ from dotenv import load_dotenv
 from supabase import Client, create_client
 from csv_to_keras import exportKerasFolder
 
+
 def main(argv: list[str]) -> None:
+  '''
+  Converts the supabase dataset to a keras dataset.
+  '''
 
   # Check if the correct number of arguments is provided
   if len(argv) != 3:
@@ -41,8 +49,11 @@ def main(argv: list[str]) -> None:
 
   df = pd.DataFrame(response.data)
 
-  keras_directory = os.path.join(os.getcwd(), 'data', 'keras', f'{dataset_name}-{training_split}')
-  exportKerasFolder(df, keras_directory, training_split=training_split)
+  print(df)
+
+  # keras_directory = os.path.join(os.getcwd(), 'data', 'keras', f'{dataset_name}-{training_split}')
+  # exportKerasFolder(df, keras_directory, training_split=training_split)
+
 
 if __name__ == "__main__":
   main(sys.argv)
