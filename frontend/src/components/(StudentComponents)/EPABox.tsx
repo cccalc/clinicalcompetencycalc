@@ -59,11 +59,12 @@ export interface Assessment {
 interface EPABoxProps {
   epaId: number;
   timeRange: 3 | 6 | 12;
+  kfDescriptions?: Record<string, string[]> | null;
 }
 
 const supabase = createClient();
 
-const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange }) => {
+const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions }) => {
   const [expanded, setExpanded] = useState(false);
   const [epaTitle, setEpaTitle] = useState('');
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -104,8 +105,10 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange }) => {
   const devLevels = filtered.filter((a) => a.devLevel !== null) as {
     devLevel: number;
   }[];
+
   const avg =
     devLevels.length >= 3 ? Math.floor(devLevels.reduce((acc, cur) => acc + cur.devLevel, 0) / devLevels.length) : null;
+
   const allGreen = devLevels.length >= 3 && devLevels.every((d) => d.devLevel === 3);
 
   const comments = filtered.map((a) => a.comment).filter(Boolean);
@@ -132,7 +135,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange }) => {
       </div>
 
       {expanded && (
-        <div className='card-body' style={{ background: '#fff' }}>
+        <div className='card-body'>
           <div className='row mb-4'>
             <div className='col-md-6'>
               <h6 className='fw-bold border-bottom pb-1'>Performance Over Time</h6>
@@ -165,31 +168,41 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange }) => {
                 </tr>
               </thead>
               <tbody>
-                {[...new Set(assessments.filter((a) => a.epaId === epaId).map((a) => a.keyFunctionId))]
-                  .sort((a, b) => {
-                    const nA = parseInt(a.replace(/\D/g, '') || '0');
-                    const nB = parseInt(b.replace(/\D/g, '') || '0');
-                    return nA - nB;
-                  })
-                  .map((kf) => {
-                    const scores = filtered.filter((a) => a.keyFunctionId === kf && a.devLevel !== null);
+                {(() => {
+                  const epaKey = epaId.toString();
+                  const keyFunctions = kfDescriptions?.[epaKey];
 
-                    const avg =
-                      scores.length > 0
-                        ? Math.floor(scores.reduce((sum, a) => sum + a.devLevel!, 0) / scores.length)
-                        : 'Missing';
-
+                  if (!keyFunctions) {
+                    console.warn(`No key functions found for EPA ${epaKey}`);
                     return (
-                      <tr key={kf}>
-                        <td>{kf}</td>
-                        <td>
-                          {avg === 'Missing'
-                            ? '—'
-                            : `${avg} - ${['Remedial', 'Early-Developing', 'Developing', 'Entrustable'][avg]}`}
+                      <tr>
+                        <td colSpan={2} className='text-muted'>
+                          No key function descriptions available.
                         </td>
                       </tr>
                     );
-                  })}
+                  }
+
+                  return keyFunctions.map((kfLabel, i) => {
+                    const kfId = `kf${i + 1}`;
+                    const kfData = filtered.filter((a) => a.keyFunctionId === kfId && a.devLevel !== null);
+                    const avg =
+                      kfData.length > 0
+                        ? Math.floor(kfData.reduce((sum, a) => sum + (a.devLevel ?? 0), 0) / kfData.length)
+                        : '—';
+
+                    return (
+                      <tr key={kfId}>
+                        <td className='text-wrap' style={{ maxWidth: '300px' }}>
+                          {kfLabel}
+                        </td>
+                        <td>
+                          {avg === '—' ? avg : `${['Remedial', 'Early-Developing', 'Developing', 'Entrustable'][avg]}`}
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
           </div>
