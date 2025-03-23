@@ -49,7 +49,10 @@ def main(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-  parser = argparse.ArgumentParser(description='Convert supabase dataset to keras dataset.')
+  parser = argparse.ArgumentParser(description='''
+      Convert supabase dataset to keras dataset.
+      The dataset will be saved in "./data/keras/<dataset_name>".
+      ''')
 
   parser.add_argument('-f', '--force',
                       help='force overwrite if destination folder exists', action='store_true')
@@ -59,7 +62,7 @@ if __name__ == "__main__":
                       help='verbose output', action='store_true')
 
   parser.add_argument('--ds_name', type=str, default=None,
-                      help='custom dataset name; default is yymmdd-split[-eq]')
+                      help='custom dataset name; default is <yymmdd>-<split>[-eq]')
   parser.add_argument('--equalize',
                       help='equalize the number of samples in each class', action='store_true')
   parser.add_argument('--no-export',
