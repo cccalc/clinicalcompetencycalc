@@ -54,6 +54,21 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          created_at: string
+          permission: string
+        }
+        Insert: {
+          created_at?: string
+          permission: string
+        }
+        Update: {
+          created_at?: string
+          permission?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           display_name: string | null
@@ -74,42 +89,74 @@ export type Database = {
       }
       role_permissions: {
         Row: {
-          id: number
-          permission: Database["public"]["Enums"]["user_permission"]
-          role: Database["public"]["Enums"]["user_role"]
+          permission: string
+          role: string
         }
         Insert: {
-          id?: number
-          permission: Database["public"]["Enums"]["user_permission"]
-          role: Database["public"]["Enums"]["user_role"]
+          permission: string
+          role: string
         }
         Update: {
-          id?: number
-          permission?: Database["public"]["Enums"]["user_permission"]
-          role?: Database["public"]["Enums"]["user_role"]
+          permission?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_fkey"
+            columns: ["permission"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["permission"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_fkey"
+            columns: ["role"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["role"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          role: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
         }
         Relationships: []
       }
       user_roles: {
         Row: {
           assigned_at: string
-          id: number
-          role: Database["public"]["Enums"]["user_role"]
+          role: string
           user_id: string
         }
         Insert: {
           assigned_at?: string
-          id?: number
-          role: Database["public"]["Enums"]["user_role"]
+          role: string
           user_id: string
         }
         Update: {
           assigned_at?: string
-          id?: number
-          role?: Database["public"]["Enums"]["user_role"]
+          role?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_fkey"
+            columns: ["role"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["role"]
+          },
+        ]
       }
     }
     Views: {
@@ -118,7 +165,7 @@ export type Database = {
     Functions: {
       authorize: {
         Args: {
-          requested_permission: Database["public"]["Enums"]["user_permission"]
+          requested_permission: string
         }
         Returns: boolean
       }
@@ -128,14 +175,33 @@ export type Database = {
         }
         Returns: Json
       }
+      fetch_role_permissions: {
+        Args: {
+          role: string
+        }
+        Returns: {
+          permission: string
+        }[]
+      }
+      fetch_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          user_id: string
+          role: string
+          email: string
+          display_name: string
+        }[]
+      }
+      get_email_by_user_id: {
+        Args: {
+          user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
-      user_permission:
-        | "mcqs_options.insert"
-        | "mcqs_options.select"
-        | "mcqs_options.update"
-        | "mcqs_options.delete"
-      user_role: "ccc_admin"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1981,6 +2047,33 @@ export type Database = {
           created_at?: string | null
           dev_level?: number | null
           id?: never
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      text_responses: {
+        Row: {
+          created_at: string
+          dev_level: number | null
+          epa: number | null
+          id: number
+          text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dev_level?: number | null
+          epa?: number | null
+          id?: number
+          text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dev_level?: number | null
+          epa?: number | null
+          id?: number
+          text?: string | null
           user_id?: string | null
         }
         Relationships: []
