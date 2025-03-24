@@ -7,7 +7,7 @@ import os
 import argparse
 import pandas as pd
 
-from utils import equalizeClasses, exportKerasFolder, querySupabase
+from utils import augmentData, equalizeClasses, exportKerasFolder, querySupabase
 
 
 def main(args: argparse.Namespace) -> None:
@@ -33,6 +33,8 @@ def main(args: argparse.Namespace) -> None:
     print(f'Creating dataset {dataset_name}...')
 
   df = querySupabase(verbose=verbose)
+
+  df = augmentData(df, delete=args.augment_del_prob, synonym=args.augment_synonym, verbose=verbose)
 
   if args.equalize:
     df = equalizeClasses(df, verbose=verbose)
@@ -61,6 +63,10 @@ if __name__ == "__main__":
   parser.add_argument('-v', '--verbose',
                       help='verbose output', action='store_true')
 
+  parser.add_argument('--augment-del-prob', type=float, default=0.1,
+                      help='probability of deleting a word; default is 0.1')
+  parser.add_argument('--augment-synonym',
+                      help='augment with synonyms', action='store_true')
   parser.add_argument('--ds_name', type=str, default=None,
                       help='custom dataset name; default is <yymmdd>-<split>[-eq]')
   parser.add_argument('--equalize',

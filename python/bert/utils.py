@@ -1,8 +1,13 @@
+'''
+Utility functions for the BERT model.
+'''
+
 import os
 from dotenv import load_dotenv
 import pandas as pd
 from postgrest.types import CountMethod
 from supabase import Client, create_client
+import nlpaug.augmenter.word as naw
 
 
 def querySupabase(verbose: bool = False) -> pd.DataFrame:
@@ -62,25 +67,106 @@ def querySupabase(verbose: bool = False) -> pd.DataFrame:
   return df
 
 
+def augmentData(
+    df: pd.DataFrame,
+    text_col_label: str = 'text',
+    level_col_label: str = 'dev_level',
+    synonym: bool = True,
+    delete: float = 0,
+    verbose: bool = False
+) -> pd.DataFrame:
+  '''
+  Augments the data to create more samples.
+
+  :param df: The DataFrame to augment.
+  :type df: DataFrame
+
+  :param verbose: If True, print verbose output. Defaults to False.
+  :type verbose: bool
+
+  :param text_col_label: The label of the text column. Defaults to ``'text'``.
+  :type text_col_label: str
+
+  :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
+  :type level_col_label: str
+
+  :param synonym: If True, use synonyms to augment the data. Defaults to True.
+  :type synonym: bool
+
+  :param delete: The probability of deleting a word. Defaults to 0.
+  :type delete: float
+
+  :return: The augmented DataFrame.
+  :rtype: DataFrame
+  '''
+
+  if verbose:
+    print("Augmenting data...")
+
+  # Ensure the specified columns exist in the DataFrame
+    if text_col_label not in df.columns:
+      raise ValueError(f"The DataFrame must have a column labeled '{text_col_label}'.")
+    if level_col_label not in df.columns:
+      raise ValueError(f"The DataFrame must have a column labeled '{level_col_label}'.")
+
+     # Augmentation setups
+    synonym_aug = naw.SynonymAug(aug_src='wordnet') if synonym else None
+    deletion_aug = naw.RandomWordAug(action="delete", aug_p=delete) if delete > 0 else None
+
+    if synonym_aug is None and deletion_aug is None:
+      return df
+
+    # Create a DataFrame to hold augmented rows
+    augmented_rows = []
+
+    # Iterate through each row in the DataFrame
+    for row in df.iterrows():
+      original_text = row[text_col_label]
+      level = row[level_col_label]
+
+      # Apply synonym replacement if enabled
+      if synonym and synonym_aug:
+        augmented_texts = synonym_aug.augment(original_text, n=2)  # Generate 2 augmented samples
+        for aug_text in augmented_texts:
+          augmented_rows.append({text_col_label: aug_text, level_col_label: level})
+          if verbose:
+            print(f"Synonym Augmentation: {aug_text}")
+
+      # Apply random word deletion if enabled
+      if delete > 0 and deletion_aug:
+        deleted_text = deletion_aug.augment(original_text)
+        augmented_rows.append({text_col_label: deleted_text, level_col_label: level})
+        if verbose:
+          print(f"Random Word Deletion: {deleted_text}")
+
+    # Convert the augmented rows into a DataFrame
+    augmented_df = pd.DataFrame(augmented_rows)
+
+    # Concatenate the original DataFrame with the augmented DataFrame
+    result_df = pd.concat([df, augmented_df], ignore_index=True)
+
+    return result_df
+
+
 def equalizeClasses(
     df: pd.DataFrame,
     level_col_label: str = 'dev_level',
     verbose: bool = False,
 ) -> pd.DataFrame:
   '''
-  Equalizes the number of samples in each class.
+  Equalizes the number of samples in each class .
 
-  :param df: The DataFrame to equalize.
-  :type df: DataFrame
+  : param df: The DataFrame to equalize.
+  : type df: DataFrame
 
-  :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
-  :type level_col_label: str
+  : param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
+  : type level_col_label: str
 
-  :param verbose: If True, print verbose output. Defaults to False.
-  :type verbose: bool
+  : param verbose: If True, print verbose output. Defaults to False.
+  : type verbose: bool
 
-  :return: The equalized DataFrame.
-  :rtype: DataFrame
+  : return: The equalized DataFrame.
+  : rtype: DataFrame
   '''
 
   # get the number of samples in each class
@@ -105,7 +191,7 @@ def exportKerasFolder(
   '''
   Export the DataFrame to a folder in Keras format.
   The folder will be compatible with ``keras.utils.text_dataset_from_directory``.
-  The directory structure will be as follows::
+  The directory structure will be as follows: :
 
     train/
     ├── remedial/
@@ -126,26 +212,26 @@ def exportKerasFolder(
 
   where each class is a folder, and each file is a text file containing the description.
 
-  :param df: The DataFrame to export.
-  :type df: DataFrame
+  : param df: The DataFrame to export.
+  : type df: DataFrame
 
-  :param destination: The destination folder.
-  :type destination: str
+  : param destination: The destination folder.
+  : type destination: str
 
-  :param training_split: The split ratio for training and testing. Defaults to 0.8.
-  :type training_split: float
+  : param training_split: The split ratio for training and testing. Defaults to 0.8.
+  : type training_split: float
 
-  :param text_col_label: The label of the text column. Defaults to ``'text'``.
-  :type text_col_label: str
+  : param text_col_label: The label of the text column. Defaults to ``'text'``.
+  : type text_col_label: str
 
-  :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
-  :type level_col_label: str
+  : param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
+  : type level_col_label: str
 
-  :param verbose: If True, print verbose output. Defaults to False.
-  :type verbose: bool
+  : param verbose: If True, print verbose output. Defaults to False.
+  : type verbose: bool
 
-  :param force: If True, force overwrite the destination folder. Defaults to False.
-  :type force: bool
+  : param force: If True, force overwrite the destination folder. Defaults to False.
+  : type force: bool
   '''
 
   class_names = ['remedial', 'early_dev', 'developing', 'entrustable']
