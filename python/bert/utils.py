@@ -104,48 +104,52 @@ def augmentData(
     print("Augmenting data...")
 
   # Ensure the specified columns exist in the DataFrame
-    if text_col_label not in df.columns:
-      raise ValueError(f"The DataFrame must have a column labeled '{text_col_label}'.")
-    if level_col_label not in df.columns:
-      raise ValueError(f"The DataFrame must have a column labeled '{level_col_label}'.")
+  if text_col_label not in df.columns:
+    raise ValueError(f"The DataFrame must have a column labeled '{text_col_label}'.")
+  if level_col_label not in df.columns:
+    raise ValueError(f"The DataFrame must have a column labeled '{level_col_label}'.")
 
-     # Augmentation setups
-    synonym_aug = naw.SynonymAug(aug_src='wordnet') if synonym else None
-    deletion_aug = naw.RandomWordAug(action="delete", aug_p=delete) if delete > 0 else None
+  # Augmentation setups
+  synonym_aug = naw.SynonymAug(aug_src='wordnet') if synonym else None
+  deletion_aug = naw.RandomWordAug(action="delete", aug_p=delete) if delete > 0 else None
 
-    if synonym_aug is None and deletion_aug is None:
-      return df
+  if synonym_aug is None and deletion_aug is None:
+    return df
 
-    # Create a DataFrame to hold augmented rows
-    augmented_rows = []
+  if verbose:
+    print(f"Synonym augmentation: {'Enabled' if synonym_aug else 'Disabled'}")
+    print('Random word deletion:',
+          f'Enabled with probability {delete}' if deletion_aug else 'Disabled')
 
-    # Iterate through each row in the DataFrame
-    for row in df.iterrows():
-      original_text = row[text_col_label]
-      level = row[level_col_label]
+  # Create a DataFrame to hold augmented rows
+  augmented_rows = []
 
-      # Apply synonym replacement if enabled
-      if synonym and synonym_aug:
-        augmented_texts = synonym_aug.augment(original_text, n=2)  # Generate 2 augmented samples
-        for aug_text in augmented_texts:
-          augmented_rows.append({text_col_label: aug_text, level_col_label: level})
-          if verbose:
-            print(f"Synonym Augmentation: {aug_text}")
+  # Iterate through each row in the DataFrame
+  for index, row in df.iterrows():
+    original_text = row[text_col_label]
+    level = row[level_col_label]
 
-      # Apply random word deletion if enabled
-      if delete > 0 and deletion_aug:
-        deleted_text = deletion_aug.augment(original_text)
-        augmented_rows.append({text_col_label: deleted_text, level_col_label: level})
-        if verbose:
-          print(f"Random Word Deletion: {deleted_text}")
+    # Apply synonym replacement if enabled
+    if synonym and synonym_aug:
+      augmented_texts = synonym_aug.augment(original_text, n=2)  # Generate 2 augmented samples
+      for aug_text in augmented_texts:
+        augmented_rows.append({text_col_label: aug_text, level_col_label: level})
 
-    # Convert the augmented rows into a DataFrame
-    augmented_df = pd.DataFrame(augmented_rows)
+    # Apply random word deletion if enabled
+    if delete > 0 and deletion_aug:
+      deleted_text = deletion_aug.augment(original_text)
+      augmented_rows.append({text_col_label: deleted_text, level_col_label: level})
 
-    # Concatenate the original DataFrame with the augmented DataFrame
-    result_df = pd.concat([df, augmented_df], ignore_index=True)
+  # Convert the augmented rows into a DataFrame
+  augmented_df = pd.DataFrame(augmented_rows)
 
-    return result_df
+  if verbose:
+    print(f"Generated {len(augmented_df)} augmented samples.")
+
+  # Concatenate the original DataFrame with the augmented DataFrame
+  result_df = pd.concat([df, augmented_df], ignore_index=True)
+
+  return result_df
 
 
 def equalizeClasses(
@@ -253,12 +257,31 @@ def exportKerasFolder(
     print('Creating directory structure...')
 
   # create the directory structure
-  for c in classes:
-    os.makedirs(os.path.join(destination, 'train', class_names[c]), exist_ok=force)
-    os.makedirs(os.path.join(destination, 'test', class_names[c]), exist_ok=force)
+  try:
+    for c in classes:
+      os.makedirs(os.path.join(destination, 'train', class_names[c]), exist_ok=force)
+      os.makedirs(os.path.join(destination, 'test', class_names[c]), exist_ok=force)
+  except FileExistsError:
+    # if the directory already exists, check if there is a numerical suffix
+    if not force:
+      suffix = 1
+      new_destination = f"{destination}_{suffix}"
+      while os.path.exists(new_destination):
+        suffix += 1
+        new_destination = f"{destination}_{suffix}"
+      destination = new_destination
+      for c in classes:
+        os.makedirs(os.path.join(destination, 'train', class_names[c]))
+        os.makedirs(os.path.join(destination, 'test', class_names[c]))
+    # if not, add a suffix of 1
+    else:
+      destination = f"{destination}_1"
+      for c in classes:
+        os.makedirs(os.path.join(destination, 'train', class_names[c]))
+        os.makedirs(os.path.join(destination, 'test', class_names[c]))
 
   if verbose:
-    print('Writing files...')
+    print(f'Writing files to {destination}...')
 
   # split each class into training and testing sets
   for c in classes:

@@ -19,6 +19,8 @@ def main(args: argparse.Namespace) -> None:
   if dataset_name is None:
     yymmdd = pd.Timestamp.now().strftime('%y%m%d')
     dataset_name = f'{yymmdd}-{args.split * 100:.0f}'
+    if args.augment_del_prob > 0 or args.augment_synonym:
+      dataset_name += '-arg'
     if args.equalize:
       dataset_name += '-eq'
 
@@ -38,6 +40,8 @@ def main(args: argparse.Namespace) -> None:
 
   if args.equalize:
     df = equalizeClasses(df, verbose=verbose)
+
+  print(f"Collected {len(df)} samples in dataset.")
 
   if args.no_export:
     return
@@ -63,12 +67,12 @@ if __name__ == "__main__":
   parser.add_argument('-v', '--verbose',
                       help='verbose output', action='store_true')
 
-  parser.add_argument('--augment-del-prob', type=float, default=0.1,
-                      help='probability of deleting a word; default is 0.1')
+  parser.add_argument('--augment-del-prob', type=float, default=0.0,
+                      help='probability of deleting a word; default is 0.0')
   parser.add_argument('--augment-synonym',
                       help='augment with synonyms', action='store_true')
   parser.add_argument('--ds_name', type=str, default=None,
-                      help='custom dataset name; default is <yymmdd>-<split>[-eq]')
+                      help='custom dataset name; default is <yymmdd>-<split>[-arg][-eq]')
   parser.add_argument('--equalize',
                       help='equalize the number of samples in each class', action='store_true')
   parser.add_argument('--no-export',
