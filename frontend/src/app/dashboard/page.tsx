@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useUser } from '@/context/UserContext';
 
 const AdminDashboardPage = lazy(() => import('@/components/(AdminComponents)/adminDashboard'));
@@ -9,32 +9,55 @@ const StudentDashboard = lazy(() => import('@/components/(StudentComponents)/stu
 
 const Dashboard = () => {
   const { userRoleAuthorized, userRoleRater, displayName, userRoleStudent, userRoleDev } = useUser();
+  const [devView, setDevView] = useState<'admin' | 'rater' | 'student'>('admin');
 
   const renderDashboard = () => {
+    if (userRoleDev) {
+      switch (devView) {
+        case 'admin':
+          return <AdminDashboardPage />;
+        case 'rater':
+          return <RaterDashboard />;
+        case 'student':
+          return <StudentDashboard />;
+      }
+    }
+
     if (userRoleAuthorized) {
       return <AdminDashboardPage />;
     } else if (userRoleRater) {
       return <RaterDashboard />;
     } else if (userRoleStudent) {
       return <StudentDashboard />;
-    } else if (userRoleDev) {
-      return (
-        <>
-          <AdminDashboardPage />
-          <RaterDashboard />
-          <StudentDashboard />
-        </>
-      );
     }
+
+    return <p>No role assigned.</p>;
   };
 
   return (
-    <>
-      <main className='container mx-auto p-4'>
-        <p className='h5'>Welcome, {displayName}</p>
-        <Suspense fallback={<div>Loading...</div>}>{renderDashboard()}</Suspense>
-      </main>
-    </>
+    <main className='container mx-auto p-4'>
+      <p className='h5 mb-4'>Welcome, {displayName}</p>
+
+      {userRoleDev && (
+        <div className='mb-4'>
+          <label htmlFor='devViewSelect' className='form-label'>
+            Developer View:
+          </label>
+          <select
+            id='devViewSelect'
+            className='form-select w-auto'
+            value={devView}
+            onChange={(e) => setDevView(e.target.value as 'admin' | 'rater' | 'student')}
+          >
+            <option value='admin'>Admin Dashboard</option>
+            <option value='rater'>Rater Dashboard</option>
+            <option value='student'>Student Dashboard</option>
+          </select>
+        </div>
+      )}
+
+      <Suspense fallback={<div>Loading dashboard...</div>}>{renderDashboard()}</Suspense>
+    </main>
   );
 };
 
