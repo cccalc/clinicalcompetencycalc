@@ -36,19 +36,34 @@ const AdminDashboard = () => {
     account_status: string;
   }
 
+  /**
+   * Represents a role object from the `roles` table.
+   */
   interface Role {
     role: string;
   }
 
+  // ----------------------
+  // State
+  // ----------------------
+
   const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
+  const [roles, setRoles] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedUser, setSelectedUser] = useState<(User & { account_status: string }) | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
-  const [roles, setRoles] = useState<string[]>([]);
+
+
+  // ----------------------
+  // Data Fetching
+  // ----------------------
 
   useEffect(() => {
+    /**
+     * Fetch all users from the database using a stored procedure.
+     */
     fetchUsers();
     fetchRoles();
   });
@@ -82,6 +97,9 @@ const AdminDashboard = () => {
     }
   };
 
+    /**
+     * Fetch list of available roles from the `roles` table.
+     */
   const fetchRoles = async () => {
     const { data, error } = await supabase.from('roles').select('role');
     if (error) {
@@ -91,6 +109,13 @@ const AdminDashboard = () => {
     }
   };
 
+  // ----------------------
+  // Role Update Logic
+  // ----------------------
+
+  /**
+   * Handles closing the Edit Role modal.
+   */
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
@@ -106,9 +131,9 @@ const AdminDashboard = () => {
     console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
 
     const { error } = await supabase
-      .from('user_roles') // Updating the correct table
+      .from('user_roles')
       .update({ role: selectedUser.role })
-      .eq('user_id', selectedUser.user_id); // Match by user_id
+      .eq('user_id', selectedUser.user_id);
 
     if (error) {
       console.error('Error updating role:', error);
@@ -120,6 +145,13 @@ const AdminDashboard = () => {
     setShowModal(false);
   };
 
+  // ----------------------
+  // Filtering Logic
+  // ----------------------
+
+  /**
+   * Filters users based on search term and selected role.
+   */
   const toggleUserStatus = async () => {
     if (!selectedUser) return;
 
@@ -153,6 +185,10 @@ const AdminDashboard = () => {
       if (a.account_status !== 'Deactivated' && b.account_status === 'Deactivated') return -1;
       return 0;
     });
+
+  // ----------------------
+  // Render
+  // ----------------------
 
   return (
     <div className='container text-center'>
@@ -276,6 +312,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Delete Modal (Logic not yet implemented) */}
       {showDeactivateModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
