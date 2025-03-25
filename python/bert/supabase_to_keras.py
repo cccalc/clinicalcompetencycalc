@@ -64,14 +64,16 @@ def main(args: argparse.Namespace) -> None:
 
   df = df.sample(frac=1, random_state=42)  # shuffle
   train_size = int(len(df) * training_split)
+  rest_size = int(len(df) * (1 - training_split) / 2)
   train_df = df[:train_size]
-  test_df = df[train_size:]
+  val_df = df[train_size:train_size + rest_size]
+  test_df = df[train_size + rest_size:]
 
   if augment_count > 0:
     train_df = augmentData(train_df, samples=augment_count, verbose=verbose)
 
   keras_directory = os.path.join(os.getcwd(), 'data', 'keras', dataset_name)
-  exportKerasFolder(train_df, test_df, keras_directory,
+  exportKerasFolder(train_df, val_df, test_df, keras_directory,
                     verbose=verbose, dry_run=args.dry_run, force=force)
 
   if verbose:

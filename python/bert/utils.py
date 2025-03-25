@@ -176,6 +176,7 @@ def equalizeClasses(
 
 def exportKerasFolder(
     train_df: pd.DataFrame,
+    val_df: pd.DataFrame,
     test_df: pd.DataFrame,
     destination: str,
     text_col_label: str = 'text',
@@ -211,6 +212,9 @@ def exportKerasFolder(
 
   :param train_df: The training DataFrame.
   :type train_df: DataFrame
+
+  :param val_df: The validation DataFrame.
+  :type val_df: DataFrame
 
   :param test_df: The testing DataFrame.
   :type test_df: DataFrame
@@ -256,15 +260,16 @@ def exportKerasFolder(
     os.makedirs(destination)
     for c in classes:
       os.makedirs(os.path.join(destination, 'train', class_names[c]))
+      os.makedirs(os.path.join(destination, 'validate', class_names[c]))
       os.makedirs(os.path.join(destination, 'test', class_names[c]))
   else:
     if verbose:
       print(f'Would create folder {destination}...')
 
   if verbose:
-    print(f'Exporting {len(train_df)} training samples and {len(test_df)} testing samples ({len(train_df) + len(test_df)} total)...')
+    print(f'Exporting {len(train_df)} training, {len(val_df)} validation, and {len(test_df)} testing samples ({len(train_df) + len(val_df) + len(test_df)} total)...')
 
-  for df, split in [(train_df, 'train'), (test_df, 'test')]:
+  for df, split in [(train_df, 'train'), (val_df, 'validate'), (test_df, 'test')]:
     for c in classes:
       class_df = df[df[level_col_label] == c]
       if dry_run:
