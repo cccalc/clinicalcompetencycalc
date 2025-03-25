@@ -57,21 +57,26 @@ const Dashboard = () => {
   };
 
   const renderDashboard = () => {
+    if (userRoleDev) {
+      switch (devView) {
+        case 'admin':
+          return <AdminDashboardPage />;
+        case 'rater':
+          return <RaterDashboard />;
+        case 'student':
+          return <StudentDashboard />;
+      }
+    }
+
     if (userRoleAuthorized) {
       return <AdminDashboardPage />;
     } else if (userRoleRater) {
       return <RaterDashboard />;
     } else if (userRoleStudent) {
       return <StudentDashboard />;
-    } else if (userRoleDev) {
-      return (
-        <>
-          <AdminDashboardPage />
-          <RaterDashboard />
-          <StudentDashboard />
-        </>
-      );
     }
+
+    return <p>No role assigned.</p>;
   };
 
   return (
