@@ -34,21 +34,14 @@ def main(args: argparse.Namespace) -> None:
     if args.equalize:
       dataset_name += '-eq'
 
-  if verbose:
-    print('Creating directory structure...')
-
-  if force or not os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', dataset_name)):
-    if not args.dry_run:
-      os.makedirs(os.path.join(os.getcwd(), 'data', 'keras', dataset_name), exist_ok=force)
-  else:
+  # Handle if dataset already exists
+  if os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', dataset_name)) and not force:
     suffix = 1
     new_dataset_name = f"{dataset_name}_{suffix}"
     while os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', new_dataset_name)):
       suffix += 1
       new_dataset_name = f"{dataset_name}_{suffix}"
     dataset_name = new_dataset_name
-    if not args.dry_run:
-      os.makedirs(os.path.join(os.getcwd(), 'data', 'keras', dataset_name))
 
   # Adjust training split if augmenting to account for augmented samples
   # n = augment_count, s = training_split, x = adjusted training split
@@ -79,7 +72,7 @@ def main(args: argparse.Namespace) -> None:
 
   keras_directory = os.path.join(os.getcwd(), 'data', 'keras', dataset_name)
   exportKerasFolder(train_df, test_df, keras_directory,
-                    verbose=verbose, force=force, dry_run=args.dry_run)
+                    verbose=verbose, dry_run=args.dry_run, force=force)
 
   if verbose:
     if args.dry_run:

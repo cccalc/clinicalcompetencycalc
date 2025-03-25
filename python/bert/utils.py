@@ -3,11 +3,14 @@ Utility functions for the BERT model.
 '''
 
 import os
-from dotenv import load_dotenv
+import shutil
+
+import nlpaug.augmenter.word as naw
 import pandas as pd
+
+from dotenv import load_dotenv
 from postgrest.types import CountMethod
 from supabase import Client, create_client
-import nlpaug.augmenter.word as naw
 
 
 def querySupabase(verbose: bool = False) -> pd.DataFrame:
@@ -179,8 +182,8 @@ def exportKerasFolder(
     level_col_label: str = 'dev_level',
     class_names: list[str] = None,
     verbose: bool = False,
+    dry_run: bool = False,
     force: bool = False,
-    dry_run: bool = False
 ) -> None:
   '''
   Export the DataFrame to a folder in Keras format.
@@ -228,6 +231,9 @@ def exportKerasFolder(
   :param verbose: If True, print verbose output. Defaults to False.
   :type verbose: bool
 
+  :param dry_run: If True, do not write any files. Defaults to False.
+  :type dry_run: bool
+
   :param force: If True, force overwrite the destination folder. Defaults to False.
   :type force: bool
   '''
@@ -235,10 +241,28 @@ def exportKerasFolder(
     class_names = ['remedial', 'early_dev', 'developing', 'entrustable']
   classes = train_df[level_col_label].unique()
 
-  # split dataframe into classes, keeping only the "description" column
+  if os.path.exists(destination):
+    if force:
+      if verbose:
+        print(f'Removing existing folder {destination}...')
+      shutil.rmtree(destination)
+    else:
+      raise ValueError(
+          f'Destination folder {destination} already exists. Use --force to overwrite.')
+
+  if not dry_run:
+    if verbose:
+      print(f'Creating folder {destination}...')
+    os.makedirs(destination)
+    for c in classes:
+      os.makedirs(os.path.join(destination, 'train', class_names[c]))
+      os.makedirs(os.path.join(destination, 'test', class_names[c]))
+  else:
+    if verbose:
+      print(f'Would create folder {destination}...')
 
   if verbose:
-    print(f'Exporting {len(train_df)} training samples and {len(test_df)} testing samples...')
+    print(f'Exporting {len(train_df)} training samples and {len(test_df)} testing samples ({len(train_df) + len(test_df)} total)...')
 
   for df, split in [(train_df, 'train'), (test_df, 'test')]:
     for c in classes:
