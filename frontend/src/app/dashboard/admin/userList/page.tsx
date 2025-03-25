@@ -167,7 +167,11 @@ const AdminDashboard = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+        <select
+          className='form-select w-25'
+          value={selectedRole}
+          onChange={(e) => setSelectedRole(e.target.value)}
+        >
           <option value=''>All Roles</option>
           {roles.map((role) => (
             <option key={role} value={role}>
@@ -315,17 +319,25 @@ const AdminDashboard = () => {
                 <h5 className='modal-title'>Confirm Delete</h5>
                 <button type='button' className='btn-close' onClick={() => setShowDeactivateModal(false)}></button>
               </div>
-              <div className='modal-body text-center'>
-                <p>
-                  Are you sure you want to delete <strong>{selectedUser.display_name}</strong>?
-                </p>
+              <div className='modal-body text-start'>
+                <div className='p-3 border rounded mb-3'>
+                  <p className='mb-2'>
+                    <strong>ID:</strong> {selectedUser.user_id}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Display Name:</strong> {selectedUser.display_name}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Email:</strong> {selectedUser.email}
+                  </p>
+                </div>
               </div>
               <div className='modal-footer'>
                 <button type='button' className='btn btn-secondary' onClick={() => setShowDeactivateModal(false)}>
                   Cancel
                 </button>
-                <button type='button' className='btn btn-danger'>
-                  Delete
+                <button type='button' className='btn btn-danger' onClick={toggleUserStatus}>
+                  {selectedUser.account_status === 'Active' ? 'Deactivate' : 'Activate'}
                 </button>
               </div>
             </div>
