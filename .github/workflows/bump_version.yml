@@ -21,6 +21,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4.0.1
 
+      - name: Check for existing releases
+        id: check-releases
+        run: |
+          if [ $(gh release list | wc -l) -eq 0 ]; then
+            gh release create v0.1.0 -t "Initial Release"
+          fi
+
       - name: Get next version
         uses: MiguelRipoll23/get-next-version@v3.0.0
         id: get-next-version
