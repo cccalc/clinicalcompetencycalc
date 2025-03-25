@@ -125,7 +125,7 @@ def augmentData(
   augmented_rows = []
 
   # Iterate through each row in the DataFrame
-  for index, row in df.iterrows():
+  for _, row in df.iterrows():
     original_text = row[text_col_label]
     level = row[level_col_label]
 
