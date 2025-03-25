@@ -1,0 +1,42 @@
+name: Bump version
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  bump-version:
+    name: Bump version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.0.1
+
+      - name: Get next version
+        uses: MiguelRipoll23/get-next-version@v3.0.0
+        id: get-next-version
+
+      - name: Find all package.json files and update version
+        run: |
+          find . -name 'package.json' -exec npm --prefix {} version --no-git-tag-version ${{ env.NEXT_VERSION }} \;
+        env:
+          NEXT_VERSION: ${{ steps.get-next-version.outputs.next-version }}
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: version/${{ steps.get-next-version.outputs.next-version }}
+          commit-message: Bump version to ${{ steps.get-next-version.outputs.next-version }}
+          title: Bump version to ${{ steps.get-next-version.outputs.next-version }}
+          body: Automated pull request triggered by a new release.
+          labels: new-release,ignore-for-release
+          draft: true
