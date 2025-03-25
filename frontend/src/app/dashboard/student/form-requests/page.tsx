@@ -85,9 +85,9 @@ const FormRequests = () => {
         return;
       }
 
-      const usersWithNames = profiles.map((profile) => ({
-        user_id: profile.id,
-        display_name: profile.display_name || 'Unknown',
+      const usersWithNames = userRoles.map((user) => ({
+        user_id: user.user_id,
+        display_name: profiles.find((profile) => profile.id === user.user_id)?.display_name || 'Unknown',
       }));
 
       setUsers(usersWithNames);
