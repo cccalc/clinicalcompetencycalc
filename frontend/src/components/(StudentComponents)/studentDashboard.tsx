@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import EPACard from './EPACard';
 import EPAModal from './EPAModal';
+import ToggleControl from '@/components/(StudentComponents)/ToggleControl';
 import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
@@ -48,7 +49,7 @@ const generateDummyData = (): EPA[] => {
 
 const StudentDashboard: React.FC = () => {
   const [data, setData] = useState<EPA[]>([]);
-  const [range, setRange] = useState<number>(3);
+  const [range, setRange] = useState<3 | 6 | 12>(3);
   const [selectedEpa, setSelectedEpa] = useState<EPA | null>(null);
 
   useEffect(() => {
@@ -101,15 +102,7 @@ const StudentDashboard: React.FC = () => {
   return (
     <div className='container mt-4'>
       <div className='d-flex justify-content-center mb-4 gap-2'>
-        {[3, 6, 12].map((r) => (
-          <button
-            key={r}
-            className={`btn btn-${range === r ? 'primary' : 'outline-secondary'}`}
-            onClick={() => setRange(r)}
-          >
-            Last {r} mo
-          </button>
-        ))}
+        <ToggleControl selected={range} onSelect={setRange} />
       </div>
       <div className='row'>
         {data.map((epa) => (

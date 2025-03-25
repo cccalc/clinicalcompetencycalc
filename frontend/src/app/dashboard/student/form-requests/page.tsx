@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/utils/supabase/client'; 
+import { createClient } from '@/utils/supabase/client';
 
-const supabase = createClient(); 
+const supabase = createClient();
 
 const FormRequests = () => {
   const [faculty, setFaculty] = useState<string>('');
@@ -64,8 +64,7 @@ const FormRequests = () => {
 
       const usersWithNames = userRoles.map((user) => ({
         user_id: user.user_id,
-        display_name:
-          profiles.find((profile) => profile.id === user.user_id)?.display_name || 'Unknown',
+        display_name: profiles.find((profile) => profile.id === user.user_id)?.display_name || 'Unknown',
       }));
 
       setUsers(usersWithNames);
@@ -77,7 +76,7 @@ const FormRequests = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!faculty || !details) {
       setMessage('Please fill in all fields.');
       return;
@@ -93,9 +92,9 @@ const FormRequests = () => {
 
     const { error } = await supabase.from('form_requests').insert([
       {
-        student_id: studentId, 
-        notes: details, 
-        completed_by: faculty, 
+        student_id: studentId,
+        notes: details,
+        completed_by: faculty,
       },
     ]);
 
@@ -109,7 +108,6 @@ const FormRequests = () => {
     }
 
     setLoading(false);
-
   };
 
   return (
@@ -137,19 +135,6 @@ const FormRequests = () => {
             </select>
           </div>
           <div className='mb-3'>
-            <label htmlFor='details' className='form-label'>
-              Briefly describe the relevant activity
-            </label>
-            <textarea
-              id='details'
-              name='details'
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              rows={4}
-              className='form-control'
-            />
-          </div>
-          <div className='mb-3'>
             <label htmlFor='goals' className='form-label'>
               What I&apos;d like feedback on
             </label>
@@ -158,6 +143,19 @@ const FormRequests = () => {
               name='goals'
               value={goals}
               onChange={(e) => setGoals(e.target.value)}
+              rows={4}
+              className='form-control'
+            />
+          </div>
+          <div className='mb-3'>
+            <label htmlFor='details' className='form-label'>
+              Additional notes:
+            </label>
+            <textarea
+              id='details'
+              name='details'
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
               rows={4}
               className='form-control'
             />

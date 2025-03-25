@@ -18,7 +18,7 @@ const ToggleControl: React.FC<ToggleControlProps> = ({ selected, onSelect }) => 
           className={`btn btn-outline-primary${selected === value ? ' active' : ''}`}
           onClick={() => onSelect(value as 3 | 6 | 12)}
         >
-          {value} mo
+          Last {value} mo
         </button>
       ))}
     </div>
