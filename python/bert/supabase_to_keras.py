@@ -15,43 +15,77 @@ def main(args: argparse.Namespace) -> None:
   Converts the supabase dataset to a keras dataset.
   '''
 
-  dataset_name = args.ds_name
-  if dataset_name is None:
-    yymmdd = pd.Timestamp.now().strftime('%y%m%d')
-    dataset_name = f'{yymmdd}-{args.split * 100:.0f}'
-    if args.augment_del_prob > 0 or args.augment_synonym:
-      dataset_name += '-arg'
-    if args.equalize:
-      dataset_name += '-eq'
-
+  # Get arguments
   force = args.force
   training_split = args.split
   verbose = args.verbose
+  augment_count = args.augment_count
 
-  if not 0 <= training_split <= 1:
+  if not 0 < training_split < 1:
     raise ValueError("Training split must be between 0 and 1.")
+
+  # Construct dataset name
+  dataset_name = args.ds_name
+  if dataset_name is None:
+    yymmdd = pd.Timestamp.now().strftime('%y%m%d')
+    dataset_name = f'{yymmdd}-{training_split * 100:.0f}'
+    if args.augment_count > 0:
+      dataset_name += f'-aug-{augment_count}'
+    if args.equalize:
+      dataset_name += '-eq'
+
+  if verbose:
+    print('Creating directory structure...')
+
+  if force or not os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', dataset_name)):
+    if not args.dry_run:
+      os.makedirs(os.path.join(os.getcwd(), 'data', 'keras', dataset_name), exist_ok=force)
+  else:
+    suffix = 1
+    new_dataset_name = f"{dataset_name}_{suffix}"
+    while os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', new_dataset_name)):
+      suffix += 1
+      new_dataset_name = f"{dataset_name}_{suffix}"
+    dataset_name = new_dataset_name
+    if not args.dry_run:
+      os.makedirs(os.path.join(os.getcwd(), 'data', 'keras', dataset_name))
+
+  # Adjust training split if augmenting to account for augmented samples
+  # n = augment_count, s = training_split, x = adjusted training split
+  # (1+n)x/(1-x) = s/(1-s)  =>  x = s/(1+n-sn)
+  if augment_count > 0:
+    training_split = training_split / (1 + augment_count - training_split * augment_count)
 
   if verbose:
     print(f'Creating dataset {dataset_name}...')
 
+  # Get samples
   df = querySupabase(verbose=verbose)
-
-  df = augmentData(df, delete=args.augment_del_prob, synonym=args.augment_synonym, verbose=verbose)
+  if verbose:
+    print(f'Retrieved {len(df)} samples.')
 
   if args.equalize:
     df = equalizeClasses(df, verbose=verbose)
+    if verbose:
+      print(f'Equalized to {len(df)} samples.')
 
-  print(f"Collected {len(df)} samples in dataset.")
+  df = df.sample(frac=1, random_state=42)  # shuffle
+  train_size = int(len(df) * training_split)
+  train_df = df[:train_size]
+  test_df = df[train_size:]
 
-  if args.no_export:
-    return
+  if augment_count > 0:
+    train_df = augmentData(train_df, samples=augment_count, verbose=verbose)
 
   keras_directory = os.path.join(os.getcwd(), 'data', 'keras', dataset_name)
-  exportKerasFolder(df, keras_directory, training_split=training_split,
-                    verbose=verbose, force=force)
+  exportKerasFolder(train_df, test_df, keras_directory,
+                    verbose=verbose, force=force, dry_run=args.dry_run)
 
   if verbose:
-    print(f'Dataset {dataset_name} created at {keras_directory}')
+    if args.dry_run:
+      print(f'Dataset {dataset_name} would be created at {keras_directory}')
+    else:
+      print(f'Dataset {dataset_name} created at {keras_directory}')
 
 
 if __name__ == "__main__":
@@ -67,15 +101,13 @@ if __name__ == "__main__":
   parser.add_argument('-v', '--verbose',
                       help='verbose output', action='store_true')
 
-  parser.add_argument('--augment-del-prob', type=float, default=0.0,
-                      help='probability of deleting a word; default is 0.0')
-  parser.add_argument('--augment-synonym',
-                      help='augment with synonyms', action='store_true')
+  parser.add_argument('--augment-count', type=int, default=0,
+                      help='number of augmented samples to generate using synonyms')
   parser.add_argument('--ds_name', type=str, default=None,
-                      help='custom dataset name; default is <yymmdd>-<split>[-arg][-eq]')
+                      help='custom dataset name; default is <yymmdd>-<split>[-aug][-eq]')
+  parser.add_argument('--dry-run',
+                      help='run through the program without writing any files', action='store_true')
   parser.add_argument('--equalize',
                       help='equalize the number of samples in each class', action='store_true')
-  parser.add_argument('--no-export',
-                      help='do not export the dataset', action='store_true')
 
   main(parser.parse_args())

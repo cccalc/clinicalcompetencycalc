@@ -71,8 +71,7 @@ def augmentData(
     df: pd.DataFrame,
     text_col_label: str = 'text',
     level_col_label: str = 'dev_level',
-    synonym: bool = True,
-    delete: float = 0,
+    samples: int = 0,
     verbose: bool = False
 ) -> pd.DataFrame:
   '''
@@ -90,11 +89,8 @@ def augmentData(
   :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
   :type level_col_label: str
 
-  :param synonym: If True, use synonyms to augment the data. Defaults to True.
-  :type synonym: bool
-
-  :param delete: The probability of deleting a word. Defaults to 0.
-  :type delete: float
+  :param synonym: The number of augmented samples to generate. Defaults to 0.
+  :type synonym: int
 
   :return: The augmented DataFrame.
   :rtype: DataFrame
@@ -109,20 +105,17 @@ def augmentData(
   if level_col_label not in df.columns:
     raise ValueError(f"The DataFrame must have a column labeled '{level_col_label}'.")
 
-  # Augmentation setups
-  synonym_aug = naw.SynonymAug(aug_src='wordnet') if synonym else None
-  deletion_aug = naw.RandomWordAug(action="delete", aug_p=delete) if delete > 0 else None
-
-  if synonym_aug is None and deletion_aug is None:
+  if samples == 0:
     return df
 
-  if verbose:
-    print(f"Synonym augmentation: {'Enabled' if synonym_aug else 'Disabled'}")
-    print('Random word deletion:',
-          f'Enabled with probability {delete}' if deletion_aug else 'Disabled')
+  # Augmentation setups
+  synonym_aug = naw.SynonymAug(aug_src='wordnet')
 
   # Create a DataFrame to hold augmented rows
   augmented_rows = []
+
+  if verbose:
+    print(f"Generating {samples} augmented samples per sample...")
 
   # Iterate through each row in the DataFrame
   for _, row in df.iterrows():
@@ -130,15 +123,10 @@ def augmentData(
     level = row[level_col_label]
 
     # Apply synonym replacement if enabled
-    if synonym and synonym_aug:
-      augmented_texts = synonym_aug.augment(original_text, n=2)  # Generate 2 augmented samples
+    if samples and synonym_aug:
+      augmented_texts = synonym_aug.augment(original_text, n=samples)
       for aug_text in augmented_texts:
         augmented_rows.append({text_col_label: aug_text, level_col_label: level})
-
-    # Apply random word deletion if enabled
-    if delete > 0 and deletion_aug:
-      deleted_text = deletion_aug.augment(original_text)
-      augmented_rows.append({text_col_label: deleted_text, level_col_label: level})
 
   # Convert the augmented rows into a DataFrame
   augmented_df = pd.DataFrame(augmented_rows)
@@ -184,13 +172,15 @@ def equalizeClasses(
 
 
 def exportKerasFolder(
-    df: pd.DataFrame,
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
     destination: str,
     text_col_label: str = 'text',
     level_col_label: str = 'dev_level',
-    training_split: float = 0.8,
+    class_names: list[str] = None,
     verbose: bool = False,
     force: bool = False,
+    dry_run: bool = False
 ) -> None:
   '''
   Export the DataFrame to a folder in Keras format.
@@ -216,93 +206,49 @@ def exportKerasFolder(
 
   where each class is a folder, and each file is a text file containing the description.
 
-  : param df: The DataFrame to export.
-  : type df: DataFrame
+  :param train_df: The training DataFrame.
+  :type train_df: DataFrame
 
-  : param destination: The destination folder.
-  : type destination: str
+  :param test_df: The testing DataFrame.
+  :type test_df: DataFrame
 
-  : param training_split: The split ratio for training and testing. Defaults to 0.8.
-  : type training_split: float
+  :param destination: The destination folder.
+  :type destination: str
 
-  : param text_col_label: The label of the text column. Defaults to ``'text'``.
-  : type text_col_label: str
+  :param text_col_label: The label of the text column. Defaults to ``'text'``.
+  :type text_col_label: str
 
-  : param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
-  : type level_col_label: str
+  :param level_col_label: The label of the level column. Defaults to ``'dev_level'``.
+  :type level_col_label: str
 
-  : param verbose: If True, print verbose output. Defaults to False.
-  : type verbose: bool
+  :param class_names: The names of the classes.
+  Defaults to ``['remedial', 'early_dev', 'developing', 'entrustable']``.
+  :type class_names: list[str]
 
-  : param force: If True, force overwrite the destination folder. Defaults to False.
-  : type force: bool
+  :param verbose: If True, print verbose output. Defaults to False.
+  :type verbose: bool
+
+  :param force: If True, force overwrite the destination folder. Defaults to False.
+  :type force: bool
   '''
-
-  class_names = ['remedial', 'early_dev', 'developing', 'entrustable']
-  classes = df[level_col_label].unique()
+  if class_names is None:
+    class_names = ['remedial', 'early_dev', 'developing', 'entrustable']
+  classes = train_df[level_col_label].unique()
 
   # split dataframe into classes, keeping only the "description" column
 
   if verbose:
-    print(f'Splitting dataframe into {len(classes)} classes...')
+    print(f'Exporting {len(train_df)} training samples and {len(test_df)} testing samples...')
 
-  class_dfs = {}
-  for c in classes:
-    class_df = df[df[level_col_label] == c]
-    if verbose:
-      print(f'Found {len(class_df)} samples for class {class_names[c]}')
-    class_dfs[c] = class_df[[text_col_label]]
-
-  if verbose:
-    print('Creating directory structure...')
-
-  # create the directory structure
-  try:
+  for df, split in [(train_df, 'train'), (test_df, 'test')]:
     for c in classes:
-      os.makedirs(os.path.join(destination, 'train', class_names[c]), exist_ok=force)
-      os.makedirs(os.path.join(destination, 'test', class_names[c]), exist_ok=force)
-  except FileExistsError:
-    # if the directory already exists, check if there is a numerical suffix
-    if not force:
-      suffix = 1
-      new_destination = f"{destination}_{suffix}"
-      while os.path.exists(new_destination):
-        suffix += 1
-        new_destination = f"{destination}_{suffix}"
-      destination = new_destination
-      for c in classes:
-        os.makedirs(os.path.join(destination, 'train', class_names[c]))
-        os.makedirs(os.path.join(destination, 'test', class_names[c]))
-    # if not, add a suffix of 1
-    else:
-      destination = f"{destination}_1"
-      for c in classes:
-        os.makedirs(os.path.join(destination, 'train', class_names[c]))
-        os.makedirs(os.path.join(destination, 'test', class_names[c]))
-
-  if verbose:
-    print(f'Writing files to {destination}...')
-
-  # split each class into training and testing sets
-  for c in classes:
-    class_df = class_dfs[c]
-    class_df = class_df.sample(frac=1, random_state=42)  # shuffle the dataframe
-    train_size = int(len(class_df) * training_split)
-    train_df = class_df[:train_size]
-    test_df = class_df[train_size:]
-
-    if verbose:
-      print(f'Writing {len(train_df)} training samples for class {class_names[c]}')
-
-    # write the training set to files
-    for i, row in train_df.iterrows():
-      with open(os.path.join(destination, 'train', class_names[c], f'{i}.txt'), 'w') as f:
-        f.write(row[text_col_label])
-
-    if verbose:
-      print(f'Writing {len(test_df)} testing samples for class {class_names[c]}')
-
-    # write the testing set to files
-    for i, row in test_df.iterrows():
-      with open(os.path.join(destination, 'test', class_names[c], f'{i}.txt'), 'w') as f:
-        f.write(row[text_col_label])
+      class_df = df[df[level_col_label] == c]
+      if dry_run:
+        if verbose:
+          print(f'Would write {len(class_df)} {split} samples for class {class_names[c]}')
+      else:
+        if verbose:
+          print(f'Writing {len(class_df)} {split} samples for class {class_names[c]}')
+        for i, row in class_df.iterrows():
+          with open(os.path.join(destination, split, class_names[c], f'{i}.txt'), 'w') as f:
+            f.write(row[text_col_label])
