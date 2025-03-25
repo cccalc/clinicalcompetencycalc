@@ -47,9 +47,7 @@ const RaterDashboard = () => {
         return;
       }
 
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, activity_status, email');
+      const { data: users, error: userError } = await supabase.rpc('fetch_users');
 
       if (userError) {
         console.error('Error fetching users:', userError.message);
@@ -57,19 +55,14 @@ const RaterDashboard = () => {
         return;
       }
 
-      const activeProfiles = profiles.filter((p) => p.activity_status !== 'Deactivated');
-      const requests = formRequests
-        .map((request) => {
-          const student = activeProfiles.find((p) => p.user_id === request.student_id);
-          return student
-            ? {
-                ...request,
-                display_name: student.display_name || 'Unknown',
-                email: student.email,
-              }
-            : null;
-        })
-        .filter(Boolean); // Remove null entries (deactivated users)
+      const requests = formRequests.map((request) => {
+        const student = users.find((user: { user_id: string; }) => user.user_id === request.student_id);
+        return {
+          ...request,
+          display_name: student?.display_name || 'Unknown',
+          email: student?.email ,
+        };
+      });
 
       setFormRequests(requests);
       setLoading(false);
