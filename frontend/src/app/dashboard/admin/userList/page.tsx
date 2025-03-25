@@ -59,11 +59,11 @@ const AdminDashboard = () => {
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
-    console.log("Updating role for user:", selectedUser.user_id, "to role:", selectedUser.role);
+    console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
 
     const { error } = await supabase
       .from('user_roles') // Updating the correct table
-      .update({ role: selectedUser.role }) 
+      .update({ role: selectedUser.role })
       .eq('user_id', selectedUser.user_id); // Match by user_id
 
     if (error) {
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    console.log("Role update successful!");
+    console.log('Role update successful!');
 
     // Fetch updated users after role update
     const { data, error: fetchError } = await supabase.rpc('fetch_users');
@@ -93,7 +93,7 @@ const AdminDashboard = () => {
 
   return (
     <div className='container text-center'>
-      <h1 className='my-4 text-primary fw-bold'>Admin Dashboard</h1>
+      <h1 className='my-4 text-primary fw-bold'>Manage Users</h1>
 
       {/* Search and Filter Bar */}
       <div className='mb-3 d-flex justify-content-between'>
@@ -196,7 +196,9 @@ const AdminDashboard = () => {
                 <button type='button' className='btn btn-secondary' onClick={handleCloseModal}>
                   Close
                 </button>
-                <button type='button' className='btn btn-primary' onClick={updateUserRole}>Save</button>
+                <button type='button' className='btn btn-primary' onClick={updateUserRole}>
+                  Save
+                </button>
               </div>
             </div>
           </div>

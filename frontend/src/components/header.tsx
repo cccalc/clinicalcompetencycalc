@@ -81,7 +81,7 @@ const Header = () => {
                       pathname === '/dashboard/student/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'
                     }`}
                   >
-                    Form Requests
+                    Request Assessment
                   </Link>
                   <Link
                     href='/dashboard/student/report'
@@ -89,7 +89,7 @@ const Header = () => {
                       pathname === '/dashboard/student/report' ? 'btn-secondary' : 'btn-outline-secondary'
                     }`}
                   >
-                    Report
+                    Comprehensive Report
                   </Link>
                 </>
               )}
@@ -101,7 +101,7 @@ const Header = () => {
                       pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
                     }`}
                   >
-                    All Users
+                    Manage Users
                   </Link>
                   <Link
                     href='/all-reports'

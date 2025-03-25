@@ -113,7 +113,7 @@ const FormRequests = () => {
   return (
     <>
       <main className='container mt-5'>
-        <h1 className='text-2xl font-bold mb-4'>Form Requests</h1>
+        <h1 className='text-2xl font-bold mb-4'>Request Assessment</h1>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='mb-3'>
             <label htmlFor='faculty' className='form-label'>
