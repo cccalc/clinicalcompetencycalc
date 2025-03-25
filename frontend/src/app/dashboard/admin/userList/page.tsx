@@ -6,7 +6,24 @@ import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
 
+/**
+ * AdminDashboard Component
+ * 
+ * Provides a user interface for administrators to manage users:
+ * - View all users
+ * - Search/filter users by name/email/role
+ * - Edit user roles
+ * 
+ * Data is fetched from Supabase using an RPC function and table queries.
+ */
 const AdminDashboard = () => {
+  // ----------------------
+  // Types
+  // ----------------------
+
+  /**
+   * Represents a user fetched from Supabase.
+   */
   interface User {
     id: string;
     user_id: string;
@@ -15,20 +32,35 @@ const AdminDashboard = () => {
     display_name: string;
   }
 
+  /**
+   * Represents a role object from the `roles` table.
+   */
   interface Role {
     role: string;
   }
 
+  // ----------------------
+  // State
+  // ----------------------
+
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [roles, setRoles] = useState<string[]>([]);
+
   const router = useRouter();
 
+  // ----------------------
+  // Data Fetching
+  // ----------------------
+
   useEffect(() => {
+    /**
+     * Fetch all users from the database using a stored procedure.
+     */
     const fetchUsers = async () => {
       const { data, error } = await supabase.rpc('fetch_users');
       if (error) {
@@ -38,6 +70,9 @@ const AdminDashboard = () => {
       }
     };
 
+    /**
+     * Fetch list of available roles from the `roles` table.
+     */
     const fetchRoles = async () => {
       const { data, error } = await supabase.from('roles').select('role');
       if (error) {
@@ -51,29 +86,38 @@ const AdminDashboard = () => {
     fetchRoles();
   }, [router]);
 
+  // ----------------------
+  // Role Update Logic
+  // ----------------------
+
+  /**
+   * Handles closing the Edit Role modal.
+   */
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
   };
 
+  /**
+   * Submits the updated user role to the database.
+   * Re-fetches user list after update for consistency.
+   */
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
     console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
 
     const { error } = await supabase
-      .from('user_roles') // Updating the correct table
+      .from('user_roles')
       .update({ role: selectedUser.role })
-      .eq('user_id', selectedUser.user_id); // Match by user_id
+      .eq('user_id', selectedUser.user_id);
 
     if (error) {
       console.error('Error updating role:', error);
       return;
     }
 
-    console.log('Role update successful!');
-
-    // Fetch updated users after role update
+    // Refresh user list after update
     const { data, error: fetchError } = await supabase.rpc('fetch_users');
     if (fetchError) {
       console.error('Error fetching updated users:', fetchError);
@@ -84,6 +128,13 @@ const AdminDashboard = () => {
     setShowModal(false);
   };
 
+  // ----------------------
+  // Filtering Logic
+  // ----------------------
+
+  /**
+   * Filters users based on search term and selected role.
+   */
   const filteredUsers = users.filter(
     (user) =>
       (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,11 +142,15 @@ const AdminDashboard = () => {
       (selectedRole === '' || user.role === selectedRole)
   );
 
+  // ----------------------
+  // Render
+  // ----------------------
+
   return (
     <div className='container text-center'>
       <h1 className='my-4 text-primary fw-bold'>Manage Users</h1>
 
-      {/* Search and Filter Bar */}
+      {/* Search and Role Filter */}
       <div className='mb-3 d-flex justify-content-between'>
         <input
           type='text'
@@ -114,6 +169,7 @@ const AdminDashboard = () => {
         </select>
       </div>
 
+      {/* User Table */}
       <table className='table table-hover shadow rounded bg-white'>
         <thead className='table-dark'>
           <tr>
@@ -154,6 +210,7 @@ const AdminDashboard = () => {
         </tbody>
       </table>
 
+      {/* Edit Role Modal */}
       {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -164,13 +221,13 @@ const AdminDashboard = () => {
               </div>
               <div className='modal-body text-start'>
                 <div className='p-3 border rounded mb-3'>
-                  <p className='mb-2'>
+                  <p>
                     <strong>ID:</strong> {selectedUser.user_id}
                   </p>
-                  <p className='mb-2'>
+                  <p>
                     <strong>Display Name:</strong> {selectedUser.display_name}
                   </p>
-                  <p className='mb-2'>
+                  <p>
                     <strong>Email:</strong> {selectedUser.email}
                   </p>
                 </div>
@@ -205,6 +262,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Delete Modal (Logic not yet implemented) */}
       {showDeleteModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>

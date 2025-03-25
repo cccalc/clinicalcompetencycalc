@@ -6,6 +6,10 @@ import { User } from '@supabase/supabase-js';
 
 const supabase = createClient();
 
+/**
+ * Describes the shape of the user context, including
+ * the current user, profile details, role flags, and loading state.
+ */
 interface UserContextType {
   user: User | null;
   displayName: string;
@@ -17,8 +21,16 @@ interface UserContextType {
   loading: boolean;
 }
 
+// Create a React context to store user session and role info
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+/**
+ * UserProvider component to wrap the application and provide user context.
+ *
+ * @param {Object} props
+ * @param {ReactNode} props.children - Child components that consume the user context
+ * @returns {JSX.Element}
+ */
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [displayName, setDisplayName] = useState('');
@@ -29,7 +41,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userRoleDev, setUserRoleDev] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async (userId: string) => {
+  /**
+   * Fetches the display name from the `profiles` table using the user's ID.
+   *
+   * @param {string} userId - Supabase user ID
+   * @returns {Promise<string | null>} - Display name or null if error occurs
+   */
+  const fetchUserProfile = async (userId: string): Promise<string | null> => {
     const { data: profileData, error } = await supabase
       .from('profiles')
       .select('display_name')
@@ -44,7 +62,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return profileData.display_name;
   };
 
-  const fetchUserRole = async (userId: string) => {
+  /**
+   * Calls a Supabase RPC to get the user role by ID.
+   *
+   * @param {string} userId - Supabase user ID
+   * @returns {Promise<string | null>} - Role string (e.g., 'admin', 'student') or null on error
+   */
+  const fetchUserRole = async (userId: string): Promise<string | null> => {
     const { data, error } = await supabase.rpc('get_user_role_by_user_id', {
       id: userId,
     });
@@ -57,6 +81,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return data as string | null;
   };
 
+  /**
+   * Fetches the current authenticated user, profile, and role,
+   * and updates all state variables accordingly.
+   */
   const fetchUser = useCallback(async () => {
     setLoading(true);
 
@@ -65,6 +93,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     } = await supabase.auth.getSession();
 
     if (!session?.user) {
+      // Reset state if no session exists
       setUser(null);
       setDisplayName('');
       setEmail('');
@@ -84,7 +113,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setDisplayName(fetchedDisplayName ?? '');
 
     const role = await fetchUserRole(user.id);
-
     setUserRoleDev(role === 'dev');
     setUserRoleAuthorized(role === 'admin');
     setUserRoleRater(role === 'rater');
@@ -93,6 +121,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, []);
 
+  /**
+   * Initializes the user state and listens for auth state changes (sign-in/out, token refresh).
+   * Automatically updates the user context accordingly.
+   */
   useEffect(() => {
     fetchUser();
 
@@ -100,6 +132,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         fetchUser();
       } else if (event === 'SIGNED_OUT') {
+        // Reset user state on sign-out
         setUser(null);
         setDisplayName('');
         setEmail('');
@@ -134,7 +167,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useUser = () => {
+/**
+ * Custom hook to access the user context safely.
+ *
+ * @throws {Error} If used outside of a <UserProvider>
+ * @returns {UserContextType} - The current user context
+ */
+export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');

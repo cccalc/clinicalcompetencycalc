@@ -8,6 +8,15 @@ import { useRef, useState, useEffect } from 'react';
 import logo from '@/components/ccc-logo-color.svg';
 import { useUser } from '@/context/UserContext';
 
+/**
+ * Header component
+ *
+ * Renders the top navigation bar with dynamic links based on the user's role.
+ * Includes:
+ * - Logo and app name
+ * - Role-specific navigation links (Admin, Rater, Student)
+ * - Profile dropdown for name/email, settings, and logout
+ */
 const Header = () => {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -18,27 +27,43 @@ const Header = () => {
   const [editedDisplayName, setEditedDisplayName] = useState(displayName);
   const [isChanged, setIsChanged] = useState(false);
 
+  // Role shorthand booleans
   const isDev = userRoleDev;
   const isOnlyStudent = userRoleStudent && !isDev && !userRoleRater && !userRoleAuthorized;
   const isOnlyRater = userRoleRater && !isDev && !userRoleAuthorized;
   const isOnlyAuthorized = userRoleAuthorized && !isDev;
 
+  /**
+   * Update local editable display name when the user's name changes.
+   */
   useEffect(() => {
     setEditedDisplayName(displayName);
   }, [displayName]);
 
+  /**
+   * Detect whether the display name input was changed.
+   */
   useEffect(() => {
     setIsChanged(editedDisplayName !== displayName);
   }, [editedDisplayName, displayName]);
 
+  /**
+   * Toggles the visibility of the profile dropdown menu.
+   */
   const toggleProfileMenu = () => {
     setShowProfileMenu((prev) => !prev);
   };
 
+  /**
+   * Handles saving updated profile info (to be implemented).
+   */
   const handleSaveChanges = async () => {
-    // Implement update logic (update Supabase profile)
+    // Implement update logic (e.g., update Supabase profile)
   };
 
+  /**
+   * Closes the dropdown if clicking outside of it.
+   */
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
@@ -60,13 +85,17 @@ const Header = () => {
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
       <div className='container mx-auto d-flex justify-content-between align-items-center flex-wrap'>
+        {/* Logo and app name */}
         <Link href='/dashboard' className='d-flex align-items-center text-decoration-none'>
           <Image src={logo} alt='Logo' width={40} height={40} />
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
+
+        {/* Navigation links */}
         <nav className='d-flex gap-3 align-items-center flex-wrap'>
           {user ? (
             <>
+              {/* Student View */}
               {(isOnlyStudent || isDev) && (
                 <>
                   <Link
@@ -93,6 +122,8 @@ const Header = () => {
                   </Link>
                 </>
               )}
+
+              {/* Admin View */}
               {(isOnlyAuthorized || isDev) && (
                 <>
                   <Link
@@ -111,6 +142,8 @@ const Header = () => {
                   </Link>
                 </>
               )}
+
+              {/* Rater View */}
               {(isOnlyRater || isDev) && (
                 <>
                   <Link
@@ -123,6 +156,7 @@ const Header = () => {
                   </Link>
                 </>
               )}
+
               {/* 🔹 Profile Dropdown */}
               <div className='dropdown' ref={profileMenuRef}>
                 <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>

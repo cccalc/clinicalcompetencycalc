@@ -7,11 +7,21 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const supabase = createClient();
 
+// ----------------------
+// Types
+// ----------------------
+
+/**
+ * Represents a single EPA description record.
+ */
 interface EPA {
   id: number;
   description: string;
 }
 
+/**
+ * Represents a key function question associated with an EPA.
+ */
 interface KeyFunction {
   kf: string;
   epa: number;
@@ -19,7 +29,19 @@ interface KeyFunction {
   options: { [key: string]: string };
 }
 
+/**
+ * RaterFormsPage Component
+ *
+ * Allows raters to:
+ * - Select EPAs for evaluation
+ * - Answer multiple-choice key function questions for each EPA
+ * - Toggle between selection and evaluation views
+ */
 export default function RaterFormsPage() {
+  // ----------------------
+  // State Management
+  // ----------------------
+
   const [epas, setEPAs] = useState<EPA[]>([]);
   const [kfData, setKFData] = useState<KeyFunction[]>([]);
   const [selectedEPAs, setSelectedEPAs] = useState<number[]>([]);
@@ -28,12 +50,22 @@ export default function RaterFormsPage() {
   const [loading, setLoading] = useState(true);
   const [selectionCollapsed, setSelectionCollapsed] = useState(false);
 
+  // ----------------------
+  // Initial Data Fetch
+  // ----------------------
+
   useEffect(() => {
+    /**
+     * Fetches EPA descriptions and MCQ data on component mount.
+     */
     async function fetchData() {
       setLoading(true);
+
+      // Fetch EPA descriptions
       const { data: epaData, error: epaError } = await supabase.from('epa_kf_descriptions').select('*');
-      if (epaError) console.error('EPA Fetch Error:', epaError);
-      else {
+      if (epaError) {
+        console.error('EPA Fetch Error:', epaError);
+      } else {
         const formattedEPAs = Object.entries(epaData[0].epa_descriptions).map(([key, value]) => ({
           id: parseInt(key, 10),
           description: value as string,
@@ -41,6 +73,7 @@ export default function RaterFormsPage() {
         setEPAs(formattedEPAs);
       }
 
+      // Fetch latest multiple-choice key function questions
       const latestMCQs = await getLatestMCQs();
       if (latestMCQs) {
         const formattedKFData = latestMCQs.map((mcq) => ({
@@ -49,19 +82,35 @@ export default function RaterFormsPage() {
         })) as KeyFunction[];
         setKFData(formattedKFData);
       }
+
       setLoading(false);
     }
+
     fetchData();
   }, []);
 
+  // ----------------------
+  // Event Handlers
+  // ----------------------
+
+  /**
+   * Adds or removes an EPA from the selected list.
+   * @param {number} epaId - The EPA ID to toggle
+   */
   const toggleEPASelection = (epaId: number) => {
     setSelectedEPAs((prev) => (prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]));
   };
 
+  /**
+   * Collapses or expands the EPA selection section.
+   */
   const toggleSelectionCollapse = () => {
     setSelectionCollapsed(!selectionCollapsed);
   };
 
+  /**
+   * Submits selected EPAs and shows the form for the first one.
+   */
   const submitEPAs = () => {
     if (selectedEPAs.length > 0) {
       setCurrentEPA(selectedEPAs[0]);
@@ -69,13 +118,21 @@ export default function RaterFormsPage() {
     }
   };
 
+  /**
+   * Marks an EPA as completed in local state.
+   * @param {number} epaId - The EPA ID to mark as completed
+   */
   const handleFormCompletion = (epaId: number) => {
     setCompletedEPAs((prev) => ({ ...prev, [epaId]: true }));
   };
 
+  // ----------------------
+  // Render
+  // ----------------------
+
   return (
     <div className='container-fluid d-flex'>
-      {/* Sidebar Navigation */}
+      {/* Sidebar: Selected EPA Navigation */}
       <div className='col-md-3 bg-light p-4 border-end'>
         <h3 className='mb-3'>Selected EPAs</h3>
         <ul className='list-group'>
@@ -108,18 +165,18 @@ export default function RaterFormsPage() {
         </ul>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content: EPA Selection and Question Forms */}
       <div className='col-md-9 p-4'>
         {loading ? (
           <p>Loading data...</p>
         ) : (
           <>
-            {selectionCollapsed && (
+            {/* EPA Selection Panel */}
+            {selectionCollapsed ? (
               <button className='btn btn-secondary mb-3' onClick={toggleSelectionCollapse}>
                 Modify EPA Selection
               </button>
-            )}
-            {!selectionCollapsed && (
+            ) : (
               <>
                 <h2 className='mb-3'>Select EPAs for Evaluation</h2>
                 <div className='d-flex flex-wrap gap-2'>
@@ -139,7 +196,8 @@ export default function RaterFormsPage() {
                         }}
                         onClick={() => toggleEPASelection(epa.id)}
                       >
-                        <span className='badge bg-primary me-2'>EPA {epa.id}</span> {epa.description}
+                        <span className='badge bg-primary me-2'>EPA {epa.id}</span>
+                        {epa.description}
                       </button>
                     ))
                   )}
@@ -151,6 +209,8 @@ export default function RaterFormsPage() {
             )}
           </>
         )}
+
+        {/* Key Function Form Display */}
         {currentEPA !== null && (
           <div key={currentEPA} className='card mt-4'>
             <div className='card-header bg-primary text-white'>
