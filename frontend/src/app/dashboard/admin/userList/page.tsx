@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -35,7 +34,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchUsers();
     fetchRoles();
-  }, []); // Add the empty dependency array to ensure the effect runs only once
+  })
 
   const fetchUsers = async () => {
     try {
