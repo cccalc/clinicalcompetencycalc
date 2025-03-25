@@ -47,16 +47,18 @@ const RaterDashboard = () => {
         return;
       }
 
-      const { data: users, error: userError } = await supabase.rpc('fetch_users');
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, activity_status, email');
 
-      if (userError) {
-        console.error('Error fetching users:', userError.message);
+      if (profileError) {
+        console.error('Error fetching users:', profileError.message);
         setLoading(false);
         return;
       }
 
       const requests = formRequests.map((request) => {
-        const student = users.find((user: { user_id: string }) => user.user_id === request.student_id);
+        const student = profiles.find((user: { user_id: string }) => user.user_id === request.student_id);
         return {
           ...request,
           display_name: student?.display_name || 'Unknown',
