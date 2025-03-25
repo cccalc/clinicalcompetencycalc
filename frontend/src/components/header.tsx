@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import logo from '@/components/ccc-logo-color.svg';
+import logo from '.../components/ccc-logo-color.svg';
 import { useUser } from '@/context/UserContext';
 const supabase = createClient();
 const Header = () => {
