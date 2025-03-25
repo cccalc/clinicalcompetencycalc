@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { supabase_authorize } from '@/utils/async-util';
 
 const supabase = createClient();
 
@@ -30,20 +29,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [userRoleDev, setUserRoleDev] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile from Supabase
   const fetchUserProfile = async (userId: string) => {
-    const { data: profileData, error: profileError } = await supabase
+    const { data: profileData, error } = await supabase
       .from('profiles')
       .select('display_name')
       .eq('id', userId)
       .single();
 
-    if (profileError) {
-      console.error('Error fetching profile:', profileError);
+    if (error) {
+      console.error('Error fetching profile:', error);
       return null;
     }
 
     return profileData.display_name;
+  };
+
+  const fetchUserRole = async (userId: string) => {
+    const { data, error } = await supabase.rpc('get_user_role_by_user_id', {
+      id: userId,
+    });
+
+    if (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+
+    return data as string | null;
   };
 
   const fetchUser = useCallback(async () => {
@@ -69,35 +80,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUser(user);
     setEmail(user.email ?? '');
 
-    // Fetch display name from profiles table
     const fetchedDisplayName = await fetchUserProfile(user.id);
     setDisplayName(fetchedDisplayName ?? '');
 
-    // Fetch user roles
-    const dev = await supabase_authorize([
-      'user_roles.select',
-      'user_roles.insert',
-      'user_roles.delete',
-      'user_roles.update',
-      'form_responses.select',
-      'form_responses.insert',
-      'mcqs_options.select',
-      'mcqs_options.update',
-      'mcqs_options.delete',
-      'mcqs_options.insert',
-      'form_responses.update',
-      'form_responses.delete',
-    ]);
-    setUserRoleDev(dev);
+    const role = await fetchUserRole(user.id);
 
-    const authorized = await supabase_authorize(['user_roles.select', 'user_roles.insert']);
-    setUserRoleAuthorized(authorized);
-
-    const rater = await supabase_authorize(['form_responses.select', 'form_responses.insert', 'mcqs_options.select']);
-    setUserRoleRater(rater);
-
-    const student = await supabase_authorize(['form_responses.select']);
-    setUserRoleStudent(student);
+    setUserRoleDev(role === 'dev');
+    setUserRoleAuthorized(role === 'admin');
+    setUserRoleRater(role === 'rater');
+    setUserRoleStudent(role === 'student');
 
     setLoading(false);
   }, []);
@@ -105,7 +96,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     fetchUser();
 
-    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         fetchUser();
@@ -128,7 +118,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent, userRoleDev, loading }}
+      value={{
+        user,
+        displayName,
+        email,
+        userRoleAuthorized,
+        userRoleRater,
+        userRoleStudent,
+        userRoleDev,
+        loading,
+      }}
     >
       {children}
     </UserContext.Provider>
