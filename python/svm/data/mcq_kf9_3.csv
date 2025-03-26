@@ -9,3 +9,8 @@ id,created_at,user_id,c9_3_1,c9_3_2,c9_3_3,c9_3_4,c9_3_5,c9_3_6,c9_3_7,c9_3_8,de
 8,2025-02-21T15:26:00.039+00:00,4af06985-db73-4918-901f-61e0377a0c37,,,,,True,True,False,False,1
 9,2025-02-21T17:59:41.983+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,True,,,,,4
 10,2025-02-24T19:02:34.22+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,True,False,False,False,False,True,4
+11,2025-02-26T21:56:38.874+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,True,True,True,False,False,2
+12,2025-03-14T18:41:57.893736+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,False,True,False,False,True,False,4
+13,2025-03-14T18:48:42.696492+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,False,True,False,True,False,False,2
+14,2025-03-18T15:23:58.104775+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,False,False,False,False,True,False,False,1
+15,2025-03-25T15:32:07.057629+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,True,False,False,True,False,False,2

@@ -4,3 +4,10 @@ id,created_at,user_id,c11_2_1,c11_2_2,c11_2_3,c11_2_4,c11_2_5,c11_2_6,c11_2_7,de
 3,2025-02-18T15:06:27.495+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,False,True,True,False,False,3
 4,2025-02-19T17:18:49.774+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,False,True,True,False,True,4
 5,2025-02-24T19:06:52.782+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,False,True,False,False,True,False,2
+6,2025-02-26T21:58:56.925+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,True,False,True,False,False,2
+7,2025-02-26T23:29:05.068+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,False,True,False,False,False,2
+8,2025-03-25T15:04:56.579533+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,True,False,False,False,False,2
+9,2025-03-25T20:01:37.73552+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,False,True,True,False,False,3
+10,2025-03-26T16:28:12.612998+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,True,False,False,False,False,False,1
+11,2025-03-26T16:29:55.152323+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,True,False,False,True,False,False,2
+12,2025-03-26T17:16:01.412598+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,False,False,True,False,True,3
