@@ -31,76 +31,28 @@ const AdminDashboard = () => {
     display_name: string;
   }
 
-<<<<<<< HEAD
-  /**
-   * Represents a role object from the `roles` table.
-   */
-=======
   interface Profile {
     id: string;
     account_status: string;
   }
 
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
   interface Role {
     role: string;
   }
 
-<<<<<<< HEAD
-  // ----------------------
-  // State
-  // ----------------------
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<string[]>([]);
-=======
   const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedUser, setSelectedUser] = useState<User & { account_status: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
-<<<<<<< HEAD
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const router = useRouter();
-=======
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
 
   // ----------------------
   // Data Fetching
   // ----------------------
 
   useEffect(() => {
-<<<<<<< HEAD
-    /**
-     * Fetch all users from the database using a stored procedure.
-     */
-    const fetchUsers = async () => {
-      const { data, error } = await supabase.rpc('fetch_users');
-      if (error) {
-        console.error('Error fetching users:', error);
-      } else {
-        setUsers(data);
-      }
-    };
-
-    /**
-     * Fetch list of available roles from the `roles` table.
-     */
-    const fetchRoles = async () => {
-      const { data, error } = await supabase.from('roles').select('role');
-      if (error) {
-        console.error('Error fetching roles:', error);
-      } else {
-        setRoles(data.map((role: Role) => role.role));
-      }
-    };
-
-=======
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
     fetchUsers();
     fetchRoles();
   })
@@ -164,11 +116,6 @@ const AdminDashboard = () => {
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
-<<<<<<< HEAD
-    console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
-
-=======
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
     const { error } = await supabase
       .from('user_roles')
       .update({ role: selectedUser.role })
@@ -179,32 +126,6 @@ const AdminDashboard = () => {
       return;
     }
 
-<<<<<<< HEAD
-    // Refresh user list after update
-    const { data, error: fetchError } = await supabase.rpc('fetch_users');
-    if (fetchError) {
-      console.error('Error fetching updated users:', fetchError);
-    } else {
-      setUsers(data);
-    }
-
-    setShowModal(false);
-  };
-
-  // ----------------------
-  // Filtering Logic
-  // ----------------------
-
-  /**
-   * Filters users based on search term and selected role.
-   */
-  const filteredUsers = users.filter(
-    (user) =>
-      (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedRole === '' || user.role === selectedRole)
-  );
-=======
     console.log('Role update successful!');
     fetchUsers();
     setShowModal(false);
@@ -243,7 +164,6 @@ const AdminDashboard = () => {
       if (a.account_status !== 'Deactivated' && b.account_status === 'Deactivated') return -1;
       return 0;
     });
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
 
   // ----------------------
   // Render
@@ -322,11 +242,7 @@ const AdminDashboard = () => {
         </tbody>
       </table>
 
-<<<<<<< HEAD
-      {/* Edit Role Modal */}
-=======
       {/* Edit Modal */}
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
       {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -378,12 +294,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-<<<<<<< HEAD
-      {/* Delete Modal (Logic not yet implemented) */}
-      {showDeleteModal && selectedUser && (
-=======
       {showDeactivateModal && selectedUser && (
->>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
             <div className='modal-content rounded shadow-lg'>
