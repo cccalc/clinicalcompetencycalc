@@ -5,7 +5,24 @@ import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
 
+/**
+ * AdminDashboard Component
+ * 
+ * Provides a user interface for administrators to manage users:
+ * - View all users
+ * - Search/filter users by name/email/role
+ * - Edit user roles
+ * 
+ * Data is fetched from Supabase using an RPC function and table queries.
+ */
 const AdminDashboard = () => {
+  // ----------------------
+  // Types
+  // ----------------------
+
+  /**
+   * Represents a user fetched from Supabase.
+   */
   interface User {
     id: string;
     user_id: string;
@@ -81,13 +98,19 @@ const AdminDashboard = () => {
     setSelectedUser(null);
   };
 
+  /**
+   * Submits the updated user role to the database.
+   * Re-fetches user list after update for consistency.
+   */
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
+    console.log("Updating role for user:", selectedUser.user_id, "to role:", selectedUser.role);
+
     const { error } = await supabase
-      .from('user_roles')
-      .update({ role: selectedUser.role })
-      .eq('user_id', selectedUser.user_id);
+      .from('user_roles') // Updating the correct table
+      .update({ role: selectedUser.role }) 
+      .eq('user_id', selectedUser.user_id); // Match by user_id
 
     if (error) {
       console.error('Error updating role:', error);
@@ -135,9 +158,9 @@ const AdminDashboard = () => {
 
   return (
     <div className='container text-center'>
-      <h1 className='my-4 text-primary fw-bold'>Admin Dashboard</h1>
+      <h1 className='my-4 text-primary fw-bold'>Manage Users</h1>
 
-      {/* Search and Filter Bar */}
+      {/* Search and Role Filter */}
       <div className='mb-3 d-flex justify-content-between'>
         <input
           type='text'
@@ -160,6 +183,7 @@ const AdminDashboard = () => {
         </select>
       </div>
 
+      {/* User Table */}
       <table className='table table-hover shadow rounded bg-white'>
         <thead className='table-dark'>
           <tr>
@@ -205,7 +229,7 @@ const AdminDashboard = () => {
         </tbody>
       </table>
 
-      {/* Edit Modal */}
+      {/* Edit Role Modal */}
       {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -216,13 +240,13 @@ const AdminDashboard = () => {
               </div>
               <div className='modal-body text-start'>
                 <div className='p-3 border rounded mb-3'>
-                  <p className='mb-2'>
+                  <p>
                     <strong>ID:</strong> {selectedUser.user_id}
                   </p>
-                  <p className='mb-2'>
+                  <p>
                     <strong>Display Name:</strong> {selectedUser.display_name}
                   </p>
-                  <p className='mb-2'>
+                  <p>
                     <strong>Email:</strong> {selectedUser.email}
                   </p>
                 </div>

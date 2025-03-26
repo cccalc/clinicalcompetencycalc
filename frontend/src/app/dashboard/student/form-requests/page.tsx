@@ -1,20 +1,39 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/utils/supabase/client'; 
+import { createClient } from '@/utils/supabase/client';
 
-const supabase = createClient(); 
+const supabase = createClient();
 
+/**
+ * FormRequests Component
+ *
+ * Allows a student to request a faculty/rater to complete a clinical competency assessment form.
+ * - Fetches the currently logged-in student
+ * - Lists available faculty (raters)
+ * - Submits a form request with optional goals and notes
+ */
 const FormRequests = () => {
-  const [faculty, setFaculty] = useState<string>('');
-  const [details, setDetails] = useState<string>('');
-  const [goals, setGoals] = useState<string>('');
-  const [users, setUsers] = useState<{ user_id: string; display_name: string }[]>([]);
-  const [studentId, setStudentId] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>('');
+  // ----------------------
+  // State Variables
+  // ----------------------
+
+  const [faculty, setFaculty] = useState<string>(''); // Selected rater/faculty ID
+  const [details, setDetails] = useState<string>(''); // Additional notes
+  const [goals, setGoals] = useState<string>(''); // Feedback request/goals
+  const [users, setUsers] = useState<{ user_id: string; display_name: string }[]>([]); // Raters list
+  const [studentId, setStudentId] = useState<string | null>(null); // Logged-in student ID
+  const [loading, setLoading] = useState<boolean>(false); // Submission status
+  const [message, setMessage] = useState<string>(''); // Feedback message
+
+  // ----------------------
+  // Initial Data Load
+  // ----------------------
 
   useEffect(() => {
+    /**
+     * Retrieves the currently logged-in Supabase user and stores the student ID.
+     */
     const fetchCurrentUser = async () => {
       const {
         data: { user },
@@ -34,6 +53,9 @@ const FormRequests = () => {
       setStudentId(user.id);
     };
 
+    /**
+     * Fetches all users with the 'rater' role and retrieves their display names.
+     */
     const fetchUsersWithDisplayNames = async () => {
       const { data: userRoles, error: userRolesError } = await supabase
         .from('user_roles')
@@ -75,9 +97,20 @@ const FormRequests = () => {
     fetchUsersWithDisplayNames();
   }, []);
 
+  // ----------------------
+  // Form Submission
+  // ----------------------
+
+  /**
+   * Handles form submission to Supabase.
+   * Inserts a new record in the `form_requests` table.
+   *
+   * @param {React.FormEvent} e - Form event object
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Validation
     if (!faculty || !details) {
       setMessage('Please fill in all fields.');
       return;
@@ -112,65 +145,77 @@ const FormRequests = () => {
     setLoading(false);
   };
 
+  // ----------------------
+  // Render
+  // ----------------------
+
   return (
-    <>
-      <main className='container mt-5'>
-        <h1 className='text-2xl font-bold mb-4'>Form Requests</h1>
-        <form onSubmit={handleSubmit} className='space-y-4'>
-          <div className='mb-3'>
-            <label htmlFor='faculty' className='form-label'>
-              Select Faculty
-            </label>
-            <select
-              id='faculty'
-              name='faculty'
-              value={faculty}
-              onChange={(e) => setFaculty(e.target.value)}
-              className='form-select'
-            >
-              <option value=''>Select a faculty</option>
-              {users.map((user) => (
-                <option key={user.user_id} value={user.user_id}>
-                  {user.display_name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className='mb-3'>
-            <label htmlFor='details' className='form-label'>
-              Briefly describe the relevant activity
-            </label>
-            <textarea
-              id='details'
-              name='details'
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              rows={4}
-              className='form-control'
-            />
-          </div>
-          <div className='mb-3'>
-            <label htmlFor='goals' className='form-label'>
-              What I&apos;d like feedback on
-            </label>
-            <textarea
-              id='goals'
-              name='goals'
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-              rows={4}
-              className='form-control'
-            />
-          </div>
-          <div>
-            <button type='submit' className='btn btn-primary' disabled={loading}>
-              {loading ? 'Submitting...' : 'Submit'}
-            </button>
-          </div>
-          {message && <p className='text-red-500 mt-2'>{message}</p>}
-        </form>
-      </main>
-    </>
+    <main className='container mt-5'>
+      <h1 className='text-2xl font-bold mb-4'>Request Assessment</h1>
+
+      <form onSubmit={handleSubmit} className='space-y-4'>
+        {/* Faculty Selector */}
+        <div className='mb-3'>
+          <label htmlFor='faculty' className='form-label'>
+            Select Faculty
+          </label>
+          <select
+            id='faculty'
+            name='faculty'
+            value={faculty}
+            onChange={(e) => setFaculty(e.target.value)}
+            className='form-select'
+          >
+            <option value=''>Select a faculty</option>
+            {users.map((user) => (
+              <option key={user.user_id} value={user.user_id}>
+                {user.display_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Feedback Goals Textarea */}
+        <div className='mb-3'>
+          <label htmlFor='goals' className='form-label'>
+            What I&apos;d like feedback on
+          </label>
+          <textarea
+            id='goals'
+            name='goals'
+            value={goals}
+            onChange={(e) => setGoals(e.target.value)}
+            rows={4}
+            className='form-control'
+          />
+        </div>
+
+        {/* Additional Notes Textarea */}
+        <div className='mb-3'>
+          <label htmlFor='details' className='form-label'>
+            Additional notes:
+          </label>
+          <textarea
+            id='details'
+            name='details'
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            rows={4}
+            className='form-control'
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div>
+          <button type='submit' className='btn btn-primary' disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit'}
+          </button>
+        </div>
+
+        {/* Submission Message */}
+        {message && <p className='text-red-500 mt-2'>{message}</p>}
+      </form>
+    </main>
   );
 };
 
