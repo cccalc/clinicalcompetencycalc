@@ -70,6 +70,7 @@ server/socketio/node_modules/
 .env
 
 # Python venv
+/node_modules
 .venv/
 server/socketio/node_modules/
 server/express/node_modules/
