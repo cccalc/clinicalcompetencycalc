@@ -4,9 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
-
+import { createClient } from '@/utils/supabase/client';
 import logo from '@/components/ccc-logo-color.svg';
 import { useUser } from '@/context/UserContext';
+const supabase = createClient();
 
 /**
  * Header component
@@ -58,6 +59,31 @@ const Header = () => {
    * Handles saving updated profile info (to be implemented).
    */
   const handleSaveChanges = async () => {
+    if (!user) return; // Ensure user is authenticated
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: editedDisplayName })
+        .eq('id', user.id); 
+
+      if (error) throw error;
+
+      const { data: updatedProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      setEditedDisplayName(updatedProfile?.display_name ?? '');
+
+      alert('Display name updated successfully!');
+    } catch (error) {
+      console.error('Error updating display name:', error);
+      alert('Failed to update display name.');
+    }
     // Implement update logic (e.g., update Supabase profile)
   };
 

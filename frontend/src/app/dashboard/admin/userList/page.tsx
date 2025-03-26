@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -32,67 +31,68 @@ const AdminDashboard = () => {
     display_name: string;
   }
 
-  /**
-   * Represents a role object from the `roles` table.
-   */
+  interface Profile {
+    id: string;
+    account_status: string;
+  }
+
   interface Role {
     role: string;
   }
 
-  // ----------------------
-  // State
-  // ----------------------
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<string[]>([]);
+  const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User & { account_status: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const router = useRouter();
-
-  // ----------------------
-  // Data Fetching
-  // ----------------------
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
-    /**
-     * Fetch all users from the database using a stored procedure.
-     */
-    const fetchUsers = async () => {
-      const { data, error } = await supabase.rpc('fetch_users');
-      if (error) {
-        console.error('Error fetching users:', error);
-      } else {
-        setUsers(data);
-      }
-    };
-
-    /**
-     * Fetch list of available roles from the `roles` table.
-     */
-    const fetchRoles = async () => {
-      const { data, error } = await supabase.from('roles').select('role');
-      if (error) {
-        console.error('Error fetching roles:', error);
-      } else {
-        setRoles(data.map((role: Role) => role.role));
-      }
-    };
-
     fetchUsers();
     fetchRoles();
-  }, [router]);
+  })
 
-  // ----------------------
-  // Role Update Logic
-  // ----------------------
+  const fetchUsers = async () => {
+    try {
+      const { data: users, error: usersError } = await supabase.rpc('fetch_users');
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        return;
+      }
 
-  /**
-   * Handles closing the Edit Role modal.
-   */
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, account_status');
+
+      if (profilesError) {
+        console.error('Error fetching account statuses:', profilesError);
+        return;
+      }
+
+      const usersWithStatus = users.map((user: User) => {
+        const profile = profiles.find((profile: Profile) => profile.id === user.user_id);
+        return {
+          ...user,
+          account_status: profile ? profile.account_status : 'Active',
+        };
+      });
+
+      setUsers(usersWithStatus);
+    } catch (err) {
+      console.error('Unexpected error:', err);
+    }
+  };
+
+  const fetchRoles = async () => {
+    const { data, error } = await supabase.from('roles').select('role');
+    if (error) {
+      console.error('Error fetching roles:', error);
+    } else {
+      setRoles(data.map((role: Role) => role.role));
+    }
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
@@ -105,46 +105,56 @@ const AdminDashboard = () => {
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
-    console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
+    console.log("Updating role for user:", selectedUser.user_id, "to role:", selectedUser.role);
 
     const { error } = await supabase
-      .from('user_roles')
-      .update({ role: selectedUser.role })
-      .eq('user_id', selectedUser.user_id);
+      .from('user_roles') // Updating the correct table
+      .update({ role: selectedUser.role }) 
+      .eq('user_id', selectedUser.user_id); // Match by user_id
 
     if (error) {
       console.error('Error updating role:', error);
       return;
     }
 
-    // Refresh user list after update
-    const { data, error: fetchError } = await supabase.rpc('fetch_users');
-    if (fetchError) {
-      console.error('Error fetching updated users:', fetchError);
-    } else {
-      setUsers(data);
-    }
-
+    console.log('Role update successful!');
+    fetchUsers();
     setShowModal(false);
   };
 
-  // ----------------------
-  // Filtering Logic
-  // ----------------------
+  const toggleUserStatus = async () => {
+    if (!selectedUser) return;
 
-  /**
-   * Filters users based on search term and selected role.
-   */
-  const filteredUsers = users.filter(
-    (user) =>
-      (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedRole === '' || user.role === selectedRole)
-  );
+    const newStatus = selectedUser.account_status === 'Active' ? 'Deactivated' : 'Active';
 
-  // ----------------------
-  // Render
-  // ----------------------
+    const { error } = await supabase
+      .from('profiles')
+      .update({ account_status: newStatus })
+      .eq('id', selectedUser.user_id);
+
+    if (error) {
+      console.error(`Error changing status to ${newStatus}:`, error);
+      alert(`Failed to ${newStatus.toLowerCase()} the user.`);
+      return;
+    }
+
+    console.log(`User ${newStatus.toLowerCase()} successfully!`);
+    fetchUsers();
+    setShowDeactivateModal(false);
+  };
+
+  const filteredUsers = users
+    .filter(
+      (user) =>
+        (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedRole === '' || user.role === selectedRole)
+    )
+    .sort((a, b) => {
+      if (a.account_status === 'Deactivated' && b.account_status !== 'Deactivated') return 1;
+      if (a.account_status !== 'Deactivated' && b.account_status === 'Deactivated') return -1;
+      return 0;
+    });
 
   return (
     <div className='container text-center'>
@@ -159,7 +169,11 @@ const AdminDashboard = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+        <select
+          className='form-select w-25'
+          value={selectedRole}
+          onChange={(e) => setSelectedRole(e.target.value)}
+        >
           <option value=''>All Roles</option>
           {roles.map((role) => (
             <option key={role} value={role}>
@@ -176,15 +190,20 @@ const AdminDashboard = () => {
             <th>Display Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredUsers.map((user) => (
-            <tr key={user.user_id}>
+            <tr
+              key={user.user_id}
+              className={user.account_status === 'Deactivated' ? 'deactivated' : ''}
+            >
               <td>{user.display_name}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
+              <td>{user.account_status}</td>
               <td>
                 <button
                   className='btn btn-primary btn-sm me-2'
@@ -199,10 +218,10 @@ const AdminDashboard = () => {
                   className='btn btn-danger btn-sm'
                   onClick={() => {
                     setSelectedUser(user);
-                    setShowDeleteModal(true);
+                    setShowDeactivateModal(true);
                   }}
                 >
-                  Delete
+                  {user.account_status === 'Active' ? 'Deactivate' : 'Activate'}
                 </button>
               </td>
             </tr>
@@ -262,26 +281,35 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Delete Modal (Logic not yet implemented) */}
-      {showDeleteModal && selectedUser && (
+      {showDeactivateModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
             <div className='modal-content rounded shadow-lg'>
               <div className='modal-header bg-danger text-white'>
-                <h5 className='modal-title'>Confirm Delete</h5>
-                <button type='button' className='btn-close' onClick={() => setShowDeleteModal(false)}></button>
+                <h5 className='modal-title'>
+                  Confirm {selectedUser.account_status === 'Active' ? 'Deactivation' : 'Activation'}
+                </h5>
+                <button type='button' className='btn-close' onClick={() => setShowDeactivateModal(false)}></button>
               </div>
-              <div className='modal-body text-center'>
-                <p>
-                  Are you sure you want to delete <strong>{selectedUser.display_name}</strong>?
-                </p>
+              <div className='modal-body text-start'>
+                <div className='p-3 border rounded mb-3'>
+                  <p className='mb-2'>
+                    <strong>ID:</strong> {selectedUser.user_id}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Display Name:</strong> {selectedUser.display_name}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Email:</strong> {selectedUser.email}
+                  </p>
+                </div>
               </div>
               <div className='modal-footer'>
-                <button type='button' className='btn btn-secondary' onClick={() => setShowDeleteModal(false)}>
-                  Cancel
+                <button type='button' className='btn btn-secondary' onClick={() => setShowDeactivateModal(false)}>
+                  Close
                 </button>
-                <button type='button' className='btn btn-danger'>
-                  Delete
+                <button type='button' className='btn btn-danger' onClick={toggleUserStatus}>
+                  {selectedUser.account_status === 'Active' ? 'Deactivate' : 'Activate'}
                 </button>
               </div>
             </div>
