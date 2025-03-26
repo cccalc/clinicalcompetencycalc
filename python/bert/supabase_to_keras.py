@@ -12,8 +12,10 @@ from utils import augmentData, equalizeClasses, exportKerasFolder, querySupabase
 
 def main(args: argparse.Namespace) -> None:
   '''
-  Converts the supabase dataset to a keras dataset.
+  Convert Supabase training data to Keras dataset.
   '''
+
+  folder_path = os.path.join(os.getcwd(), 'data', 'keras')
 
   # Get arguments
   force = args.force
@@ -35,10 +37,10 @@ def main(args: argparse.Namespace) -> None:
       dataset_name += '-eq'
 
   # Handle if dataset already exists
-  if os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', dataset_name)) and not force:
+  if os.path.exists(os.path.join(folder_path, dataset_name)) and not force:
     suffix = 1
     new_dataset_name = f"{dataset_name}_{suffix}"
-    while os.path.exists(os.path.join(os.getcwd(), 'data', 'keras', new_dataset_name)):
+    while os.path.exists(os.path.join(folder_path, new_dataset_name)):
       suffix += 1
       new_dataset_name = f"{dataset_name}_{suffix}"
     dataset_name = new_dataset_name
@@ -72,7 +74,7 @@ def main(args: argparse.Namespace) -> None:
   if augment_count > 0:
     train_df = augmentData(train_df, samples=augment_count, verbose=verbose)
 
-  keras_directory = os.path.join(os.getcwd(), 'data', 'keras', dataset_name)
+  keras_directory = os.path.join(folder_path, dataset_name)
   exportKerasFolder(train_df, val_df, test_df, keras_directory,
                     verbose=verbose, dry_run=args.dry_run, force=force)
 
@@ -85,24 +87,24 @@ def main(args: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='''
-      Convert supabase dataset to keras dataset.
+      Convert Supabase training data to Keras dataset.
       The dataset will be saved in "./data/keras/<dataset_name>".
       ''')
 
-  parser.add_argument('-f', '--force',
-                      help='force overwrite if destination folder exists', action='store_true')
+  parser.add_argument('-f', '--force', action='store_true',
+                      help='force overwrite if destination folder exists')
   parser.add_argument('-s', '--split', type=float, default=0.8,
                       help='specify a training split; default is 0.8')
-  parser.add_argument('-v', '--verbose',
-                      help='verbose output', action='store_true')
+  parser.add_argument('-v', '--verbose', action='store_true',
+                      help='verbose output')
 
   parser.add_argument('--augment-count', type=int, default=0,
                       help='number of augmented samples to generate using synonyms')
   parser.add_argument('--ds_name', type=str, default=None,
                       help='custom dataset name; default is <yymmdd>-<split>[-aug][-eq]')
-  parser.add_argument('--dry-run',
-                      help='run through the program without writing any files', action='store_true')
-  parser.add_argument('--equalize',
-                      help='equalize the number of samples in each class', action='store_true')
+  parser.add_argument('--dry-run', action='store_true',
+                      help='run through the program without writing any files')
+  parser.add_argument('--equalize', action='store_true',
+                      help='equalize the number of samples in each class')
 
   main(parser.parse_args())

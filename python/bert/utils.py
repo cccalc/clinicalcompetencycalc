@@ -267,7 +267,8 @@ def exportKerasFolder(
       print(f'Would create folder {destination}...')
 
   if verbose:
-    print(f'Exporting {len(train_df)} training, {len(val_df)} validation, and {len(test_df)} testing samples ({len(train_df) + len(val_df) + len(test_df)} total)...')
+    print(f'Exporting {len(train_df)} training, {len(val_df)} validation, and {len(test_df)} '
+          f'testing samples ({len(train_df) + len(val_df) + len(test_df)} total)...')
 
   for df, split in [(train_df, 'train'), (val_df, 'validate'), (test_df, 'test')]:
     for c in classes:
@@ -281,3 +282,47 @@ def exportKerasFolder(
         for i, row in class_df.iterrows():
           with open(os.path.join(destination, split, class_names[c], f'{i}.txt'), 'w') as f:
             f.write(row[text_col_label])
+
+
+def exportDfPickle(
+    df: pd.DataFrame,
+    destination: str,
+    verbose: bool = False,
+    dry_run: bool = False,
+    force: bool = False,
+) -> None:
+  '''
+  Export the DataFrame to a pickle file.
+
+  :param df: The DataFrame to export.
+  :type df: DataFrame
+
+  :param destination: The destination file.
+  :type destination: str
+
+  :param verbose: If True, print verbose output. Defaults to False.
+  :type verbose: bool
+
+  :param dry_run: If True, do not write any files. Defaults to False.
+  :type dry_run: bool
+
+  :param force: If True, force overwrite the destination file. Defaults to False.
+  :type force: bool
+  '''
+
+  if os.path.exists(destination):
+    if force:
+      if verbose:
+        print(f'Removing existing file {destination}...')
+      os.remove(destination)
+    else:
+      raise ValueError(
+          f'Destination file {destination} already exists. Use --force to overwrite.')
+
+  if not dry_run:
+    if verbose:
+      print(f'Exporting DataFrame to {destination}...')
+    df.to_pickle(destination)
+  else:
+    if verbose:
+      print(f'Would export DataFrame to {destination}')
