@@ -4,37 +4,6 @@ import StudentDashboard from '../src/components/(StudentComponents)/studentDashb
 import React from 'react';
 import { createClient } from '@/utils/supabase/client';
 
-// // Mocking components that are imported in StudentDashboard
-// jest.mock('../src/components/(StudentComponents)/EPACard', () => ({
-//   __esModule: true,
-//   default: ({ epa, onClick }) => (
-//     <div data-testid={`epacard-${epa.epa}`} onClick={() => onClick(epa)}>
-//       {epa.title}
-//     </div>
-//   ),
-// }));
-
-// jest.mock('../src/components/(StudentComponents)/EPAModal', () => ({
-//   __esModule: true,
-//   default: ({ selectedEpa, onClose }) => (
-//     <div>
-//       <div data-testid="epamodal">
-//         {selectedEpa?.title ?? 'No EPA selected'}
-//       </div>
-//       <button onClick={onClose}>Close</button>
-//     </div>
-//   ),
-// }));
-
-// jest.mock('../src/components/(StudentComponents)/ToggleControl', () => ({
-//   __esModule: true,
-//   default: ({ selected, onSelect }) => (
-//     <div>
-//       <button onClick={() => onSelect(6)}>{selected}</button>
-//     </div>
-//   ),
-// }));
-
 describe('StudentDashboard', () => {
   test('renders EPACards and toggles range', async () => {
     const supabase = createClient();
