@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -32,32 +31,50 @@ const AdminDashboard = () => {
     display_name: string;
   }
 
+<<<<<<< HEAD
   /**
    * Represents a role object from the `roles` table.
    */
+=======
+  interface Profile {
+    id: string;
+    account_status: string;
+  }
+
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
   interface Role {
     role: string;
   }
 
+<<<<<<< HEAD
   // ----------------------
   // State
   // ----------------------
 
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
+=======
+  const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User & { account_status: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
+<<<<<<< HEAD
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const router = useRouter();
+=======
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
 
   // ----------------------
   // Data Fetching
   // ----------------------
 
   useEffect(() => {
+<<<<<<< HEAD
     /**
      * Fetch all users from the database using a stored procedure.
      */
@@ -82,9 +99,51 @@ const AdminDashboard = () => {
       }
     };
 
+=======
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
     fetchUsers();
     fetchRoles();
-  }, [router]);
+  })
+
+  const fetchUsers = async () => {
+    try {
+      const { data: users, error: usersError } = await supabase.rpc('fetch_users');
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        return;
+      }
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, account_status');
+
+      if (profilesError) {
+        console.error('Error fetching account statuses:', profilesError);
+        return;
+      }
+
+      const usersWithStatus = users.map((user: User) => {
+        const profile = profiles.find((profile: Profile) => profile.id === user.user_id);
+        return {
+          ...user,
+          account_status: profile ? profile.account_status : 'Active',
+        };
+      });
+
+      setUsers(usersWithStatus);
+    } catch (err) {
+      console.error('Unexpected error:', err);
+    }
+  };
+
+  const fetchRoles = async () => {
+    const { data, error } = await supabase.from('roles').select('role');
+    if (error) {
+      console.error('Error fetching roles:', error);
+    } else {
+      setRoles(data.map((role: Role) => role.role));
+    }
+  };
 
   // ----------------------
   // Role Update Logic
@@ -105,8 +164,11 @@ const AdminDashboard = () => {
   const updateUserRole = async () => {
     if (!selectedUser) return;
 
+<<<<<<< HEAD
     console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
 
+=======
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
     const { error } = await supabase
       .from('user_roles')
       .update({ role: selectedUser.role })
@@ -117,6 +179,7 @@ const AdminDashboard = () => {
       return;
     }
 
+<<<<<<< HEAD
     // Refresh user list after update
     const { data, error: fetchError } = await supabase.rpc('fetch_users');
     if (fetchError) {
@@ -141,6 +204,46 @@ const AdminDashboard = () => {
         user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (selectedRole === '' || user.role === selectedRole)
   );
+=======
+    console.log('Role update successful!');
+    fetchUsers();
+    setShowModal(false);
+  };
+
+  const toggleUserStatus = async () => {
+    if (!selectedUser) return;
+
+    const newStatus = selectedUser.account_status === 'Active' ? 'Deactivated' : 'Active';
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ account_status: newStatus })
+      .eq('id', selectedUser.user_id);
+
+    if (error) {
+      console.error(`Error changing status to ${newStatus}:`, error);
+      alert(`Failed to ${newStatus.toLowerCase()} the user.`);
+      return;
+    }
+
+    console.log(`User ${newStatus.toLowerCase()} successfully!`);
+    fetchUsers();
+    setShowDeactivateModal(false);
+  };
+
+  const filteredUsers = users
+    .filter(
+      (user) =>
+        (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedRole === '' || user.role === selectedRole)
+    )
+    .sort((a, b) => {
+      if (a.account_status === 'Deactivated' && b.account_status !== 'Deactivated') return 1;
+      if (a.account_status !== 'Deactivated' && b.account_status === 'Deactivated') return -1;
+      return 0;
+    });
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
 
   // ----------------------
   // Render
@@ -159,7 +262,11 @@ const AdminDashboard = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+        <select
+          className='form-select w-25'
+          value={selectedRole}
+          onChange={(e) => setSelectedRole(e.target.value)}
+        >
           <option value=''>All Roles</option>
           {roles.map((role) => (
             <option key={role} value={role}>
@@ -176,15 +283,20 @@ const AdminDashboard = () => {
             <th>Display Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredUsers.map((user) => (
-            <tr key={user.user_id}>
+            <tr
+              key={user.user_id}
+              className={user.account_status === 'Deactivated' ? 'deactivated' : ''}
+            >
               <td>{user.display_name}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
+              <td>{user.account_status}</td>
               <td>
                 <button
                   className='btn btn-primary btn-sm me-2'
@@ -199,10 +311,10 @@ const AdminDashboard = () => {
                   className='btn btn-danger btn-sm'
                   onClick={() => {
                     setSelectedUser(user);
-                    setShowDeleteModal(true);
+                    setShowDeactivateModal(true);
                   }}
                 >
-                  Delete
+                  {user.account_status === 'Active' ? 'Deactivate' : 'Activate'}
                 </button>
               </td>
             </tr>
@@ -210,7 +322,11 @@ const AdminDashboard = () => {
         </tbody>
       </table>
 
+<<<<<<< HEAD
       {/* Edit Role Modal */}
+=======
+      {/* Edit Modal */}
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
       {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -262,26 +378,40 @@ const AdminDashboard = () => {
         </div>
       )}
 
+<<<<<<< HEAD
       {/* Delete Modal (Logic not yet implemented) */}
       {showDeleteModal && selectedUser && (
+=======
+      {showDeactivateModal && selectedUser && (
+>>>>>>> c12ed0e5fd56a8ab9e162c5a15cc0b26b27d4a2d
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
             <div className='modal-content rounded shadow-lg'>
               <div className='modal-header bg-danger text-white'>
-                <h5 className='modal-title'>Confirm Delete</h5>
-                <button type='button' className='btn-close' onClick={() => setShowDeleteModal(false)}></button>
+                <h5 className='modal-title'>
+                  Confirm {selectedUser.account_status === 'Active' ? 'Deactivation' : 'Activation'}
+                </h5>
+                <button type='button' className='btn-close' onClick={() => setShowDeactivateModal(false)}></button>
               </div>
-              <div className='modal-body text-center'>
-                <p>
-                  Are you sure you want to delete <strong>{selectedUser.display_name}</strong>?
-                </p>
+              <div className='modal-body text-start'>
+                <div className='p-3 border rounded mb-3'>
+                  <p className='mb-2'>
+                    <strong>ID:</strong> {selectedUser.user_id}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Display Name:</strong> {selectedUser.display_name}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Email:</strong> {selectedUser.email}
+                  </p>
+                </div>
               </div>
               <div className='modal-footer'>
-                <button type='button' className='btn btn-secondary' onClick={() => setShowDeleteModal(false)}>
-                  Cancel
+                <button type='button' className='btn btn-secondary' onClick={() => setShowDeactivateModal(false)}>
+                  Close
                 </button>
-                <button type='button' className='btn btn-danger'>
-                  Delete
+                <button type='button' className='btn btn-danger' onClick={toggleUserStatus}>
+                  {selectedUser.account_status === 'Active' ? 'Deactivate' : 'Activate'}
                 </button>
               </div>
             </div>

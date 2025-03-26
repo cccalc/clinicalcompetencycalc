@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./",  // Base path for resolving modules
+      "paths": {
+          "@/*": ["frontend/src/*"]  // Adjust path to resolve correctly within 'frontend/src'
+        },
+      "jsx": "react-jsx",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "esModuleInterop": true
+    },
+    "include": [
+      "frontend/src/*",  // Include the entire 'frontend/src' folder
+      "testing/custom.d.ts"
+    ]
+  }
+  

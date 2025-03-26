@@ -4,12 +4,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
-
-import logo from '@/components/ccc-logo-color.svg';
+import { createClient } from '@/utils/supabase/client';
+import logo from '../components/ccc-logo-color.svg';
 import { useUser } from '@/context/UserContext';
 
 /**
  * Header component
+ *
  *
  * Renders the top navigation bar with dynamic links based on the user's role.
  * Includes:
@@ -17,6 +18,7 @@ import { useUser } from '@/context/UserContext';
  * - Role-specific navigation links (Admin, Rater, Student)
  * - Profile dropdown for name/email, settings, and logout
  */
+const supabase = createClient();
 const Header = () => {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -59,6 +61,31 @@ const Header = () => {
    */
   const handleSaveChanges = async () => {
     // Implement update logic (e.g., update Supabase profile)
+    if (!user) return; // Ensure user is authenticated
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: editedDisplayName })
+        .eq('id', user.id); 
+
+      if (error) throw error;
+
+      const { data: updatedProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      setEditedDisplayName(updatedProfile?.display_name ?? '');
+
+      alert('Display name updated successfully!');
+    } catch (error) {
+      console.error('Error updating display name:', error);
+      alert('Failed to update display name.');
+    }
   };
 
   /**

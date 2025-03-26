@@ -1,0 +1,81 @@
+// src/components/StudentDashboard.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import StudentDashboard from '../src/components/(StudentComponents)/studentDashboard';
+import React from 'react';
+import { createClient } from '@/utils/supabase/client';
+
+// // Mocking components that are imported in StudentDashboard
+// jest.mock('../src/components/(StudentComponents)/EPACard', () => ({
+//   __esModule: true,
+//   default: ({ epa, onClick }) => (
+//     <div data-testid={`epacard-${epa.epa}`} onClick={() => onClick(epa)}>
+//       {epa.title}
+//     </div>
+//   ),
+// }));
+
+// jest.mock('../src/components/(StudentComponents)/EPAModal', () => ({
+//   __esModule: true,
+//   default: ({ selectedEpa, onClose }) => (
+//     <div>
+//       <div data-testid="epamodal">
+//         {selectedEpa?.title ?? 'No EPA selected'}
+//       </div>
+//       <button onClick={onClose}>Close</button>
+//     </div>
+//   ),
+// }));
+
+// jest.mock('../src/components/(StudentComponents)/ToggleControl', () => ({
+//   __esModule: true,
+//   default: ({ selected, onSelect }) => (
+//     <div>
+//       <button onClick={() => onSelect(6)}>{selected}</button>
+//     </div>
+//   ),
+// }));
+
+describe('StudentDashboard', () => {
+  test('renders EPACards and toggles range', async () => {
+    const supabase = createClient();
+    try {
+        // Log in the user
+        const { } = await supabase.auth.signInWithPassword({
+          email: "tyler101price@gmail.com",
+          password: "Fireball",
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    render(<StudentDashboard />);
+      // Will give an error because this account is not a student.
+      // So there are no epa descriptions.
+      // Need to get student account.
+
+
+    // Test if the EPACards are rendered (assuming `generateDummyData` generates data)
+    // const epaCard = screen.getByTestId('remedial');
+    // expect(epaCard).toBeInTheDocument();
+
+    // Test if the range toggles
+    // const toggleButton = screen.getByText('3');
+    // fireEvent.click(toggleButton);
+    // expect(toggleButton).toHaveTextContent('6');
+  });
+
+//   test('opens and closes the modal', () => {
+//     render(<StudentDashboard />);
+
+//     // Trigger a click on the EPA card
+//     const epaCard = screen.getByTestId('epacard-1');
+//     fireEvent.click(epaCard);
+
+//     // Check if the modal shows the correct data
+//     expect(screen.getByTestId('epamodal')).toHaveTextContent('No EPA selected'); // This will change based on your data
+
+//     // Close the modal
+//     const closeButton = screen.getByText('Close');
+//     fireEvent.click(closeButton);
+//     expect(screen.queryByTestId('epamodal')).toBeNull();
+//   });
+});

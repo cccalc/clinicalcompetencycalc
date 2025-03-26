@@ -77,7 +77,8 @@ const FormRequests = () => {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, display_name')
-        .in('id', userIds);
+        .in('id', userIds)
+        .eq('account_status', 'Active'); // Ensures only active profiles are retrieved
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError.message);
@@ -86,7 +87,8 @@ const FormRequests = () => {
 
       const usersWithNames = userRoles.map((user) => ({
         user_id: user.user_id,
-        display_name: profiles.find((profile) => profile.id === user.user_id)?.display_name || 'Unknown',
+        display_name:
+          profiles.find((profile) => profile.id === user.user_id)?.display_name || 'Unknown',
       }));
 
       setUsers(usersWithNames);
@@ -125,9 +127,9 @@ const FormRequests = () => {
 
     const { error } = await supabase.from('form_requests').insert([
       {
-        student_id: studentId,
-        notes: details,
-        completed_by: faculty,
+        student_id: studentId, 
+        notes: details, 
+        completed_by: faculty, 
       },
     ]);
 
