@@ -74,3 +74,4 @@ server/socketio/node_modules/
 .venv/
 server/socketio/node_modules/
 server/express/node_modules/
+**/node_modules
