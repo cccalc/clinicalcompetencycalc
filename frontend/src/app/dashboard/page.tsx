@@ -56,29 +56,6 @@ const Dashboard = () => {
     return <p>No role assigned.</p>;
   };
 
-  const renderDashboard = () => {
-    if (userRoleDev) {
-      switch (devView) {
-        case 'admin':
-          return <AdminDashboardPage />;
-        case 'rater':
-          return <RaterDashboard />;
-        case 'student':
-          return <StudentDashboard />;
-      }
-    }
-
-    if (userRoleAuthorized) {
-      return <AdminDashboardPage />;
-    } else if (userRoleRater) {
-      return <RaterDashboard />;
-    } else if (userRoleStudent) {
-      return <StudentDashboard />;
-    }
-
-    return <p>No role assigned.</p>;
-  };
-
   return (
     <main className='container mx-auto p-4'>
       {/* Greeting */}
