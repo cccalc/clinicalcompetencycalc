@@ -1,11 +1,11 @@
 'use client';
 
-import AdminDashboard from '@/components/adminDashboard';
+import Notifications from '@/components/(AdminComponents)/notifications';
 
 const AdminDashboardPage = () => {
   return (
     <>
-      <AdminDashboard />
+      <Notifications />
     </>
   );
 };
