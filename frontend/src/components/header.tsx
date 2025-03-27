@@ -3,205 +3,218 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-import logo from '@/components/ccc-logo-color.svg'; // Update the path to your logo
-import { supabase_authorize } from '@/utils/async-util';
+import { useRef, useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-
-// import { isAdmin } from '@/utils/supabase/roles';
-
+import logo from '@/components/ccc-logo-color.svg';
+import { useUser } from '@/context/UserContext';
 const supabase = createClient();
-
+/**
+ * Header component
+ *
+ * Renders the top navigation bar with dynamic links based on the user's role.
+ * Includes:
+ * - Logo and app name
+ * - Role-specific navigation links (Admin, Rater, Student)
+ * - Profile dropdown for name/email, settings, and logout
+ */
 const Header = () => {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [displayName, setDisplayName] = useState('');
-  const [email, setEmail] = useState('');
-  const [originalDisplayName, setOriginalDisplayName] = useState('');
-  const [isChanged, setIsChanged] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const [user_roleAuthorized, setUser_roleAuthorized] = useState(false);
+  const { user, displayName, email, userRoleAuthorized, userRoleRater, userRoleStudent, userRoleDev } = useUser();
 
-  const fetchProfile = useCallback(async () => {
-    try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
-      if (!data?.user) throw new Error('No user');
+  const [editedDisplayName, setEditedDisplayName] = useState(displayName);
+  const [isChanged, setIsChanged] = useState(false);
 
-      setEmail(data.user.email ?? '');
+  // Role shorthand booleans
+  const isDev = userRoleDev;
+  const isOnlyStudent = userRoleStudent && !isDev && !userRoleRater && !userRoleAuthorized;
+  const isOnlyRater = userRoleRater && !isDev && !userRoleAuthorized;
+  const isOnlyAuthorized = userRoleAuthorized && !isDev;
 
-      const {
-        data: profileData,
-        error: profileError,
-        status,
-      } = await supabase.from('profiles').select('display_name').eq('id', data.user.id).single();
-
-      if (profileError && status !== 406) {
-        console.log(profileError);
-        throw profileError;
-      }
-
-      if (profileData) {
-        setDisplayName(profileData.display_name);
-        setOriginalDisplayName(profileData.display_name);
-      }
-
-      // const isAdminUser = await isAdmin(data.user.id);
-      // setIsAdminUser(isAdminUser);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error loading user data:', error.message);
-      } else {
-        console.error('Error loading user data:', String(error));
-      }
-      alert(`Error loading user data: ${JSON.stringify(error)}`);
-    }
-  }, []);
-
+  /**
+   * Update local editable display name when the user's name changes.
+   */
   useEffect(() => {
-    console.log('Checking user role authorization...');
-    supabase_authorize(['user_roles.select', 'user_roles.insert']).then((result) => {
-      setUser_roleAuthorized(result);
-    });
-  }, [email]);
+    setEditedDisplayName(displayName);
+  }, [displayName]);
 
+  /**
+   * Detect whether the display name input was changed.
+   */
   useEffect(() => {
-    fetchProfile();
+    setIsChanged(editedDisplayName !== displayName);
+  }, [editedDisplayName, displayName]);
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        fetchProfile();
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [fetchProfile]);
-
+  /**
+   * Toggles the visibility of the profile dropdown menu.
+   */
   const toggleProfileMenu = () => {
-    setShowProfileMenu(!showProfileMenu);
+    setShowProfileMenu((prev) => !prev);
   };
 
+  /**
+   * Handles saving updated profile info (to be implemented).
+   */
   const handleSaveChanges = async () => {
+    if (!user) return; // Ensure user is authenticated
+
     try {
-      const { data, error } = await supabase.auth.getUser();
+      const { error } = await supabase.from('profiles').update({ display_name: editedDisplayName }).eq('id', user.id);
+
       if (error) throw error;
-      if (!data?.user) throw new Error('No user');
 
-      const updates = {
-        id: data.user.id,
-        display_name: displayName,
-        updated_at: new Date().toISOString(),
-      };
+      const { data: updatedProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
 
-      const { error: updateError } = await supabase.from('profiles').upsert(updates);
-      if (updateError) throw updateError;
+      if (fetchError) throw fetchError;
 
-      setOriginalDisplayName(displayName);
-      setIsChanged(false);
-      alert('Profile updated successfully');
+      setEditedDisplayName(updatedProfile?.display_name ?? '');
+
+      alert('Display name updated successfully!');
     } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error updating profile:', error.message);
-      } else {
-        console.error('Error updating profile:', String(error));
-      }
-      alert(`Error updating profile: ${JSON.stringify(error)}`);
+      console.error('Error updating display name:', error);
+      alert('Failed to update display name.');
     }
+    // Implement update logic (e.g., update Supabase profile)
   };
 
+  /**
+   * Closes the dropdown if clicking outside of it.
+   */
   useEffect(() => {
-    setIsChanged(displayName !== originalDisplayName);
-  }, [displayName, originalDisplayName]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleOutsideClick = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setShowProfileMenu(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    } else {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    }
+
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
-  }, [profileMenuRef]);
+  }, [showProfileMenu]);
 
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
-      <div className='container mx-auto d-flex justify-content-between align-items-center'>
-        <Link href='/' className='d-flex align-items-center text-decoration-none'>
+      <div className='container mx-auto d-flex justify-content-between align-items-center flex-wrap'>
+        {/* Logo and app name */}
+        <Link href='/dashboard' className='d-flex align-items-center text-decoration-none'>
           <Image src={logo} alt='Logo' width={40} height={40} />
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
-        <nav className='d-flex gap-3 align-items-center'>
-          {user_roleAuthorized ? (
+
+        {/* Navigation links */}
+        <nav className='d-flex gap-3 align-items-center flex-wrap'>
+          {user ? (
             <>
-              <Link
-                href='/admin-dashboard'
-                className={`btn ${pathname === '/admin-dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                Admin Dashboard
-              </Link>
-              <Link
-                href='/all-reports'
-                className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                All Reports
-              </Link>
+              {/* Student View */}
+              {(isOnlyStudent || isDev) && (
+                <>
+                  <Link
+                    href='/dashboard'
+                    className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href='/dashboard/student/form-requests'
+                    className={`btn ${
+                      pathname === '/dashboard/student/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Request Assessment
+                  </Link>
+                  <Link
+                    href='/dashboard/student/report'
+                    className={`btn ${
+                      pathname === '/dashboard/student/report' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Comprehensive Report
+                  </Link>
+                </>
+              )}
+
+              {/* Admin View */}
+              {(isOnlyAuthorized || isDev) && (
+                <>
+                  <Link
+                    href='/dashboard/admin/userList'
+                    className={`btn ${
+                      pathname === '/dashboard/admin/userList' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Manage Users
+                  </Link>
+                  <Link
+                    href='/all-reports'
+                    className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                  >
+                    All Reports
+                  </Link>
+                </>
+              )}
+
+              {/* Rater View */}
+              {(isOnlyRater || isDev) && (
+                <>
+                  <Link
+                    href='/dashboard/rater/form'
+                    className={`btn ${
+                      pathname === '/dashboard/rater/form' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Form
+                  </Link>
+                </>
+              )}
+
+              {/* 🔹 Profile Dropdown */}
+              <div className='dropdown' ref={profileMenuRef}>
+                <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
+                  <i className='bi bi-person-circle'></i>
+                </button>
+                {showProfileMenu && (
+                  <ul className='dropdown-menu dropdown-menu-end show'>
+                    <li className='dropdown-item-text text-center no-select'>
+                      <strong className='no-pointer'>{displayName || 'User'}</strong>
+                      <br />
+                      <small className='text-muted no-pointer'>{email}</small>
+                    </li>
+                    <li>
+                      <hr className='dropdown-divider' />
+                    </li>
+                    <li>
+                      <button className='dropdown-item' data-bs-toggle='modal' data-bs-target='#profileModal'>
+                        Profile Settings
+                      </button>
+                    </li>
+                    <li>
+                      <form action='/auth/signout' method='post'>
+                        <button className='dropdown-item' type='submit'>
+                          Logout
+                        </button>
+                      </form>
+                    </li>
+                  </ul>
+                )}
+              </div>
             </>
-          ) : (
-            <>
-              <Link
-                href='/dashboard'
-                className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href='/form-requests'
-                className={`btn ${pathname === '/form-requests' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                Form Requests
-              </Link>
-              <Link
-                href='/report'
-                className={`btn ${pathname === '/report' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              >
-                Report
-              </Link>
-            </>
-          )}
-          <div className='dropdown' ref={profileMenuRef}>
-            <button className='btn btn-outline-secondary dropdown-toggle' type='button' onClick={toggleProfileMenu}>
-              <i className='bi bi-person-circle'></i>
-            </button>
-            {showProfileMenu && (
-              <ul className='dropdown-menu dropdown-menu-end show'>
-                <li>
-                  <button className='dropdown-item' data-bs-toggle='modal' data-bs-target='#profileModal'>
-                    Profile Settings
-                  </button>
-                </li>
-                <li>
-                  <form action='/auth/signout' method='post'>
-                    <button className='dropdown-item' type='submit'>
-                      Logout
-                    </button>
-                  </form>
-                </li>
-              </ul>
-            )}
-          </div>
+          ) : null}
         </nav>
       </div>
 
-      {/* Profile Settings Modal */}
+      {/* 🔹 Profile Settings Modal */}
       <div
         className='modal fade'
         id='profileModal'
@@ -227,8 +240,8 @@ const Header = () => {
                     type='text'
                     className='form-control'
                     id='displayName'
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    value={editedDisplayName}
+                    onChange={(e) => setEditedDisplayName(e.target.value)}
                   />
                 </div>
                 <div className='mb-3'>

@@ -1,27 +1,40 @@
 'use client';
 
 import Image from 'next/image';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import logo from '@/components/ccc-logo-color.svg';
-
 import { login, signup } from './actions';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Login() {
   const [emailValidationClass, setEmailValidationClass] = useState<string>('');
   const [passwordValidationClass, setPasswordValidationClass] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [alertColor, setAlertColor] = useState<string>('');
+  const router = useRouter();
+  const supabase = createClient();
 
-  const validate = (e: SyntheticEvent, f: (formData: FormData) => Promise<{ alertColor: string; error: string }>) => {
-    console.log(f.name);
+  useEffect(() => {
+    if (localStorage.getItem('redirectToDashboard') === 'true') {
+      localStorage.removeItem('redirectToDashboard');
+      router.push('/dashboard');
+    }
+  }, [router]);
 
+  const validate = async (
+    e: SyntheticEvent,
+    authFunction: (formData: FormData) => Promise<{ alertColor: string; error: string }>
+  ) => {
+    e.preventDefault();
     let valid = true;
 
     const form = (e.target as HTMLButtonElement).form as HTMLFormElement;
-    const email = form.email.value;
+    const email = form.email.value.trim();
     const password = form.password.value;
 
+    // 🔹 Validate email
     if (typeof email !== 'string' || email.length === 0 || !email.includes('@')) {
       valid = false;
       setEmailValidationClass('is-invalid');
@@ -29,6 +42,7 @@ export default function Login() {
       setEmailValidationClass('is-valid');
     }
 
+    // 🔹 Validate password
     if (typeof password !== 'string' || password.length < 8) {
       valid = false;
       setPasswordValidationClass('is-invalid');
@@ -40,10 +54,18 @@ export default function Login() {
       const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
-      f(formData).then(({ alertColor, error }) => {
-        if (error) setError(error);
-        if (alertColor) setAlertColor(alertColor);
-      });
+
+      const { alertColor, error } = await authFunction(formData);
+      setAlertColor(alertColor);
+      setError(error);
+
+      if (!error) {
+        // ✅ Ensure session updates properly
+        await supabase.auth.getSession();
+
+        window.location.reload();
+        localStorage.setItem('redirectToDashboard', 'true');
+      }
     }
   };
 
@@ -54,9 +76,9 @@ export default function Login() {
           <Image className='mb-3' src={logo} height={32} alt='CCC logo' />
         </span>
         <h1 className='fs-2'>Clinical Competency Calculator</h1>
-        <p className='fs-3'>MCQ Sample Collection</p>
       </div>
       <form id='login-form' className='needs-validation' noValidate onSubmit={(e) => e.preventDefault()}>
+        {/* Email Input */}
         <div className='form-floating mb-3'>
           <input
             id='email'
@@ -75,6 +97,8 @@ export default function Login() {
           </label>
           <div className='invalid-feedback'>Please enter a valid email address.</div>
         </div>
+
+        {/* Password Input */}
         <div className='form-floating mb-3'>
           <input
             id='password'
@@ -96,7 +120,11 @@ export default function Login() {
           </div>
           <div className='invalid-feedback'>Password must be at least 8 characters long.</div>
         </div>
+
+        {/* Error Alert */}
         <div className={`alert alert-${alertColor} ${error ? 'visible' : 'invisible'}`}>{error}</div>
+
+        {/* Buttons */}
         <div className='d-flex justify-content-end gap-2'>
           <button id='signup' className='btn btn-outline-secondary' type='button' onClick={(e) => validate(e, signup)}>
             Sign Up
