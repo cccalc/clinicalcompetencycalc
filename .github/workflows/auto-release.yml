@@ -22,16 +22,13 @@ jobs:
       - name: Get latest tag
         id: previous_tag
         run: |
-          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-beta)?$' | sed -n 2p)
+          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n 2p)
           echo "current=$PREV_TAG" >> $GITHUB_OUTPUT
 
           if [ -z "$PREV_TAG" ]; then
           echo "No previous tag found, skipping release."
           exit 0
           fi
-
-          # Ensure -beta is removed from the previous tag
-          PREV_TAG_CLEAN=$(echo "$PREV_TAG" | sed 's/-beta$//')
           
           echo "Previous tag (cleaned): $PREV_TAG_CLEAN"
           echo "previous=$PREV_TAG_CLEAN" >> $GITHUB_OUTPUT
@@ -39,13 +36,12 @@ jobs:
       - name: Calculate next version
         id: next_version
         run: |
-          PREV_TAG_CLEAN="${{ steps.previous_tag.outputs.previous }}"  # Extract previous tag (cleaned)
-          PREV_MAJOR=$(echo "$PREV_TAG_CLEAN" | cut -d'.' -f1 | tr -d 'v')
+          PREV_TAG="${{ steps.previous_tag.outputs.previous }}"  # Extract previous tag (cleaned)
+          PREV_MAJOR=$(echo "$PREV_TAG" | cut -d'.' -f1 | tr -d 'v')
           
           # Get current version from package.json
           CURRENT_TAG="v$(node -p "require('./package.json').version")"
-          CURRENT_TAG_CLEAN=$(echo "$CURRENT_TAG" | sed 's/-beta$//')
-          CUR_MAJOR=$(echo "$CURRENT_TAG_CLEAN" | cut -d'.' -f1 | tr -d 'v')
+          CUR_MAJOR=$(echo "$CURRENT_TAG" | cut -d'.' -f1 | tr -d 'v')
           
           echo "Previous major version: $PREV_MAJOR"
           echo "Current major version: $CUR_MAJOR"
