@@ -131,8 +131,7 @@ max-module-lines = 1000
 [messages control]
 # Only show warnings with the listed confidence levels. Leave empty to show all.
 # Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED.
-confidence = HIGH, CONTROL_FLOW, UNDEFINED
-disable = E1101, W1514
+confidence = HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED
 
 [miscellaneous]
 # List of note tags to take in consideration, separated by a comma.
