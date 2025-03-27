@@ -208,7 +208,6 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/svm.predict.html">svm.predict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/svm.fetch_data.html">svm.fetch_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/svm.train.html">svm.train</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/bert.csv_to_keras.html">bert.csv_to_keras</a></li>
 </ul>
 </li>
 </ul>
@@ -256,60 +255,6 @@
 <p><a class="reference internal" href="model_doc.html#bert"><span class="std std-ref">Read more</span></a> about BERT and the state-of-the-art langauge model.</p>
 <section id="bert-csv-to-keras">
 <h2>bert.csv_to_keras<a class="headerlink" href="#bert-csv-to-keras" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="bert.csv_to_keras.loadLatestCSV">
-<span class="sig-prename descclassname"><span class="pre">bert.csv_to_keras.</span></span><span class="sig-name descname"><span class="pre">loadLatestCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#bert.csv_to_keras.loadLatestCSV" title="Link to this definition">¶</a></dt>
-<dd><p>Load the latest CSV file from a given directory into a pandas DataFrame.
-The CSV filename is expected to be in the format <code class="docutils literal notranslate"><span class="pre">yymmdd.csv</span></code>, and contain the comment string
-and an integer class (0=remedial, …, 3=entrustable).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>directory</strong> (<em>str</em>) – The directory containing the CSV files.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple containing the date (as a string) and the DataFrame.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[str, DataFrame]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="bert.csv_to_keras.exportKerasFolder">
-<span class="sig-prename descclassname"><span class="pre">bert.csv_to_keras.</span></span><span class="sig-name descname"><span class="pre">exportKerasFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#bert.csv_to_keras.exportKerasFolder" title="Link to this definition">¶</a></dt>
-<dd><p>Export the DataFrame to a folder in Keras format.
-The folder will be compatible with <code class="docutils literal notranslate"><span class="pre">keras.utils.text_dataset_from_directory</span></code>.
-The directory structure will be as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>train/
-├── remedial/
-│   ├── 0.txt
-│   ├── 1.txt
-│   └── ...
-├── early_dev/
-│   ├── 0.txt
-│   ├── 1.txt
-│   └── ...
-└── ...
-test/
-├── remedial/
-│   ├── 0.txt
-│   ├── 1.txt
-│   └── ...
-└── ...
-</pre></div>
-</div>
-<p>where each class is a folder, and each file is a text file containing the description.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>DataFrame</em>) – The DataFrame to export.</p></li>
-<li><p><strong>destination</strong> (<em>str</em>) – The destination folder.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="bert-train">
 <h2>bert.train<a class="headerlink" href="#bert-train" title="Link to this heading">¶</a></h2>
@@ -372,11 +317,7 @@ test/
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">BERT Documentation</a><ul>
-<li><a class="reference internal" href="#bert-csv-to-keras">bert.csv_to_keras</a><ul>
-<li><a class="reference internal" href="#bert.csv_to_keras.loadLatestCSV"><code class="docutils literal notranslate"><span class="pre">loadLatestCSV()</span></code></a></li>
-<li><a class="reference internal" href="#bert.csv_to_keras.exportKerasFolder"><code class="docutils literal notranslate"><span class="pre">exportKerasFolder()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#bert-csv-to-keras">bert.csv_to_keras</a></li>
 <li><a class="reference internal" href="#bert-train">bert.train</a></li>
 </ul>
 </li>
