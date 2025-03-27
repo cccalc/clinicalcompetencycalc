@@ -1,38 +1,67 @@
 name: 'Bump Version'
 
 on:
-  pull_request:
-    branches: [ 'main' ]
+  pull_request_review:
+    types: [ submitted ]
 
 jobs:
   bump-version:
-    name: 'Bump Version on master'
+    if: |
+      github.event.review.state == 'approved' &&
+      github.base_ref == 'refs/heads/main'
+    name: 'Bump Version'
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: 'Checkout PR branch'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: 'Fetch latest package.json from main'
+        run: |
+          git fetch origin main
+          git checkout origin/main -- package.json  # Copy the latest package.json from main
+          echo "Updated package.json from main:"
+          cat package.json
+
+      - name: 'Commit and Push Updated package.json to PR branch'
+        if: env.changed == 'true'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          git add package.json
+          git commit -m "ci: sync package.json version from main"
+          git push origin HEAD:${{ github.head_ref }}
+
       - name: 'Checkout source code'
         uses: 'actions/checkout@v2'
         with:
           ref: ${{ github.ref }}
+
       - name: 'cat package.json'
         run: cat ./package.json
+
       - name: 'Automated Version Bump'
         id: version-bump
         uses: 'phips28/gh-action-bump-version@master'
         with:
-          major-wording: 'major, breaking, overhaul, revamp'
-          minor-wording: 'minor, add, added, feat, feature, implement, new, introduced'
-          patch-wording: 'fix, bugfix, patch, workaround, secure, security, correct'
+          major-wording: 'major,breaking,overhaul,revamp'
+          minor-wording: 'minor,add,added,feat,feature,implement,new,introduced'
+          patch-wording: 'fix,bugfix,patch,workaround,secure,security,correct'
+          
           default: 'patch'
-
           tag-prefix: 'v'
           tag-suffix: '-beta'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 'cat package.json'
         run: cat ./package.json
+
       - name: 'Output Step'
         env:
           NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
