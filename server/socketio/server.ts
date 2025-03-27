@@ -9,23 +9,36 @@ const io = new Server(httpServer, {
   },
 });
 
+// Connect Node.js client to Python server
 const pythonSocket = Client('http://localhost:5000');
 
+pythonSocket.on('connect', () => {
+  console.log('Connected to Python server');
+});
+
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('A user connected');
 
   socket.on('message', (data) => {
-    console.log('message from client:', data);
-    pythonSocket.emit('message', data);
+    console.log('Message from client:', data);
+
+    // Only forward message if it's not a loopback
+    if (data !== "forwarded") {
+      pythonSocket.emit('message', data);
+    }
   });
 
   pythonSocket.on('message', (data) => {
-    console.log('message from Python server:', data);
-    socket.emit('message', data);
+    console.log('Message from Python:', data);
+
+    // Prevent infinite loop
+    if (data !== "forwarded") {
+      socket.emit('message', data);
+    }
   });
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log('User disconnected');
   });
 });
 

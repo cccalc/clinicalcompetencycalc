@@ -1,0 +1,73 @@
+name: Auto Release on Major Version Bump
+
+on:
+  workflow_run:
+    workflows: [Bump Version]
+    types:
+      - completed
+
+jobs:
+  release:
+    name: Create GitHub Release for Major Versions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to compare tags
+
+      - name: Get latest tag
+        id: previous_tag
+        run: |
+          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-beta)?$' | sed -n 2p)
+          echo "current=$PREV_TAG" >> $GITHUB_OUTPUT
+
+          if [ -z "$PREV_TAG" ]; then
+          echo "No previous tag found, skipping release."
+          exit 0
+          fi
+
+          # Ensure -beta is removed from the previous tag
+          PREV_TAG_CLEAN=$(echo "$PREV_TAG" | sed 's/-beta$//')
+          
+          echo "Previous tag (cleaned): $PREV_TAG_CLEAN"
+          echo "previous=$PREV_TAG_CLEAN" >> $GITHUB_OUTPUT
+          
+      - name: Calculate next version
+        id: next_version
+        run: |
+          PREV_TAG_CLEAN="${{ steps.previous_tag.outputs.previous }}"  # Extract previous tag (cleaned)
+          PREV_MAJOR=$(echo "$PREV_TAG_CLEAN" | cut -d'.' -f1 | tr -d 'v')
+          
+          # Get current version from package.json
+          CURRENT_TAG="v$(node -p "require('./package.json').version")"
+          CURRENT_TAG_CLEAN=$(echo "$CURRENT_TAG" | sed 's/-beta$//')
+          CUR_MAJOR=$(echo "$CURRENT_TAG_CLEAN" | cut -d'.' -f1 | tr -d 'v')
+          
+          echo "Previous major version: $PREV_MAJOR"
+          echo "Current major version: $CUR_MAJOR"
+          if [ "$CUR_MAJOR" -gt "$PREV_MAJOR" ]; then
+            echo "Major version increased, proceeding with release."
+            echo "release=true" >> $GITHUB_ENV
+            echo "current=$CURRENT_TAG" >> $GITHUB_ENV
+          else
+            echo "No major version bump, skipping release."
+            echo "release=false" >> $GITHUB_ENV
+          fi
+      - name: Generate Changelog
+        if: env.release == 'true'
+        run: |
+          echo "## Changes in this release:" > RELEASE_NOTES.md
+          git log --oneline $(git describe --tags --abbrev=0 @^)..@ >> RELEASE_NOTES.md
+      - name: Create GitHub Release
+        if: env.release == 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.current }}
+          name: "Release ${{ env.current }}"
+          bodyFile: "RELEASE_NOTES.md"
+          draft: false
+          prerelease: false
