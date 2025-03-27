@@ -56,7 +56,6 @@ jobs:
           
           default: 'patch'
           tag-prefix: 'v'
-          tag-suffix: '-beta'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
