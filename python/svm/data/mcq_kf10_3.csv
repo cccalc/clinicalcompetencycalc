@@ -1,5 +1,0 @@
-id,created_at,user_id,c10_3_1,c10_3_2,c10_3_3,c10_3_4,c10_3_5,c10_3_6,dev_level
-1,2025-02-18T13:23:30.195+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,False,True,False,False,2
-2,2025-02-18T14:40:42.881+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,True,True,True,True,3
-3,2025-02-19T16:41:20.485+00:00,4af06985-db73-4918-901f-61e0377a0c37,True,True,False,False,False,False,1
-4,2025-02-24T18:52:35.327+00:00,4af06985-db73-4918-901f-61e0377a0c37,False,True,True,False,True,False,3

@@ -1,5 +1,11 @@
 # virtual environment
 .venv
 
+# pycache
+__pycache__
+*.pyc
+
 # data for training
 data
+
+.ropeproject
