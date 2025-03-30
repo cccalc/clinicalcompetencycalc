@@ -40,7 +40,7 @@ export default function AdminAnnouncements() {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+  });
 
   const handleSave = async () => {
     if (!message.trim() || !startDate || !endDate) {
@@ -127,7 +127,7 @@ export default function AdminAnnouncements() {
         backgroundColor: '#f1f3f5',
         padding: '20px',
         borderRadius: '8px',
-        maxWidth: '850px',
+        maxWidth: '100%',
         width: '100%',
       }}
     >

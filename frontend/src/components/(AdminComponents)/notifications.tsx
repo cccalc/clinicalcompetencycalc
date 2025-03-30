@@ -44,7 +44,7 @@ const Notifications = () => {
   return (
     <div
       className='p-3 rounded'
-      style={{ backgroundColor: '#f1f3f5', padding: '20px', borderRadius: '8px', maxWidth: '400px', width: '100%' }}
+      style={{ backgroundColor: '#f1f3f5', padding: '20px', borderRadius: '8px', maxWidth: '40vw', width: '100%' }}
     >
       <div className='card shadow-sm p-3 rounded border-0' style={{ backgroundColor: 'white' }}>
         <div
@@ -76,7 +76,7 @@ const Notifications = () => {
             </ul>
           </div>
         </div>
-        <div className='card-body p-2' style={{ maxHeight: '500px', overflowY: 'auto' }}>
+        <div className='card-body p-2' style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {filteredNotifications.length > 0 ? (
             filteredNotifications.map(({ id, type, message, timestamp }) => (
               <div
