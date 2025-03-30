@@ -11,6 +11,7 @@ const supabase = createClient();
  * Allows a student to request a faculty/rater to complete a clinical competency assessment form.
  * - Fetches the currently logged-in student
  * - Lists available faculty (raters)
+ * - Lists clinical settings
  * - Submits a form request with optional goals and notes
  */
 const FormRequests = () => {
@@ -25,6 +26,8 @@ const FormRequests = () => {
   const [studentId, setStudentId] = useState<string | null>(null); // Logged-in student ID
   const [loading, setLoading] = useState<boolean>(false); // Submission status
   const [message, setMessage] = useState<string>(''); // Feedback message
+  const [clinicalSettings, setClinicalSettings] = useState<{ id: string; setting: string }[]>([]); // Settings list
+  const [selectedSettingId, setSelectedSettingId] = useState<string>(''); // Selected setting name
 
   // ----------------------
   // Initial Data Load
@@ -93,8 +96,21 @@ const FormRequests = () => {
       setUsers(usersWithNames);
     };
 
+    /**
+     * Fetches available clinical settings.
+     */
+    const fetchClinicalSettings = async () => {
+      const { data, error } = await supabase.from('clinical_settings').select('*');
+      if (error) {
+        console.error('Error fetching clinical settings:', error.message);
+        return;
+      }
+      setClinicalSettings(data || []);
+    };
+
     fetchCurrentUser();
     fetchUsersWithDisplayNames();
+    fetchClinicalSettings();
   }, []);
 
   // ----------------------
@@ -111,8 +127,8 @@ const FormRequests = () => {
     e.preventDefault();
 
     // Validation
-    if (!faculty || !details) {
-      setMessage('Please fill in all fields.');
+    if (!faculty || !details || !selectedSettingId) {
+      setMessage('Please fill in all required fields.');
       return;
     }
 
@@ -126,10 +142,11 @@ const FormRequests = () => {
 
     const { error } = await supabase.from('form_requests').insert([
       {
-        student_id: studentId, 
-        notes: details, 
-        completed_by: faculty, 
+        student_id: studentId,
+        notes: details,
+        completed_by: faculty,
         goals: goals,
+        clinical_settings: selectedSettingId, // Use the setting name directly (type is text)
       },
     ]);
 
@@ -140,6 +157,7 @@ const FormRequests = () => {
       setMessage('Form submitted successfully!');
       setDetails('');
       setFaculty('');
+      setSelectedSettingId('');
     }
 
     setLoading(false);
@@ -170,6 +188,27 @@ const FormRequests = () => {
             {users.map((user) => (
               <option key={user.user_id} value={user.user_id}>
                 {user.display_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Clinical Setting Selector */}
+        <div className='mb-3'>
+          <label htmlFor='clinical-setting' className='form-label'>
+            Clinical Setting
+          </label>
+          <select
+            id='clinical-setting'
+            name='clinical-setting'
+            value={selectedSettingId}
+            onChange={(e) => setSelectedSettingId(e.target.value)}
+            className='form-select'
+          >
+            <option value=''>Select a clinical setting</option>
+            {clinicalSettings.map((setting) => (
+              <option key={setting.id} value={setting.setting}>
+                {setting.setting}
               </option>
             ))}
           </select>
