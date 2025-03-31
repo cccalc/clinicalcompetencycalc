@@ -9,9 +9,13 @@ const jestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   
   transform: {
-    "^.+\\.(ts|tsx|js|jsx)$": "ts-jest"
+    '^.+\\.(ts|tsx)$': 'ts-jest',
 },
-
+  globals: {
+    'ts-jest': {
+        tsconfig: '../testing/tsconfig.json',
+    }
+  },
   moduleDirectories: ['node_modules', '<rootDir>'],
   moduleNameMapper: {
       '^@/(.*)$': '<rootDir>/src/$1',
