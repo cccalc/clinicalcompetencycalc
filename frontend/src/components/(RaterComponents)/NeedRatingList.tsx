@@ -14,6 +14,7 @@ const RaterDashboard = () => {
     student_id: string;
     display_name?: string;
     email?: string;
+    clinical_settings: string;
     completed_by: string;
     notes: string;
     goals: string;
@@ -106,9 +107,7 @@ const RaterDashboard = () => {
                 <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <h4 className='fw-bold text-dark'> {request.display_name}</h4>
                   <p className='text-muted small mb-0'>{request.email}</p>
-                </div>
-                <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h4 className='fw-bold text-dark'>{request.email}</h4>
+                  <p className='text-muted small mb-0'> Setting: {request.clinical_settings ?? 'N/A'}</p>
                 </div>
                 <div
                   className='border rounded p-2 bg-light'
