@@ -1,11 +1,12 @@
-[tool.pylint.main]
+[main]
 # Specify a score threshold under which the program will exit with error.
 fail-under = 7
 
 # Files or directories to be skipped. They should be base names, not paths.
+ignore = ["CVS"]
 
 # Paths to be skipped.
-ignore-paths = sphinx/.*, SocketIo-Python-In-Out/.*
+ignore-paths = sphinx/.*$, SocketIo-Python-In-Out/.*$
 
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs
@@ -20,7 +21,7 @@ py-version = 3.12
 # user-friendly hints instead of false-positive error messages.
 suggestion-mode = true
 
-[tool.pylint.basic]
+[basic]
 # Naming style matching correct argument names.
 argument-naming-style = snake_case
 
@@ -66,7 +67,7 @@ no-docstring-rgx = "^_"
 # Naming style matching correct variable names.
 variable-naming-style = snake_case
 
-[tool.pylint.classes]
+[classes]
 # Warn about protected attribute access inside special methods
 # check-protected-access-in-special-methods =
 
@@ -76,7 +77,7 @@ defining-attr-methods = ["__init__", "__new__", "setUp", "asyncSetUp", "__post_i
 # List of valid names for the first argument in a class method.
 valid-classmethod-first-arg = ["cls"]
 
-[tool.pylint.design]
+[design]
 # Maximum number of arguments for function / method.
 max-args = 5
 
@@ -107,7 +108,7 @@ max-statements = 50
 # Minimum number of public methods for a class (see R0903).
 min-public-methods = 2
 
-[tool.pylint.format]
+[format]
 # Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
 # expected-line-ending-format =
 
@@ -127,32 +128,31 @@ max-line-length = 100
 # Maximum number of lines in a module.
 max-module-lines = 1000
 
-[tool.pylint."messages control"]
+[messages control]
 # Only show warnings with the listed confidence levels. Leave empty to show all.
 # Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED.
-confidence = HIGH, CONTROL_FLOW, UNDEFINED
-disable = E1101, W1514
+confidence = HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE, UNDEFINED
 
-[tool.pylint.miscellaneous]
+[miscellaneous]
 # List of note tags to take in consideration, separated by a comma.
 notes = ["FIXME", "XXX", "TODO"]
 
-[tool.pylint.refactoring]
+[refactoring]
 # Maximum number of nested blocks for function / method body
 max-nested-blocks = 5
 
-[tool.pylint.reports]
+[reports]
 # Python expression which should return a score less than or equal to 10. You
 # have access to the variables 'fatal', 'error', 'warning', 'refactor',
 # 'convention', and 'info' which contain the number of messages in each category,
 # as well as 'statement' which is the total number of statements analyzed. This
 # score is used by the global evaluation report (RP0004).
-evaluation = "max(0, 0 if fatal else 10.0 - ((float(5 * error + warning + convention) / statement) * 10))"
+evaluation = "max(0, 0 if fatal else 10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10))"
 
 # Activate the evaluation score.
 score = true
 
-[tool.pylint.similarities]
+[similarities]
 # Comments are removed from the similarity computation
 ignore-comments = true
 
@@ -168,6 +168,6 @@ ignore-signatures = true
 # Minimum lines number of a similarity.
 min-similarity-lines = 4
 
-[tool.pylint.spelling]
+[spelling]
 # Limits count of emitted suggestions for spelling mistakes.
 max-spelling-suggestions = 4

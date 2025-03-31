@@ -130,6 +130,7 @@ const FormRequests = () => {
         student_id: studentId, 
         notes: details, 
         completed_by: faculty, 
+        goals: goals,
       },
     ]);
 

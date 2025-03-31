@@ -7,12 +7,12 @@ const supabase = createClient();
 
 /**
  * AdminDashboard Component
- * 
+ *
  * Provides a user interface for administrators to manage users:
  * - View all users
  * - Search/filter users by name/email/role
  * - Edit user roles
- * 
+ *
  * Data is fetched from Supabase using an RPC function and table queries.
  */
 const AdminDashboard = () => {
@@ -36,26 +36,37 @@ const AdminDashboard = () => {
     account_status: string;
   }
 
+  /**
+   * Represents a role object from the `roles` table.
+   */
   interface Role {
     role: string;
   }
 
+  // ----------------------
+  // State
+  // ----------------------
+
   const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
+  const [roles, setRoles] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
-  const [selectedUser, setSelectedUser] = useState<User & { account_status: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<(User & { account_status: string }) | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
-  const [roles, setRoles] = useState<string[]>([]);
+
 
   // ----------------------
   // Data Fetching
   // ----------------------
 
   useEffect(() => {
+    /**
+     * Fetch all users from the database using a stored procedure.
+     */
     fetchUsers();
     fetchRoles();
-  })
+  });
 
   const fetchUsers = async () => {
     try {
@@ -65,9 +76,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, account_status');
+      const { data: profiles, error: profilesError } = await supabase.from('profiles').select('id, account_status');
 
       if (profilesError) {
         console.error('Error fetching account statuses:', profilesError);
@@ -88,6 +97,9 @@ const AdminDashboard = () => {
     }
   };
 
+    /**
+     * Fetch list of available roles from the `roles` table.
+     */
   const fetchRoles = async () => {
     const { data, error } = await supabase.from('roles').select('role');
     if (error) {
@@ -131,39 +143,19 @@ const AdminDashboard = () => {
     setShowModal(false);
   };
 
-  const toggleUserStatus = async () => {
-    if (!selectedUser) return;
+  // ----------------------
+  // Filtering Logic
+  // ----------------------
 
-    const newStatus = selectedUser.account_status === 'Active' ? 'Deactivated' : 'Active';
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ account_status: newStatus })
-      .eq('id', selectedUser.user_id);
-
-    if (error) {
-      console.error(`Error changing status to ${newStatus}:`, error);
-      alert(`Failed to ${newStatus.toLowerCase()} the user.`);
-      return;
-    }
-
-    console.log(`User ${newStatus.toLowerCase()} successfully!`);
-    fetchUsers();
-    setShowDeactivateModal(false);
-  };
-
-  const filteredUsers = users
-    .filter(
-      (user) =>
-        (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (selectedRole === '' || user.role === selectedRole)
-    )
-    .sort((a, b) => {
-      if (a.account_status === 'Deactivated' && b.account_status !== 'Deactivated') return 1;
-      if (a.account_status !== 'Deactivated' && b.account_status === 'Deactivated') return -1;
-      return 0;
-    });
+  /**
+   * Filters users based on search term and selected role.
+   */
+  const filteredUsers = users.filter(
+    (user) =>
+      (user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedRole === '' || user.role === selectedRole)
+  );
 
   // ----------------------
   // Render
@@ -209,10 +201,7 @@ const AdminDashboard = () => {
         </thead>
         <tbody>
           {filteredUsers.map((user) => (
-            <tr
-              key={user.user_id}
-              className={user.account_status === 'Deactivated' ? 'deactivated' : ''}
-            >
+            <tr key={user.user_id} className={user.account_status === 'Deactivated' ? 'deactivated' : ''}>
               <td>{user.display_name}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
@@ -294,6 +283,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Delete Modal (Logic not yet implemented) */}
       {showDeactivateModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -320,6 +310,39 @@ const AdminDashboard = () => {
               <div className='modal-footer'>
                 <button type='button' className='btn btn-secondary' onClick={() => setShowDeactivateModal(false)}>
                   Close
+                </button>
+                <button type='button' className='btn btn-danger' onClick={toggleUserStatus}>
+                  {selectedUser.account_status === 'Active' ? 'Deactivate' : 'Activate'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDeactivateModal && selectedUser && (
+        <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
+          <div className='modal-dialog'>
+            <div className='modal-content rounded shadow-lg'>
+              <div className='modal-header bg-danger text-white'>
+                <h5 className='modal-title'>Confirm Delete</h5>
+                <button type='button' className='btn-close' onClick={() => setShowDeactivateModal(false)}></button>
+              </div>
+              <div className='modal-body text-start'>
+                <div className='p-3 border rounded mb-3'>
+                  <p className='mb-2'>
+                    <strong>ID:</strong> {selectedUser.user_id}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Display Name:</strong> {selectedUser.display_name}
+                  </p>
+                  <p className='mb-2'>
+                    <strong>Email:</strong> {selectedUser.email}
+                  </p>
+                </div>
+              </div>
+              <div className='modal-footer'>
+                <button type='button' className='btn btn-secondary' onClick={() => setShowDeactivateModal(false)}>
+                  Cancel
                 </button>
                 <button type='button' className='btn btn-danger' onClick={toggleUserStatus}>
                   {selectedUser.account_status === 'Active' ? 'Deactivate' : 'Activate'}

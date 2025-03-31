@@ -58,3 +58,20 @@ local/
 # Node modules
 ./node_modules/
 server/socketio/node_modules/
+
+# Temporary files
+*.tmp
+
+# Backup files
+*~
+*.bak
+
+# Environment files
+.env
+
+# Python venv
+/node_modules
+.venv/
+server/socketio/node_modules/
+server/express/node_modules/
+**/node_modules
