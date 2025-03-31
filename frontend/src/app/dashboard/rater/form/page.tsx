@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { getLatestMCQs } from '@/utils/get-epa-data';
+import { useSearchParams } from 'next/navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const supabase = createClient();
@@ -50,9 +51,59 @@ export default function RaterFormsPage() {
   const [loading, setLoading] = useState(true);
   const [selectionCollapsed, setSelectionCollapsed] = useState(false);
 
+  const searchParams = useSearchParams();
+  const studentId = searchParams.get('id');
+  console.log('Form ID:', studentId);
+
   // ----------------------
   // Initial Data Fetch
   // ----------------------
+
+  interface FormRequest {
+    id: string;
+    created_at: string;
+    student_id: string;
+    completed_by: string;
+    clinical_settings: string;
+    notes: string;
+    goals: string;
+    display_name?: string;
+    email?: string;
+  }
+
+  const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
+
+  useEffect(() => {
+    async function fetchFormRequestDetails() {
+      if (!studentId) return;
+
+      const { data: formData, error: formError } = await supabase
+        .from('form_requests')
+        .select('*')
+        .eq('id', studentId)
+        .single();
+
+      if (formError || !formData) {
+        console.error('Failed to fetch form request:', formError?.message);
+        return;
+      }
+
+      const { data: users, error: userError } = await supabase.rpc('fetch_users');
+      if (userError) {
+        console.error('Failed to fetch users:', userError.message);
+        return;
+      }
+
+      const student = users.find((u: { user_id: string }) => u.user_id === formData.student_id);
+      setFormRequest({
+        ...formData,
+        display_name: student?.display_name || 'Unknown',
+        email: student?.email || 'Unknown',
+      });
+    }
+
+    fetchFormRequestDetails();
+  }, [studentId]);
 
   useEffect(() => {
     /**
@@ -151,6 +202,7 @@ export default function RaterFormsPage() {
                   data-bs-toggle='tooltip'
                   data-bs-placement='right'
                   title={epas.find((e) => e.id === epaId)?.description || ''}
+                  style={{ cursor: 'pointer' }}
                 >
                   <span className='badge bg-primary me-2'>EPA {epaId}</span>
                   <span className='text-truncate' style={{ maxWidth: '150px' }}>
@@ -171,6 +223,26 @@ export default function RaterFormsPage() {
           <p>Loading data...</p>
         ) : (
           <>
+            {formRequest && (
+              <div className='card p-3 mb-4 shadow-sm bg-light'>
+                <div className='row'>
+                  <div className='col-md-4'>
+                    <h5 className='fw-bold mb-1'>{formRequest.display_name}</h5>
+                    <p className='text-muted mb-1'>{formRequest.email}</p>
+                    <p className='text-muted mb-0'>Setting: {formRequest.clinical_settings || 'N/A'}</p>
+                    <small className='text-muted'>{new Date(formRequest.created_at).toLocaleString()}</small>
+                  </div>
+                  <div className='col-md-4 border-start'>
+                    <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
+                    <span>{formRequest.notes || 'No notes provided'}</span>
+                  </div>
+                  <div className='col-md-4 border-start'>
+                    <div className='text-secondary fw-bold mb-1'>Stated Goals:</div>
+                    <span>{formRequest.goals || 'No goals provided'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* EPA Selection Panel */}
             {selectionCollapsed ? (
               <button className='btn btn-secondary mb-3' onClick={toggleSelectionCollapse}>

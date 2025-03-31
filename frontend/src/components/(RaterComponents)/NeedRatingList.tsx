@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { FaSortUp, FaSortDown } from 'react-icons/fa';
 import { createClient } from '@/utils/supabase/client';
 import { useUser } from '@/context/UserContext';
+import { useRouter } from 'next/navigation';
 
 const supabase = createClient();
 
@@ -24,6 +25,7 @@ const RaterDashboard = () => {
   const [formRequests, setFormRequests] = useState<FormRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;
@@ -138,7 +140,12 @@ const RaterDashboard = () => {
                   <span>{request.goals || 'No notes provided'}</span>
                 </div>
                 <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
-                  <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
+                  <button
+                    className='btn btn-primary btn-md mb-2'
+                    onClick={() => router.push(`/dashboard/rater/form?id=${request.id}`)}
+                  >
+                    Evaluate
+                  </button>
                   <small className='text-muted mt-2'>{new Date(request.created_at).toLocaleString()}</small>
                 </div>
               </div>
