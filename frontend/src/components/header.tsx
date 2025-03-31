@@ -18,7 +18,6 @@ const supabase = createClient();
  * - Role-specific navigation links (Admin, Rater, Student)
  * - Profile dropdown for name/email, settings, and logout
  */
-const supabase = createClient();
 const Header = () => {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
