@@ -169,12 +169,10 @@ const Header = () => {
               {(isOnlyRater || isDev) && (
                 <>
                   <Link
-                    href='/dashboard/rater/form'
-                    className={`btn ${
-                      pathname === '/dashboard/rater/form' ? 'btn-secondary' : 'btn-outline-secondary'
-                    }`}
+                    href='/dashboard'
+                    className={`btn ${pathname === '/dashboard' ? 'btn-secondary' : 'btn-outline-secondary'}`}
                   >
-                    Form
+                    Home
                   </Link>
                 </>
               )}
