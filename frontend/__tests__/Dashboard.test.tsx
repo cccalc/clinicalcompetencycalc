@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Dashboard from "../src/app/dashboard/page";
 import { act } from 'react';
-import { mockUserContext } from "../../testing/__mocks__/UserContextMock";
+import { mockUserContext } from "../__mocks__/UserContextMock";
 
 // Mock the dashboard components to avoid importing them
 jest.mock('@/components/(AdminComponents)/adminDashboard', () => {
