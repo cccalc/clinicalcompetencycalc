@@ -14,10 +14,9 @@ interface EPA {
 }
 
 interface KeyFunction {
-  kf: string; // e.g. '1.1'
+  kf: string;
   epa: number;
   question: string; 
-
   options: { [key: string]: string };
 }
 
@@ -115,25 +114,11 @@ export default function RaterFormsPage() {
   useEffect(() => {
     async function fetchCachedJSON() {
       if (!formRequest) return;
-      const filePath = `responses/${formRequest.id}.json`;
-      const { data, error } = await supabase.storage.from('form-responses').download(filePath);
-      if (error) {
+      if (!cachedJSON) {
         setCachedJSON({
           metadata: { student_id: formRequest.student_id, rater_id: formRequest.completed_by },
           response: {},
         });
-      } else {
-        try {
-          const text = await data.text();
-          const parsed = JSON.parse(text);
-          setCachedJSON(parsed);
-        } catch (err) {
-          console.error('Error parsing cached JSON:', err);
-          setCachedJSON({
-            metadata: { student_id: formRequest.student_id, rater_id: formRequest.completed_by },
-            response: {},
-          });
-        }
       }
     }
     fetchCachedJSON();
@@ -170,7 +155,6 @@ export default function RaterFormsPage() {
     }
     fetchData();
   }, []);
-
 
   const toggleEPASelection = (epaId: number) => {
     setSelectedEPAs((prev) =>
@@ -245,12 +229,12 @@ export default function RaterFormsPage() {
     });
   };
 
-  async function updateJSONFile() {
+
+  function cacheEPAData() {
     if (!formRequest) {
       console.error('Form request is not available.');
       return;
     }
-    const filePath = `responses/${formRequest.id}.json`;
     const sortedResponse = sortResponsesAscending(responses);
     const localData = cachedJSON
       ? { ...cachedJSON }
@@ -263,25 +247,43 @@ export default function RaterFormsPage() {
         };
     localData.response = sortedResponse;
     setCachedJSON(localData);
-    const fileContent = JSON.stringify(localData, null, 2);
-    const { error } = await supabase.storage
-      .from('form-responses')
-      .upload(filePath, fileContent, { upsert: true });
+    console.log('Cached JSON updated for EPA:', currentEPA);
+  }
+
+  async function finalSubmit() {
+    if (!formRequest) {
+      console.error('Form request is not available.');
+      return;
+    }
+    const sortedResponse = sortResponsesAscending(responses);
+    const localData = cachedJSON
+      ? { ...cachedJSON }
+      : {
+          metadata: {
+            student_id: formRequest.student_id,
+            rater_id: formRequest.completed_by,
+          },
+          response: {},
+        };
+    localData.response = sortedResponse;
+    const { error } = await supabase
+      .from('form_responses')
+      .insert({
+        request_id: formRequest.id,
+        response: localData, 
+      });
     if (error) {
-      console.error('Error updating JSON file:', error.message);
+      console.error('Error submitting full JSON:', error.message);
     } else {
-      console.log('JSON file updated successfully.');
+      console.log('Full JSON submitted successfully.');
     }
   }
 
   const handleFormCompletion = (epaId: number) => {
     setCompletedEPAs((prev) => ({ ...prev, [epaId]: true }));
-    updateJSONFile();
+    cacheEPAData();
   };
 
-  //
-  // Render
-  //
   return (
     <div className='container-fluid d-flex'>
       {/* Sidebar */}
@@ -316,6 +318,11 @@ export default function RaterFormsPage() {
               ))
           )}
         </ul>
+        <div className="mt-4">
+          <button className='btn btn-primary w-100' onClick={finalSubmit}>
+            Submit
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -390,13 +397,9 @@ export default function RaterFormsPage() {
               {kfData
                 .filter((kf) => kf.epa === currentEPA)
                 .map((kf, instanceIndex) => {
-
                   const compKey = `${kf.kf}-${instanceIndex}`;
-
                   const currentText =
-                    (textInputs[currentEPA] &&
-                      textInputs[currentEPA][compKey]) ||
-                    '';
+                    (textInputs[currentEPA] && textInputs[currentEPA][compKey]) || '';
                   return (
                     <div key={compKey} className='mb-4'>
                       <p className='fw-bold'>{kf.question}</p>
