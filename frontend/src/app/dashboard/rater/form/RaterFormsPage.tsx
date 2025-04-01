@@ -20,29 +20,35 @@ interface EPA {
   description: string;
 }
 
-/**
- * Represents a key function question associated with an EPA.
- */
 interface KeyFunction {
   kf: string;
   epa: number;
-  question: string;
+  question: string; 
+
   options: { [key: string]: string };
 }
 
-/**
- * RaterFormsPage Component
- *
- * Allows raters to:
- * - Select EPAs for evaluation
- * - Answer multiple-choice key function questions for each EPA
- * - Toggle between selection and evaluation views
  */
-export default function RaterFormsPage() {
   // ----------------------
-  // State Management
-  // ----------------------
+interface FormRequest {
+  student_id: string;
+  completed_by: string;
+  clinical_settings: string;
+  notes: string;
+  goals: string;
+  display_name?: string;
+  email?: string;
+}
 
+type Responses = {
+  [epa: number]: {
+    [kf: string]: { [optionKey: string]: boolean | string } & { text?: string[] }
+  }
+};
+
+function sortResponsesAscending(src: Responses): Responses {
+    .map(Number)
+          for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
   const [epas, setEPAs] = useState<EPA[]>([]);
   const [kfData, setKFData] = useState<KeyFunction[]>([]);
   const [selectedEPAs, setSelectedEPAs] = useState<number[]>([]);
@@ -50,118 +56,109 @@ export default function RaterFormsPage() {
   const [currentEPA, setCurrentEPA] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectionCollapsed, setSelectionCollapsed] = useState(false);
+  const [textInputs, setTextInputs] = useState<{ [epa: number]: { [instanceKey: string]: string } }>({});
 
   const searchParams = useSearchParams();
   const studentId = searchParams.get('id');
   console.log('Form ID:', studentId);
 
   // ----------------------
-  // Initial Data Fetch
-  // ----------------------
-
   interface FormRequest {
-    id: string;
     created_at: string;
     student_id: string;
     completed_by: string;
     clinical_settings: string;
     notes: string;
-    goals: string;
-    display_name?: string;
-    email?: string;
-  }
-
-  const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
-
   useEffect(() => {
     async function fetchFormRequestDetails() {
       if (!studentId) return;
-
       const { data: formData, error: formError } = await supabase
         .from('form_requests')
         .select('*')
         .eq('id', studentId)
         .single();
-
       if (formError || !formData) {
         console.error('Failed to fetch form request:', formError?.message);
         return;
       }
-
       const { data: users, error: userError } = await supabase.rpc('fetch_users');
       if (userError) {
         console.error('Failed to fetch users:', userError.message);
         return;
       }
-
       const student = users.find((u: { user_id: string }) => u.user_id === formData.student_id);
-      setFormRequest({
+      const fr: FormRequest = {
         ...formData,
         display_name: student?.display_name || 'Unknown',
         email: student?.email || 'Unknown',
       });
+      };
+      setFormRequest(fr);
     }
-
     fetchFormRequestDetails();
   }, [studentId]);
 
   useEffect(() => {
-    /**
-     * Fetches EPA descriptions and MCQ data on component mount.
-     */
+    async function fetchCachedJSON() {
+      if (!formRequest) return;
+      const filePath = `responses/${formRequest.id}.json`;
+      const { data, error } = await supabase.storage.from('form-responses').download(filePath);
+          metadata: { student_id: formRequest.student_id, rater_id: formRequest.completed_by },
+        try {
+          const parsed = JSON.parse(text);
+        } catch (err) {
+          console.error('Error parsing cached JSON:', err);
+          setCachedJSON({
+            metadata: { student_id: formRequest.student_id, rater_id: formRequest.completed_by },
+            response: {},
+          });
+        }
+    fetchCachedJSON();
+  }, [formRequest]);
+  useEffect(() => {
     async function fetchData() {
       setLoading(true);
 
-      // Fetch EPA descriptions
       const { data: epaData, error: epaError } = await supabase.from('epa_kf_descriptions').select('*');
       if (epaError) {
         console.error('EPA Fetch Error:', epaError);
-      } else {
-        const formattedEPAs = Object.entries(epaData[0].epa_descriptions).map(([key, value]) => ({
-          id: parseInt(key, 10),
-          description: value as string,
-        }));
+      } else if (epaData && epaData.length > 0) {
+        const formattedEPAs = Object.entries(epaData[0].epa_descriptions).map(
+          ([key, value]) => ({
+            id: parseInt(key, 10),
+            description: value as string,
+          })
+        );
         setEPAs(formattedEPAs);
       }
 
-      // Fetch latest multiple-choice key function questions
       const latestMCQs = await getLatestMCQs();
       if (latestMCQs) {
-        const formattedKFData = latestMCQs.map((mcq) => ({
+        const formattedKFData: KeyFunction[] = latestMCQs.map((mcq: any) => ({
           ...mcq,
           epa: parseInt(mcq.epa, 10),
-        })) as KeyFunction[];
+
+          question: mcq.question,
+        }));
         setKFData(formattedKFData);
       }
-
       setLoading(false);
     }
-
     fetchData();
   }, []);
 
-  // ----------------------
-  // Event Handlers
-  // ----------------------
 
-  /**
-   * Adds or removes an EPA from the selected list.
-   * @param {number} epaId - The EPA ID to toggle
-   */
   const toggleEPASelection = (epaId: number) => {
     setSelectedEPAs((prev) => (prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]));
+    setSelectedEPAs((prev) =>
+      prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]
   };
 
   /**
-   * Collapses or expands the EPA selection section.
-   */
   const toggleSelectionCollapse = () => {
     setSelectionCollapsed(!selectionCollapsed);
   };
 
-  /**
-   * Submits selected EPAs and shows the form for the first one.
-   */
   const submitEPAs = () => {
     if (selectedEPAs.length > 0) {
       setCurrentEPA(selectedEPAs[0]);
@@ -169,21 +166,94 @@ export default function RaterFormsPage() {
     }
   };
 
-  /**
-   * Marks an EPA as completed in local state.
    * @param {number} epaId - The EPA ID to mark as completed
-   */
-  const handleFormCompletion = (epaId: number) => {
-    setCompletedEPAs((prev) => ({ ...prev, [epaId]: true }));
+  const handleOptionChange = (
+    kfId: string,
+    optionKey: string,
+  ) => {
+    setResponses((prev) => {
+      const epaResponses = prev[epaId] || {};
+      const kfResponses = epaResponses[kfId] || {};
+      return {
+        ...prev,
+        [epaId]: { ...epaResponses, [kfId]: { ...kfResponses, [optionKey]: value } },
+      };
+    });
   };
 
-  // ----------------------
-  // Render
-  // ----------------------
+  const handleTextInputChange = (
+    epaId: number,
+    compKey: string,
+    value: string
+  ) => {
+        [epaId]: { ...prevEpa, [compKey]: value },
+  const handleTextInputBlur = (epaId: number, kfId: string, instanceIndex: number) => {
+    const compKey = `${kfId}-${instanceIndex}`;
+    setResponses((prev) => {
+      const epaResponses = prev[epaId] || {};
+      const kfResponses = epaResponses[kfId] || {};
+      let textArray: string[] = Array.isArray(kfResponses.text) ? [...kfResponses.text] : [];
+      textArray[instanceIndex] = currentValue;
+      return {
+        ...prev,
+        [epaId]: {
+          ...epaResponses,
+          [kfId]: { ...kfResponses, text: textArray },
+        },
+      };
+    });
 
+    setTextInputs((prev) => {
+      const prevEpa = prev[epaId] || {};
+      const newKFState = { ...(prevEpa[kfId] || {}) };
+      newKFState[compKey] = '';
+      return {
+        ...prev,
+        [epaId]: { ...prevEpa, [kfId]: newKFState },
+      };
+    });
+  };
+
+  async function updateJSONFile() {
+    if (!formRequest) {
+      console.error('Form request is not available.');
+      return;
+    }
+    const filePath = `responses/${formRequest.id}.json`;
+    const sortedResponse = sortResponsesAscending(responses);
+    const localData = cachedJSON
+      ? { ...cachedJSON }
+      : {
+          metadata: {
+            student_id: formRequest.student_id,
+            rater_id: formRequest.completed_by,
+          },
+          response: {},
+        };
+    localData.response = sortedResponse;
+    setCachedJSON(localData);
+    const fileContent = JSON.stringify(localData, null, 2);
+    const { error } = await supabase.storage
+      .from('form-responses')
+      .upload(filePath, fileContent, { upsert: true });
+    if (error) {
+      console.error('Error updating JSON file:', error.message);
+    } else {
+      console.log('JSON file updated successfully.');
+    }
+  }
+
+  const handleFormCompletion = (epaId: number) => {
+    setCompletedEPAs((prev) => ({ ...prev, [epaId]: true }));
+    updateJSONFile();
+  };
+
+  //
+  // Render
+  //
   return (
     <div className='container-fluid d-flex'>
-      {/* Sidebar: Selected EPA Navigation */}
+      {/* Sidebar */}
       <div className='col-md-3 bg-light p-4 border-end'>
         <h3 className='mb-3'>Selected EPAs</h3>
         <ul className='list-group'>
@@ -217,7 +287,7 @@ export default function RaterFormsPage() {
         </ul>
       </div>
 
-      {/* Main Content: EPA Selection and Question Forms */}
+      {/* Main Content */}
       <div className='col-md-9 p-4'>
         {loading ? (
           <p>Loading data...</p>
@@ -230,7 +300,7 @@ export default function RaterFormsPage() {
                     <h5 className='fw-bold mb-1'>{formRequest.display_name}</h5>
                     <p className='text-muted mb-1'>{formRequest.email}</p>
                     <p className='text-muted mb-0'>Setting: {formRequest.clinical_settings || 'N/A'}</p>
-                    <small className='text-muted'>{new Date(formRequest.created_at).toLocaleString()}</small>
+                    <small className='text-muted'>
                   </div>
                   <div className='col-md-4 border-start'>
                     <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
@@ -258,13 +328,8 @@ export default function RaterFormsPage() {
                     epas.map((epa) => (
                       <button
                         key={epa.id}
-                        className={`btn ${
-                          selectedEPAs.includes(epa.id) ? 'btn-primary' : 'btn-outline-secondary'
-                        } text-start`}
                         style={{
                           minWidth: '150px',
-                          maxWidth: '300px',
-                          whiteSpace: 'wrap',
                         }}
                         onClick={() => toggleEPASelection(epa.id)}
                       >
@@ -296,21 +361,42 @@ export default function RaterFormsPage() {
                     <p className='fw-bold'>{kf.question}</p>
                     <div className='row'>
                       {Object.entries(kf.options).map(([key, option]) => (
-                        <div key={key} className='col-md-6 mb-2'>
                           <div className='form-check'>
                             <input className='form-check-input' type='checkbox' id={key} />
                             <label className='form-check-label' htmlFor={key}>
                               {option}
-                            </label>
+                .map((kf, instanceIndex) => {
+
+                  const compKey = `${kf.kf}-${instanceIndex}`;
+
+                  const currentText =
+                    (textInputs[currentEPA] &&
+                      <p className='fw-bold'>{kf.question}</p>
+                      <div className='row'>
+                        {Object.entries(kf.options).map(([optionKey, optionLabel]) => (
+                          <div key={optionKey} className='col-md-6 mb-2'>
+                            <div className='form-check'>
+                                htmlFor={`epa-${currentEPA}-kf-${kf.kf}-option-${optionKey}`}
                           </div>
                         </div>
-                      ))}
+                          placeholder='Additional comments ...'
+                          value={currentText}
+                          onChange={(e) =>
+                            handleTextInputChange(currentEPA, compKey, e.target.value)
+                          onBlur={() =>
+                        ></textarea>
+                      </div>
+                      <hr />
                     </div>
                     <textarea className='form-control mt-2' placeholder='Additional comments...'></textarea>
                     <hr />
                   </div>
                 ))}
-              <button className='btn btn-success mt-3' onClick={() => handleFormCompletion(currentEPA)}>
+                  );
+                })}
+              <button
+                className='btn btn-success mt-3'
+                onClick={() => currentEPA && handleFormCompletion(currentEPA)}
                 Mark as Completed
               </button>
             </div>
