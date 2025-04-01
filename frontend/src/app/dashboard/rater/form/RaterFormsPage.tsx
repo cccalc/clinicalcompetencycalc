@@ -8,28 +8,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const supabase = createClient();
 
-// ----------------------
-// Types
-// ----------------------
-
-/**
- * Represents a single EPA description record.
- */
 interface EPA {
   id: number;
   description: string;
 }
 
 interface KeyFunction {
-  kf: string;
+  kf: string; // e.g. '1.1'
   epa: number;
   question: string; 
 
   options: { [key: string]: string };
 }
 
- */
-  // ----------------------
 interface FormRequest {
   id: string;
   created_at: string;
@@ -93,13 +84,6 @@ export default function RaterFormsPage() {
   const studentId = searchParams.get('id');
   console.log('Form ID:', studentId);
 
-  // ----------------------
-  interface FormRequest {
-    created_at: string;
-    student_id: string;
-    completed_by: string;
-    clinical_settings: string;
-    notes: string;
   useEffect(() => {
     async function fetchFormRequestDetails() {
       if (!studentId) return;
@@ -122,7 +106,6 @@ export default function RaterFormsPage() {
         ...formData,
         display_name: student?.display_name || 'Unknown',
         email: student?.email || 'Unknown',
-      });
       };
       setFormRequest(fr);
     }
@@ -190,13 +173,11 @@ export default function RaterFormsPage() {
 
 
   const toggleEPASelection = (epaId: number) => {
-    setSelectedEPAs((prev) => (prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]));
     setSelectedEPAs((prev) =>
       prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]
     );
   };
 
-  /**
   const toggleSelectionCollapse = () => {
     setSelectionCollapsed(!selectionCollapsed);
   };
@@ -208,7 +189,6 @@ export default function RaterFormsPage() {
     }
   };
 
-   * @param {number} epaId - The EPA ID to mark as completed
   const handleOptionChange = (
     epaId: number,
     kfId: string,
@@ -235,7 +215,10 @@ export default function RaterFormsPage() {
       return {
         ...prev,
         [epaId]: { ...prevEpa, [compKey]: value },
+      };
+    });
   };
+
   const handleTextInputBlur = (epaId: number, kfId: string, instanceIndex: number) => {
     const compKey = `${kfId}-${instanceIndex}`;
     const currentValue = textInputs[epaId]?.[compKey] || '';
@@ -354,7 +337,9 @@ export default function RaterFormsPage() {
                   <div className='col-md-4'>
                     <h5 className='fw-bold mb-1'>{formRequest.display_name}</h5>
                     <p className='text-muted mb-1'>{formRequest.email}</p>
-                    <p className='text-muted mb-0'>Setting: {formRequest.clinical_settings || 'N/A'}</p>
+                    <p className='text-muted mb-0'>
+                      Setting: {formRequest.clinical_settings || 'N/A'}
+                    </p>
                     <small className='text-muted'>
                       {new Date(formRequest.created_at).toLocaleString()}
                     </small>
@@ -473,6 +458,7 @@ export default function RaterFormsPage() {
               <button
                 className='btn btn-success mt-3'
                 onClick={() => currentEPA && handleFormCompletion(currentEPA)}
+              >
                 Mark as Completed
               </button>
             </div>
