@@ -46,7 +46,7 @@ function sortResponsesAscending(src: Responses): Responses {
     .sort((a, b) => a - b)
     .forEach((epaKey) => {
       const kfObj = src[epaKey];
-      const sortedKF: { [kf: string]: any } = {};
+      const sortedKF: { [kf: string]: { [optionKey: string]: boolean | string } & { text?: string[] } } = {};
       Object.keys(kfObj)
         .sort((a, b) => {
           const partsA = a.split('.').map(Number);
@@ -76,7 +76,7 @@ export default function RaterFormsPage() {
   const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
 
   const [responses, setResponses] = useState<Responses>({});
-  const [cachedJSON, setCachedJSON] = useState<any>(null);
+  const [cachedJSON, setCachedJSON] = useState<{ metadata: { student_id: string; rater_id: string }; response: Responses } | null>(null);
 
   const [textInputs, setTextInputs] = useState<{ [epa: number]: { [instanceKey: string]: string } }>({});
 
@@ -158,11 +158,11 @@ export default function RaterFormsPage() {
 
       const latestMCQs = await getLatestMCQs();
       if (latestMCQs) {
-        const formattedKFData: KeyFunction[] = latestMCQs.map((mcq: any) => ({
-          ...mcq,
+        const formattedKFData: KeyFunction[] = latestMCQs.map((mcq: { epa: string; kf: string; question: string; options: { [key: string]: string } }) => ({
+          kf: mcq.kf,
           epa: parseInt(mcq.epa, 10),
-
           question: mcq.question,
+          options: mcq.options,
         }));
         setKFData(formattedKFData);
       }
@@ -200,7 +200,13 @@ export default function RaterFormsPage() {
       const kfResponses = epaResponses[kfId] || {};
       return {
         ...prev,
-        [epaId]: { ...epaResponses, [kfId]: { ...kfResponses, [optionKey]: value } },
+        [epaId]: {
+          ...epaResponses,
+          [kfId]: {
+            ...kfResponses,
+            [optionKey]: value,
+          },
+        },
       };
     });
   };
@@ -214,7 +220,10 @@ export default function RaterFormsPage() {
       const prevEpa = prev[epaId] || {};
       return {
         ...prev,
-        [epaId]: { ...prevEpa, [compKey]: value },
+        [epaId]: {
+          ...prevEpa,
+          [compKey]: value,
+        },
       };
     });
   };
@@ -223,31 +232,15 @@ export default function RaterFormsPage() {
     const compKey = `${kfId}-${instanceIndex}`;
     const currentValue = textInputs[epaId]?.[compKey] || '';
     if (currentValue.trim() === '') return;
-
-    setResponses((prev) => {
-      const epaResponses = prev[epaId] || {};
-      const kfResponses = epaResponses[kfId] || {};
-      let textArray: string[] = Array.isArray(kfResponses.text) ? [...kfResponses.text] : [];
-      while (textArray.length <= instanceIndex) {
-        textArray.push('');
-      }
-      textArray[instanceIndex] = currentValue;
+  
+    setTextInputs((prev) => {
+      const prevEpa = prev[epaId] || {};
       return {
         ...prev,
         [epaId]: {
-          ...epaResponses,
-          [kfId]: { ...kfResponses, text: textArray },
+          ...prevEpa,
+          [compKey]: '',
         },
-      };
-    });
-
-    setTextInputs((prev) => {
-      const prevEpa = prev[epaId] || {};
-      const newKFState = { ...(prevEpa[kfId] || {}) };
-      newKFState[compKey] = '';
-      return {
-        ...prev,
-        [epaId]: { ...prevEpa, [kfId]: newKFState },
       };
     });
   };
@@ -447,7 +440,7 @@ export default function RaterFormsPage() {
                             handleTextInputChange(currentEPA, compKey, e.target.value)
                           }
                           onBlur={() =>
-                            handleTextInputBlur(currentEPA, compKey, instanceIndex)
+                            handleTextInputBlur(currentEPA, kf.kf, instanceIndex)
                           }
                         ></textarea>
                       </div>
