@@ -96,7 +96,7 @@ const RaterDashboard = () => {
         <h1 className='mb-3 text-center text-primary'>Rater Dashboard</h1>
         <div className='d-flex justify-content-end mb-2'>
           <button className='btn btn-secondary' onClick={toggleSortOrder}>
-            Sort by Date Requested {sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />}
+            Sort by Date Requested {sortOrder === 'asc' ? <FaSortUp data-testid="sort-up-icon" /> : <FaSortDown data-testid="sort-down-icon" />}
           </button>
         </div>
         <div className='card overflow-auto' style={{ maxHeight: '500px' }}>
@@ -107,7 +107,7 @@ const RaterDashboard = () => {
                 className='list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm'
               >
                 <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h4 className='fw-bold text-dark'> {request.display_name}</h4>
+                  <h4 className='fw-bold text-dark' data-testid='request-item'> {request.display_name}</h4>
                   <p className='text-muted small mb-0'>{request.email}</p>
                   <p className='text-muted small mb-0'> Setting: {request.clinical_settings ?? 'N/A'}</p>
                 </div>
