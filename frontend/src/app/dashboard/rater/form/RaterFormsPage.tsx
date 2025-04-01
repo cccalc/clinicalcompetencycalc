@@ -31,6 +31,8 @@ interface KeyFunction {
  */
   // ----------------------
 interface FormRequest {
+  id: string;
+  created_at: string;
   student_id: string;
   completed_by: string;
   clinical_settings: string;
@@ -47,15 +49,44 @@ type Responses = {
 };
 
 function sortResponsesAscending(src: Responses): Responses {
+  const sorted: Responses = {} as Responses;
+  Object.keys(src)
     .map(Number)
+    .sort((a, b) => a - b)
+    .forEach((epaKey) => {
+      const kfObj = src[epaKey];
+      const sortedKF: { [kf: string]: any } = {};
+      Object.keys(kfObj)
+        .sort((a, b) => {
+          const partsA = a.split('.').map(Number);
+          const partsB = b.split('.').map(Number);
           for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+            const diff = (partsA[i] || 0) - (partsB[i] || 0);
+            if (diff !== 0) return diff;
+          }
+          return 0;
+        })
+        .forEach((kfKey) => {
+          sortedKF[kfKey] = kfObj[kfKey];
+        });
+      sorted[epaKey] = sortedKF;
+    });
+  return sorted;
+}
+
+export default function RaterFormsPage() {
   const [epas, setEPAs] = useState<EPA[]>([]);
   const [kfData, setKFData] = useState<KeyFunction[]>([]);
   const [selectedEPAs, setSelectedEPAs] = useState<number[]>([]);
-  const [completedEPAs, setCompletedEPAs] = useState<{ [key: number]: boolean }>({});
+  const [completedEPAs, setCompletedEPAs] = useState<{ [epa: number]: boolean }>({});
   const [currentEPA, setCurrentEPA] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectionCollapsed, setSelectionCollapsed] = useState(false);
+  const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
+
+  const [responses, setResponses] = useState<Responses>({});
+  const [cachedJSON, setCachedJSON] = useState<any>(null);
+
   const [textInputs, setTextInputs] = useState<{ [epa: number]: { [instanceKey: string]: string } }>({});
 
   const searchParams = useSearchParams();
@@ -103,9 +134,16 @@ function sortResponsesAscending(src: Responses): Responses {
       if (!formRequest) return;
       const filePath = `responses/${formRequest.id}.json`;
       const { data, error } = await supabase.storage.from('form-responses').download(filePath);
+      if (error) {
+        setCachedJSON({
           metadata: { student_id: formRequest.student_id, rater_id: formRequest.completed_by },
+          response: {},
+        });
+      } else {
         try {
+          const text = await data.text();
           const parsed = JSON.parse(text);
+          setCachedJSON(parsed);
         } catch (err) {
           console.error('Error parsing cached JSON:', err);
           setCachedJSON({
@@ -113,8 +151,11 @@ function sortResponsesAscending(src: Responses): Responses {
             response: {},
           });
         }
+      }
+    }
     fetchCachedJSON();
   }, [formRequest]);
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -152,6 +193,7 @@ function sortResponsesAscending(src: Responses): Responses {
     setSelectedEPAs((prev) => (prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]));
     setSelectedEPAs((prev) =>
       prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]
+    );
   };
 
   /**
@@ -168,8 +210,10 @@ function sortResponsesAscending(src: Responses): Responses {
 
    * @param {number} epaId - The EPA ID to mark as completed
   const handleOptionChange = (
+    epaId: number,
     kfId: string,
     optionKey: string,
+    value: boolean
   ) => {
     setResponses((prev) => {
       const epaResponses = prev[epaId] || {};
@@ -186,13 +230,24 @@ function sortResponsesAscending(src: Responses): Responses {
     compKey: string,
     value: string
   ) => {
+    setTextInputs((prev) => {
+      const prevEpa = prev[epaId] || {};
+      return {
+        ...prev,
         [epaId]: { ...prevEpa, [compKey]: value },
+  };
   const handleTextInputBlur = (epaId: number, kfId: string, instanceIndex: number) => {
     const compKey = `${kfId}-${instanceIndex}`;
+    const currentValue = textInputs[epaId]?.[compKey] || '';
+    if (currentValue.trim() === '') return;
+
     setResponses((prev) => {
       const epaResponses = prev[epaId] || {};
       const kfResponses = epaResponses[kfId] || {};
       let textArray: string[] = Array.isArray(kfResponses.text) ? [...kfResponses.text] : [];
+      while (textArray.length <= instanceIndex) {
+        textArray.push('');
+      }
       textArray[instanceIndex] = currentValue;
       return {
         ...prev,
@@ -301,6 +356,8 @@ function sortResponsesAscending(src: Responses): Responses {
                     <p className='text-muted mb-1'>{formRequest.email}</p>
                     <p className='text-muted mb-0'>Setting: {formRequest.clinical_settings || 'N/A'}</p>
                     <small className='text-muted'>
+                      {new Date(formRequest.created_at).toLocaleString()}
+                    </small>
                   </div>
                   <div className='col-md-4 border-start'>
                     <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
@@ -313,7 +370,6 @@ function sortResponsesAscending(src: Responses): Responses {
                 </div>
               </div>
             )}
-            {/* EPA Selection Panel */}
             {selectionCollapsed ? (
               <button className='btn btn-secondary mb-3' onClick={toggleSelectionCollapse}>
                 Modify EPA Selection
@@ -328,9 +384,8 @@ function sortResponsesAscending(src: Responses): Responses {
                     epas.map((epa) => (
                       <button
                         key={epa.id}
-                        style={{
-                          minWidth: '150px',
-                        }}
+                        className={`btn ${selectedEPAs.includes(epa.id) ? 'btn-primary' : 'btn-outline-secondary'} text-start`}
+                        style={{ minWidth: '150px', maxWidth: '300px', whiteSpace: 'wrap' }}
                         onClick={() => toggleEPASelection(epa.id)}
                       >
                         <span className='badge bg-primary me-2'>EPA {epa.id}</span>
@@ -356,42 +411,63 @@ function sortResponsesAscending(src: Responses): Responses {
             <div className='card-body'>
               {kfData
                 .filter((kf) => kf.epa === currentEPA)
-                .map((kf, i) => (
-                  <div key={i} className='mb-4'>
-                    <p className='fw-bold'>{kf.question}</p>
-                    <div className='row'>
-                      {Object.entries(kf.options).map(([key, option]) => (
-                          <div className='form-check'>
-                            <input className='form-check-input' type='checkbox' id={key} />
-                            <label className='form-check-label' htmlFor={key}>
-                              {option}
                 .map((kf, instanceIndex) => {
 
                   const compKey = `${kf.kf}-${instanceIndex}`;
 
                   const currentText =
                     (textInputs[currentEPA] &&
+                      textInputs[currentEPA][compKey]) ||
+                    '';
+                  return (
+                    <div key={compKey} className='mb-4'>
                       <p className='fw-bold'>{kf.question}</p>
                       <div className='row'>
                         {Object.entries(kf.options).map(([optionKey, optionLabel]) => (
                           <div key={optionKey} className='col-md-6 mb-2'>
                             <div className='form-check'>
+                              <input
+                                className='form-check-input'
+                                type='checkbox'
+                                id={`epa-${currentEPA}-kf-${kf.kf}-option-${optionKey}`}
+                                name={`epa-${currentEPA}-kf-${kf.kf}-${optionKey}`}
+                                checked={
+                                  !!(
+                                    responses[currentEPA] &&
+                                    responses[currentEPA][kf.kf] &&
+                                    responses[currentEPA][kf.kf][optionKey]
+                                  )
+                                }
+                                onChange={(e) =>
+                                  handleOptionChange(currentEPA, kf.kf, optionKey, e.target.checked)
+                                }
+                              />
+                              <label
+                                className='form-check-label'
                                 htmlFor={`epa-${currentEPA}-kf-${kf.kf}-option-${optionKey}`}
+                              >
+                                {optionLabel}
+                              </label>
+                            </div>
                           </div>
-                        </div>
+                        ))}
+                      </div>
+                      <div>
+                        <h6>Additional comments:</h6>
+                        <textarea
+                          className='form-control'
                           placeholder='Additional comments ...'
                           value={currentText}
                           onChange={(e) =>
                             handleTextInputChange(currentEPA, compKey, e.target.value)
+                          }
                           onBlur={() =>
+                            handleTextInputBlur(currentEPA, compKey, instanceIndex)
+                          }
                         ></textarea>
                       </div>
                       <hr />
                     </div>
-                    <textarea className='form-control mt-2' placeholder='Additional comments...'></textarea>
-                    <hr />
-                  </div>
-                ))}
                   );
                 })}
               <button
