@@ -1,0 +1,59 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-backend-bart:
+    name: Test Backend Bert (unittest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Initialize environment
+        run: |
+          cd python/bert
+          chmod +x init.sh
+          ./init.sh
+      - name: Run tests
+        run: |
+          cd python/bert
+          . .venv/bin/activate
+          cd testing
+          for file in *.py; do python3 -m unittest "$file" -v; done
+  test-backend-svm:
+    name: Test Backend SVM (unittest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Initialize environment
+        run: |
+          cd python/svm
+          chmod +x init.sh
+          ./init.sh
+      - name: Run tests
+        run: |
+          cd python/svm
+          . .venv/bin/activate
+          cd testing
+          for file in *.py; do python3 -m unittest "$file" -v; done
