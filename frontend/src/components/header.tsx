@@ -174,7 +174,7 @@ const Header = () => {
               )}
 
               {/* Rater View */}
-              {(isOnlyRater || isDev) && (
+              {isOnlyRater && (
                 <>
                   <Link
                     href='/dashboard'
