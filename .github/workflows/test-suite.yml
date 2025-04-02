@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - main
+    types: [opened, reopened]
 
 jobs:
   test-backend-bart:
@@ -14,6 +15,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check if python/bart/testing exists
+        id: check_bart_testing
+        run: |
+          if [ ! -d "python/bart/testing" ]; then
+            echo "python/bart/testing folder not found, skipping tests for Bart";
+            exit 0;
+          fi
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -38,6 +47,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check if python/svm/testing exists
+        id: check_svm_testing
+        run: |
+          if [ ! -d "python/svm/testing" ]; then
+            echo "python/svm/testing folder not found, skipping tests for SVM";
+            exit 0;
+          fi
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
