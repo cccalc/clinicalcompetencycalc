@@ -4,8 +4,7 @@ on:
   push:
   pull_request:
     branches:
-      - develop
-      - staging
+      - main
 
 jobs:
   test-backend-bart:
