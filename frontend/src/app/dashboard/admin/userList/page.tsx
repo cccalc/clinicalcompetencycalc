@@ -8,12 +8,13 @@ const supabase = createClient();
 /**
  * AdminDashboard Component
  *
- * Provides a user interface for administrators to manage users:
+ * A management panel for administrators to:
  * - View all users
- * - Search/filter users by name/email/role
+ * - Search and filter users by name, email, or role
  * - Edit user roles
+ * - Activate or deactivate users
  *
- * Data is fetched from Supabase using an RPC function and table queries.
+ * Data is pulled from Supabase using an RPC and direct table queries.
  */
 const AdminDashboard = () => {
   // ----------------------
@@ -31,6 +32,9 @@ const AdminDashboard = () => {
     display_name: string;
   }
 
+  /**
+   * Represents a user's profile containing account status.
+   */
   interface Profile {
     id: string;
     account_status: string;
@@ -44,7 +48,7 @@ const AdminDashboard = () => {
   }
 
   // ----------------------
-  // State
+  // State Management
   // ----------------------
 
   const [users, setUsers] = useState<(User & { account_status: string })[]>([]);
@@ -54,22 +58,23 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState<(User & { account_status: string }) | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
-
+  const [loading, setLoading] = useState(true);
 
   // ----------------------
-  // Data Fetching
+  // Initial Data Fetching
   // ----------------------
 
   useEffect(() => {
-    /**
-     * Fetch all users from the database using a stored procedure.
-     */
     fetchUsers();
     fetchRoles();
-  });
+  }, []);
 
+  /**
+   * Fetches all users and joins them with account status from the `profiles` table.
+   */
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const { data: users, error: usersError } = await supabase.rpc('fetch_users');
       if (usersError) {
         console.error('Error fetching users:', usersError);
@@ -77,35 +82,33 @@ const AdminDashboard = () => {
       }
 
       const { data: profiles, error: profilesError } = await supabase.from('profiles').select('id, account_status');
-
       if (profilesError) {
         console.error('Error fetching account statuses:', profilesError);
         return;
       }
 
       const usersWithStatus = users.map((user: User) => {
-        const profile = profiles.find((profile: Profile) => profile.id === user.user_id);
-        return {
-          ...user,
-          account_status: profile ? profile.account_status : 'Active',
-        };
+        const profile = profiles.find((p: Profile) => p.id === user.user_id);
+        return { ...user, account_status: profile?.account_status || 'Active' };
       });
 
       setUsers(usersWithStatus);
     } catch (err) {
       console.error('Unexpected error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-    /**
-     * Fetch list of available roles from the `roles` table.
-     */
+  /**
+   * Fetches all available roles from the `roles` table.
+   */
   const fetchRoles = async () => {
     const { data, error } = await supabase.from('roles').select('role');
     if (error) {
       console.error('Error fetching roles:', error);
     } else {
-      setRoles(data.map((role: Role) => role.role));
+      setRoles(data.map((r: Role) => r.role));
     }
   };
 
@@ -114,7 +117,7 @@ const AdminDashboard = () => {
   // ----------------------
 
   /**
-   * Handles closing the Edit Role modal.
+   * Closes the Edit Role modal.
    */
   const handleCloseModal = () => {
     setShowModal(false);
@@ -122,13 +125,10 @@ const AdminDashboard = () => {
   };
 
   /**
-   * Submits the updated user role to the database.
-   * Re-fetches user list after update for consistency.
+   * Updates the user's role in the database and refreshes the list.
    */
   const updateUserRole = async () => {
     if (!selectedUser) return;
-
-    console.log('Updating role for user:', selectedUser.user_id, 'to role:', selectedUser.role);
 
     const { error } = await supabase
       .from('user_roles')
@@ -140,17 +140,16 @@ const AdminDashboard = () => {
       return;
     }
 
-    console.log('Role update successful!');
     fetchUsers();
     setShowModal(false);
   };
 
   // ----------------------
-  // Filtering Logic
+  // Status Toggle Logic
   // ----------------------
 
   /**
-   * Filters users based on search term and selected role.
+   * Toggles the user's account status between Active and Deactivated.
    */
   const toggleUserStatus = async () => {
     if (!selectedUser) return;
@@ -168,11 +167,18 @@ const AdminDashboard = () => {
       return;
     }
 
-    console.log(`User ${newStatus.toLowerCase()} successfully!`);
     fetchUsers();
     setShowDeactivateModal(false);
   };
 
+  // ----------------------
+  // Filter & Sort Logic
+  // ----------------------
+
+  /**
+   * Filters users based on search term and selected role,
+   * and pushes deactivated users to the bottom.
+   */
   const filteredUsers = users
     .filter(
       (user) =>
@@ -187,14 +193,14 @@ const AdminDashboard = () => {
     });
 
   // ----------------------
-  // Render
+  // Render UI
   // ----------------------
 
   return (
     <div className='container text-center'>
       <h1 className='my-4 text-primary fw-bold'>Manage Users</h1>
 
-      {/* Search and Role Filter */}
+      {/* Search & Filter */}
       <div className='mb-3 d-flex justify-content-between'>
         <input
           type='text'
@@ -203,11 +209,7 @@ const AdminDashboard = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select
-          className='form-select w-25'
-          value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
-        >
+        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
           <option value=''>All Roles</option>
           {roles.map((role) => (
             <option key={role} value={role}>
@@ -217,48 +219,60 @@ const AdminDashboard = () => {
         </select>
       </div>
 
-      {/* User Table */}
-      <table className='table table-hover shadow rounded bg-white'>
-        <thead className='table-dark'>
-          <tr>
-            <th>Display Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map((user) => (
-            <tr key={user.user_id} className={user.account_status === 'Deactivated' ? 'deactivated' : ''}>
-              <td>{user.display_name}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>{user.account_status}</td>
-              <td>
-                <button
-                  className='btn btn-primary btn-sm me-2'
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setShowModal(true);
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  className='btn btn-danger btn-sm'
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setShowDeactivateModal(true);
-                  }}
-                >
-                  {user.account_status === 'Active' ? 'Deactivate' : 'Activate'}
-                </button>
-              </td>
+      {/* Loading Spinner */}
+      {loading ? (
+        <div className='my-5'>
+          <div className='spinner-border text-primary' role='status'>
+            <span className='visually-hidden'>Loading...</span>
+          </div>
+        </div>
+      ) : (
+        <table className='table table-hover shadow rounded bg-white'>
+          <thead className='table-dark'>
+            <tr>
+              <th>Display Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredUsers.map((user) => (
+              <tr
+                key={user.user_id}
+                className={`align-middle ${user.account_status === 'Deactivated' ? 'table-secondary text-muted' : ''}`}
+              >
+                <td>{user.display_name}</td>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
+                <td>{user.account_status}</td>
+                <td>
+                  <button
+                    className='btn btn-primary btn-sm me-2'
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setShowModal(true);
+                    }}
+                    disabled={user.account_status === 'Deactivated'}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className='btn btn-danger btn-sm'
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setShowDeactivateModal(true);
+                    }}
+                  >
+                    {user.account_status === 'Active' ? 'Deactivate' : 'Activate'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* Edit Role Modal */}
       {showModal && selectedUser && (
@@ -312,7 +326,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Delete Modal (Logic not yet implemented) */}
+      {/* Deactivate/Activate Confirmation Modal */}
       {showDeactivateModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
@@ -324,47 +338,18 @@ const AdminDashboard = () => {
                 <button type='button' className='btn-close' onClick={() => setShowDeactivateModal(false)}></button>
               </div>
               <div className='modal-body text-start'>
-                <div className='p-3 border rounded mb-3'>
-                  <p className='mb-2'>
+                <p>
+                  Are you sure you want to{' '}
+                  <strong>{selectedUser.account_status === 'Active' ? 'deactivate' : 'activate'}</strong> this user?
+                </p>
+                <div className='p-3 border rounded'>
+                  <p>
                     <strong>ID:</strong> {selectedUser.user_id}
                   </p>
-                  <p className='mb-2'>
+                  <p>
                     <strong>Display Name:</strong> {selectedUser.display_name}
                   </p>
-                  <p className='mb-2'>
-                    <strong>Email:</strong> {selectedUser.email}
-                  </p>
-                </div>
-              </div>
-              <div className='modal-footer'>
-                <button type='button' className='btn btn-secondary' onClick={() => setShowDeactivateModal(false)}>
-                  Close
-                </button>
-                <button type='button' className='btn btn-danger' onClick={toggleUserStatus}>
-                  {selectedUser.account_status === 'Active' ? 'Deactivate' : 'Activate'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {showDeactivateModal && selectedUser && (
-        <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
-          <div className='modal-dialog'>
-            <div className='modal-content rounded shadow-lg'>
-              <div className='modal-header bg-danger text-white'>
-                <h5 className='modal-title'>Confirm Delete</h5>
-                <button type='button' className='btn-close' onClick={() => setShowDeactivateModal(false)}></button>
-              </div>
-              <div className='modal-body text-start'>
-                <div className='p-3 border rounded mb-3'>
-                  <p className='mb-2'>
-                    <strong>ID:</strong> {selectedUser.user_id}
-                  </p>
-                  <p className='mb-2'>
-                    <strong>Display Name:</strong> {selectedUser.display_name}
-                  </p>
-                  <p className='mb-2'>
+                  <p>
                     <strong>Email:</strong> {selectedUser.email}
                   </p>
                 </div>
