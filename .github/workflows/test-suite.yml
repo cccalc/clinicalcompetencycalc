@@ -2,11 +2,10 @@ name: Run Tests
 
 on:
   push:
-    branches:
-      - '**'
   pull_request:
     branches:
-      - main
+      - develop
+      - staging
 
 jobs:
   test-backend-bart:
