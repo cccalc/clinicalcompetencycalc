@@ -52,10 +52,10 @@ def main(argv: list) -> None:
   # Load environment variables from .env file
   load_dotenv()
 
-  url: str = os.environ.get("SUPABASE_URL")
-  key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+  url: str = os.environ.get("SUPABASE_URL", "")
+  key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
-  if url is None or key is None:
+  if url == "" or key == "":
     raise ValueError("Supabase URL or key not found in environment variables.")
 
   supabase: Client = create_client(url, key)
@@ -83,7 +83,7 @@ def fetchData(supabase: Client, table: str) -> list:
   :type supabase: Client
 
   :param table:
-    The name of the table to fetch data from. This table should be in the \"trainingdata\" 
+    The name of the table to fetch data from. This table should be in the \"trainingdata\"
     schema.
   :type table: str
 

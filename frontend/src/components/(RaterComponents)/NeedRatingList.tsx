@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { FaSortUp, FaSortDown } from 'react-icons/fa';
 import { createClient } from '@/utils/supabase/client';
 import { useUser } from '@/context/UserContext';
+import { useRouter } from 'next/navigation';
+import UnlistedStudentForm from './UnlistedStudentForm'; // Ensure this file exists
 
 const supabase = createClient();
 
@@ -14,6 +16,7 @@ const RaterDashboard = () => {
     student_id: string;
     display_name?: string;
     email?: string;
+    clinical_settings: string;
     completed_by: string;
     notes: string;
     goals: string;
@@ -23,6 +26,8 @@ const RaterDashboard = () => {
   const [formRequests, setFormRequests] = useState<FormRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;
@@ -41,12 +46,6 @@ const RaterDashboard = () => {
         return;
       }
 
-      if (!formRequests || formRequests.length === 0) {
-        console.warn('Warning: No form requests returned.');
-        setLoading(false);
-        return;
-      }
-
       const { data: users, error: userError } = await supabase.rpc('fetch_users');
 
       if (userError) {
@@ -55,8 +54,8 @@ const RaterDashboard = () => {
         return;
       }
 
-      const requests = formRequests.map((request) => {
-        const student = users.find((user: { user_id: string }) => user.user_id === request.student_id);
+      const requests = (formRequests || []).map((request) => {
+        const student = users.find((u: { user_id: string }) => u.user_id === request.student_id);
         return {
           ...request,
           display_name: student?.display_name || 'Unknown',
@@ -91,11 +90,18 @@ const RaterDashboard = () => {
     <div className='container mt-4'>
       <div className='card p-3 border-0 bg-light'>
         <h1 className='mb-3 text-center text-primary'>Rater Dashboard</h1>
-        <div className='d-flex justify-content-end mb-2'>
+
+        {/* Top Controls */}
+        <div className='d-flex justify-content-between align-items-center mb-3'>
+          <button className='btn btn-success' onClick={() => setShowModal(true)}>
+            Rate Unlisted Student
+          </button>
           <button className='btn btn-secondary' onClick={toggleSortOrder}>
             Sort by Date Requested {sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />}
           </button>
         </div>
+
+        {/* Scrollable List */}
         <div className='card overflow-auto' style={{ maxHeight: '500px' }}>
           <div className='list-group'>
             {formRequests.map((request) => (
@@ -106,40 +112,29 @@ const RaterDashboard = () => {
                 <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <h4 className='fw-bold text-dark'> {request.display_name}</h4>
                   <p className='text-muted small mb-0'>{request.email}</p>
-                </div>
-                <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h4 className='fw-bold text-dark'>{request.email}</h4>
+                  <p className='text-muted small mb-0'> Setting: {request.clinical_settings ?? 'N/A'}</p>
                 </div>
                 <div
                   className='border rounded p-2 bg-light'
-                  style={{
-                    flex: '2',
-                    minHeight: '100%',
-                    overflowY: 'auto',
-                    fontSize: '14px',
-                    marginLeft: '10px',
-                    padding: '10px',
-                  }}
+                  style={{ flex: '2', overflowY: 'auto', fontSize: '14px', marginLeft: '10px' }}
                 >
                   <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
                   <span>{request.notes || 'No notes provided'}</span>
                 </div>
                 <div
                   className='border rounded p-2 bg-light'
-                  style={{
-                    flex: '2',
-                    minHeight: '100%',
-                    overflowY: 'auto',
-                    fontSize: '14px',
-                    marginLeft: '10px',
-                    padding: '10px',
-                  }}
+                  style={{ flex: '2', overflowY: 'auto', fontSize: '14px', marginLeft: '10px' }}
                 >
                   <div className='text-secondary fw-bold mb-1'>Stated Goals:</div>
-                  <span>{request.goals || 'No notes provided'}</span>
+                  <span>{request.goals || 'No goals provided'}</span>
                 </div>
                 <div className='d-flex flex-column justify-content-between align-items-end' style={{ flex: '1' }}>
-                  <button className='btn btn-primary btn-md mb-2'>Evaluate</button>
+                  <button
+                    className='btn btn-primary btn-md mb-2'
+                    onClick={() => router.push(`/dashboard/rater/form?id=${request.id}`)}
+                  >
+                    Evaluate
+                  </button>
                   <small className='text-muted mt-2'>{new Date(request.created_at).toLocaleString()}</small>
                 </div>
               </div>
@@ -147,7 +142,43 @@ const RaterDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal with Fade Animation */}
+      {showModal && (
+        <>
+          {/* Backdrop */}
+          <div className='modal-backdrop fade show' style={{ zIndex: 1040 }}></div>
+
+          {/* Modal */}
+          <div
+            className='modal fade show d-block'
+            tabIndex={-1}
+            role='dialog'
+            style={{ zIndex: 1050, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+          >
+            <div className='modal-dialog modal-lg modal-dialog-centered'>
+              <div className='modal-content shadow-lg'>
+                <div className='modal-header'>
+                  <h5 className='modal-title'>Rate Unlisted Student</h5>
+                  <button type='button' className='btn-close' onClick={() => setShowModal(false)}></button>
+                </div>
+                <div className='modal-body'>
+                  <UnlistedStudentForm
+                    existingRequests={formRequests}
+                    raterId={user!.id}
+                    onSuccess={(newRequestId: string) => {
+                      setShowModal(false);
+                      router.push(`/dashboard/rater/form?id=${newRequestId}`);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
+
 export default RaterDashboard;
