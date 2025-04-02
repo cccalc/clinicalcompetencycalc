@@ -188,11 +188,19 @@ const Header = () => {
                   >
                     All Reports
                   </Link>
+                  <Link
+                    href='/dashboard/admin/edit-questions-options'
+                    className={`btn ${
+                      pathname === '/dashboard/admin/edit-questions-options' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
+                  >
+                    Edit Questions
+                  </Link>
                 </>
               )}
 
               {/* Rater View */}
-              {(isOnlyRater || isDev) && (
+              {isOnlyRater && (
                 <>
                   <Link
                     href='/dashboard'
