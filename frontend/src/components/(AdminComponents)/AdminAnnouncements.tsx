@@ -62,7 +62,7 @@ export default function AdminAnnouncements() {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, []);
+  });
 
   /**
    * Handles saving or updating an announcement.

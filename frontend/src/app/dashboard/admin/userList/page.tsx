@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
@@ -60,19 +60,10 @@ const AdminDashboard = () => {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ----------------------
-  // Initial Data Fetching
-  // ----------------------
-
-  useEffect(() => {
-    fetchUsers();
-    fetchRoles();
-  }, []);
-
   /**
    * Fetches all users and joins them with account status from the `profiles` table.
    */
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       const { data: users, error: usersError } = await supabase.rpc('fetch_users');
@@ -98,19 +89,19 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   /**
    * Fetches all available roles from the `roles` table.
    */
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async (): Promise<void> => {
     const { data, error } = await supabase.from('roles').select('role');
     if (error) {
       console.error('Error fetching roles:', error);
     } else {
       setRoles(data.map((r: Role) => r.role));
     }
-  };
+  }, []);
 
   // ----------------------
   // Role Update Logic
@@ -191,6 +182,15 @@ const AdminDashboard = () => {
       if (a.account_status !== 'Deactivated' && b.account_status === 'Deactivated') return -1;
       return 0;
     });
+
+  const fetchAll = useCallback(async (): Promise<void> => {
+    await fetchUsers();
+    await fetchRoles();
+  }, [fetchUsers, fetchRoles]);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   // ----------------------
   // Render UI
