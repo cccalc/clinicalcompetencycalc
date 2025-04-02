@@ -3,10 +3,21 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/utils/supabase/client';
+import sanitizeHtml from 'sanitize-html';
+import MarkdownIt from 'markdown-it';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
+import MarkdownPreview from '@uiw/react-markdown-preview';
 
+// Dynamically load the Markdown editor (client-side only)
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
+
+// Safe Markdown parser (HTML disabled)
+const mdParser = new MarkdownIt({
+  html: false,
+  breaks: true,
+  linkify: true,
+});
 
 type Announcement = {
   id: string;
@@ -16,6 +27,12 @@ type Announcement = {
   announcement_type: 'info' | 'warning' | 'danger';
 };
 
+/**
+ * Admin interface for creating, editing, and deleting system-wide announcements.
+ * Markdown is supported in the message editor and rendered safely with a custom parser.
+ *
+ * @component
+ */
 export default function AdminAnnouncements() {
   const supabase = createClient();
 
@@ -28,7 +45,12 @@ export default function AdminAnnouncements() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const fetchAnnouncements = async () => {
+  /**
+   * Fetches all announcements from Supabase and stores them in local state.
+   *
+   * @returns {Promise<void>}
+   */
+  const fetchAnnouncements = async (): Promise<void> => {
     const { data, error } = await supabase.from('announcements').select('*').order('start_date', { ascending: false });
 
     if (error) {
@@ -40,9 +62,15 @@ export default function AdminAnnouncements() {
 
   useEffect(() => {
     fetchAnnouncements();
-  });
+  }, []);
 
-  const handleSave = async () => {
+  /**
+   * Handles saving or updating an announcement.
+   * Sanitizes input before storing in the database.
+   *
+   * @returns {Promise<void>}
+   */
+  const handleSave = async (): Promise<void> => {
     if (!message.trim() || !startDate || !endDate) {
       alert('Please fill out all required fields.');
       return;
@@ -51,11 +79,17 @@ export default function AdminAnnouncements() {
     setSaving(true);
     setSuccess(false);
 
+    // Sanitize input to prevent HTML injection
+    const cleanedMessage: string = sanitizeHtml(message, {
+      allowedTags: [], // Strip all HTML
+      allowedAttributes: {},
+    });
+
     if (editingId) {
       const { error } = await supabase
         .from('announcements')
         .update({
-          message,
+          message: cleanedMessage,
           start_date: startDate,
           end_date: endDate,
           announcement_type: type,
@@ -74,7 +108,7 @@ export default function AdminAnnouncements() {
       }
     } else {
       const { error } = await supabase.from('announcements').insert({
-        message,
+        message: cleanedMessage,
         start_date: startDate,
         end_date: endDate,
         announcement_type: type,
@@ -93,7 +127,13 @@ export default function AdminAnnouncements() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  /**
+   * Deletes an announcement by ID.
+   *
+   * @param {string} id - ID of the announcement to delete
+   * @returns {Promise<void>}
+   */
+  const handleDelete = async (id: string): Promise<void> => {
     if (!confirm('Are you sure you want to delete this announcement?')) return;
 
     const { error } = await supabase.from('announcements').delete().eq('id', id);
@@ -104,7 +144,12 @@ export default function AdminAnnouncements() {
     }
   };
 
-  const startEdit = (announcement: Announcement) => {
+  /**
+   * Begins editing an existing announcement.
+   *
+   * @param {Announcement} announcement - Announcement data to prefill the form
+   */
+  const startEdit = (announcement: Announcement): void => {
     setEditingId(announcement.id);
     setMessage(announcement.message);
     setStartDate(announcement.start_date);
@@ -112,7 +157,10 @@ export default function AdminAnnouncements() {
     setType(announcement.announcement_type);
   };
 
-  const resetForm = () => {
+  /**
+   * Resets the announcement form to its default state.
+   */
+  const resetForm = (): void => {
     setEditingId(null);
     setMessage('');
     setStartDate('');
@@ -121,16 +169,7 @@ export default function AdminAnnouncements() {
   };
 
   return (
-    <div
-      className='p-3 rounded'
-      style={{
-        backgroundColor: '#f1f3f5',
-        padding: '20px',
-        borderRadius: '8px',
-        maxWidth: '100%',
-        width: '100%',
-      }}
-    >
+    <div className='p-3 rounded' style={{ backgroundColor: '#f1f3f5' }}>
       <div className='card shadow-sm p-3 rounded border-0' style={{ backgroundColor: 'white' }}>
         <div className='card-header bg-white border-bottom pb-2'>
           <h5 className='m-0 text-dark'>{editingId ? 'Edit Announcement' : 'Create System Announcement'}</h5>
@@ -140,9 +179,25 @@ export default function AdminAnnouncements() {
           <div className='mb-3'>
             <label className='form-label'>Announcement Message (Markdown Supported)</label>
             <div data-color-mode='light'>
-              <MDEditor value={message} onChange={(val) => setMessage(val || '')} height={300} />
+              <MDEditor
+                value={message}
+                onChange={(val) => setMessage(val || '')}
+                height={200}
+                preview='edit' // Disable live preview for safety
+                hideToolbar={true}
+              />
             </div>
           </div>
+
+          {message && (
+            <div className='mb-3'>
+              <label className='form-label'>Preview</label>
+              <MarkdownPreview
+                source={mdParser.render(message)}
+                style={{ backgroundColor: '#D3D3D3', padding: '1rem', borderRadius: '6px', color: '#212529' }}
+              />
+            </div>
+          )}
 
           <div className='row mb-3'>
             <div className='col-md-4'>
