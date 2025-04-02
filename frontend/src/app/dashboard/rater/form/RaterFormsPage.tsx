@@ -80,17 +80,17 @@ export default function RaterFormsPage() {
   const searchParams = useSearchParams();
   const studentId = searchParams.get('id');
 
-  const saveProgress: (newResponses: Responses, newTextInputs: { [epa: number]: { [instanceKey: string]: string } }) => void = useCallback(
-    debounce(
-      (newResponses: Responses, newTextInputs: { [epa: number]: { [instanceKey: string]: string } }) => {
+  const saveProgress = useCallback(
+    (newResponses: Responses, newTextInputs: { [epa: number]: { [instanceKey: string]: string } }) => {
+      const debouncedSave = debounce(() => {
         const formProgress: { responses: Responses; textInputs: { [epa: number]: { [instanceKey: string]: string } } } = {
           responses: newResponses,
           textInputs: newTextInputs,
         };
         localStorage.setItem(`form-progress-${studentId}`, JSON.stringify(formProgress));
-      },
-      500
-    ),
+      }, 500);
+      debouncedSave();
+    },
     [studentId]
   );
 
@@ -133,7 +133,7 @@ export default function RaterFormsPage() {
       }
     }
     fetchCachedJSON();
-  }, [formRequest]);
+  }, [formRequest, cachedJSON]);
 
   useEffect(() => {
     async function fetchData() {
@@ -420,9 +420,6 @@ export default function RaterFormsPage() {
                           value={currentText}
                           onChange={(e) =>
                             handleTextInputChange(currentEPA, compKey, e.target.value)
-                          }
-                          onBlur={() =>
-                            handleTextInputBlur(currentEPA, kf.kf, instanceIndex)
                           }
                         ></textarea>
                       </div>
