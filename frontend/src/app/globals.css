@@ -88,3 +88,15 @@ header a.active {
 .no-pointer {
   pointer-events: none;
 }
+
+/* Enable scrolling on long dropdowns */
+.react-select__menu {
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+/* Ensure portal target renders above modals/navs */
+.react-select__menu-portal {
+  z-index: 9999;
+}
