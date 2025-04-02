@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { debounce } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import { getLatestMCQs } from '@/utils/get-epa-data';
 import { useSearchParams } from 'next/navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-const supabase = createClient();
+ 
+const supabase = createClient(); 
 
 interface EPA {
   id: number;
@@ -16,7 +17,7 @@ interface EPA {
 interface KeyFunction {
   kf: string;
   epa: number;
-  question: string; 
+  question: string;
   options: { [key: string]: string };
 }
 
@@ -34,8 +35,8 @@ interface FormRequest {
 
 type Responses = {
   [epa: number]: {
-    [kf: string]: { [optionKey: string]: boolean | string } & { text?: string[] }
-  }
+    [kf: string]: { [optionKey: string]: boolean | string } & { text?: string[] };
+  };
 };
 
 function sortResponsesAscending(src: Responses): Responses {
@@ -73,15 +74,25 @@ export default function RaterFormsPage() {
   const [loading, setLoading] = useState(true);
   const [selectionCollapsed, setSelectionCollapsed] = useState(false);
   const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
-
   const [responses, setResponses] = useState<Responses>({});
   const [cachedJSON, setCachedJSON] = useState<{ metadata: { student_id: string; rater_id: string }; response: Responses } | null>(null);
-
   const [textInputs, setTextInputs] = useState<{ [epa: number]: { [instanceKey: string]: string } }>({});
-
   const searchParams = useSearchParams();
   const studentId = searchParams.get('id');
-  console.log('Form ID:', studentId);
+
+  const saveProgress: (newResponses: Responses, newTextInputs: { [epa: number]: { [instanceKey: string]: string } }) => void = useCallback(
+    debounce(
+      (newResponses: Responses, newTextInputs: { [epa: number]: { [instanceKey: string]: string } }) => {
+        const formProgress: { responses: Responses; textInputs: { [epa: number]: { [instanceKey: string]: string } } } = {
+          responses: newResponses,
+          textInputs: newTextInputs,
+        };
+        localStorage.setItem(`form-progress-${studentId}`, JSON.stringify(formProgress));
+      },
+      500
+    ),
+    [studentId]
+  );
 
   useEffect(() => {
     async function fetchFormRequestDetails() {
@@ -127,7 +138,6 @@ export default function RaterFormsPage() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-
       const { data: epaData, error: epaError } = await supabase.from('epa_kf_descriptions').select('*');
       if (epaError) {
         console.error('EPA Fetch Error:', epaError);
@@ -156,10 +166,21 @@ export default function RaterFormsPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const cachedData = localStorage.getItem(`form-progress-${studentId}`);
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      setResponses(parsedData.responses || {});
+      setTextInputs(parsedData.textInputs || {});
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    saveProgress(responses, textInputs);
+  }, [responses, textInputs, saveProgress]);
+
   const toggleEPASelection = (epaId: number) => {
-    setSelectedEPAs((prev) =>
-      prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]
-    );
+    setSelectedEPAs((prev) => (prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]));
   };
 
   const toggleSelectionCollapse = () => {
@@ -173,12 +194,7 @@ export default function RaterFormsPage() {
     }
   };
 
-  const handleOptionChange = (
-    epaId: number,
-    kfId: string,
-    optionKey: string,
-    value: boolean
-  ) => {
+  const handleOptionChange = (epaId: number, kfId: string, optionKey: string, value: boolean) => {
     setResponses((prev) => {
       const epaResponses = prev[epaId] || {};
       const kfResponses = epaResponses[kfId] || {};
@@ -195,11 +211,7 @@ export default function RaterFormsPage() {
     });
   };
 
-  const handleTextInputChange = (
-    epaId: number,
-    compKey: string,
-    value: string
-  ) => {
+  const handleTextInputChange = (epaId: number, compKey: string, value: string) => {
     setTextInputs((prev) => {
       const prevEpa = prev[epaId] || {};
       return {
@@ -212,49 +224,12 @@ export default function RaterFormsPage() {
     });
   };
 
-  const handleTextInputBlur = (epaId: number, kfId: string, instanceIndex: number) => {
-    const compKey = `${kfId}-${instanceIndex}`;
-    const currentValue = textInputs[epaId]?.[compKey] || '';
-    if (currentValue.trim() === '') return;
-  
-    setTextInputs((prev) => {
-      const prevEpa = prev[epaId] || {};
-      return {
-        ...prev,
-        [epaId]: {
-          ...prevEpa,
-          [compKey]: '',
-        },
-      };
-    });
-  };
-
-
-  function cacheEPAData() {
-    if (!formRequest) {
-      console.error('Form request is not available.');
-      return;
-    }
-    const sortedResponse = sortResponsesAscending(responses);
-    const localData = cachedJSON
-      ? { ...cachedJSON }
-      : {
-          metadata: {
-            student_id: formRequest.student_id,
-            rater_id: formRequest.completed_by,
-          },
-          response: {},
-        };
-    localData.response = sortedResponse;
-    setCachedJSON(localData);
-    console.log('Cached JSON updated for EPA:', currentEPA);
-  }
-
   async function finalSubmit() {
     if (!formRequest) {
       console.error('Form request is not available.');
       return;
     }
+
     const sortedResponse = sortResponsesAscending(responses);
     const localData = cachedJSON
       ? { ...cachedJSON }
@@ -266,24 +241,28 @@ export default function RaterFormsPage() {
           response: {},
         };
     localData.response = sortedResponse;
+
     const { error } = await supabase
       .from('form_responses')
       .insert({
         request_id: formRequest.id,
-        response: localData, 
+        response: localData,
       });
+
     if (error) {
       console.error('Error submitting full JSON:', error.message);
     } else {
       console.log('Full JSON submitted successfully.');
+
+      localStorage.removeItem(`form-progress-${formRequest.id}`);
+      console.log('Cache cleared for form:', formRequest.id);
     }
   }
 
   const handleFormCompletion = (epaId: number) => {
     setCompletedEPAs((prev) => ({ ...prev, [epaId]: true }));
-    cacheEPAData();
+    saveProgress(responses, textInputs);
   };
-
   return (
     <div className='container-fluid d-flex'>
       {/* Sidebar */}
