@@ -40,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: my-docker-hub-namespace/my-docker-hub-repository
+          images: cccalculator/clinicalcompetencycalculator
 
       - name: Build and push frontend Docker image
         id: frontend-push
@@ -52,7 +52,7 @@ jobs:
             NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }}
             NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: cccalculator/clinicalcompetencycalculator:${{ env.TAG }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push backend Docker image
@@ -65,12 +65,12 @@ jobs:
             NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }}
             NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: cccalculator/clinicalcompetencycalculator:${{ env.TAG }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/my-docker-hub-namespace/my-docker-hub-repository
+          subject-name: index.docker.io/cccalculator/clinicalcompetencycalculator
           subject-digest: ${{ steps.frontend-push.outputs.digest }}
           push-to-registry: true
