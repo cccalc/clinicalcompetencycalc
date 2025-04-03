@@ -32,7 +32,9 @@ async def main() -> None:
 
   await (supabase.realtime
          .channel("form_responses_insert")
-         .on_postgres_changes("INSERT", schema="public", table="form_responses", callback=handle_new_response)
+         .on_postgres_changes("INSERT",
+                              schema="public", table="form_responses",
+                              callback=handle_new_response)
          .subscribe())
 
   await supabase.realtime.listen()
@@ -58,6 +60,10 @@ def handle_new_response(payload) -> None:
   print('New response received:', record['response_id'])
 
   response_data = record['response']['response']
+
+  if record['response_id'] != response_data['metadata']['response_id']:
+    print("Error: Response ID mismatch detected!")
+    return
 
 
 if __name__ == "__main__":
