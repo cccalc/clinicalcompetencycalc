@@ -19,22 +19,7 @@ jest.mock('@/utils/supabase/client', () => ({
     })),
     rpc: jest.fn().mockImplementation(() =>
       Promise.resolve({
-        data: [{
-            user_id: 'student-123',
-            display_name: 'Student A',
-            email: 'a@test.com'
-            },
-            {
-              user_id: 'student-456',
-              display_name: 'Student B',
-              email: 'b@test.com'
-            },
-            {
-              user_id: 'student-789',
-              display_name: 'Student C',
-              email: 'c@test.com'
-            }
-        ],
+        data: mockSupabaseData,
         error: null
       })
     )
@@ -82,10 +67,10 @@ describe('RaterDashboard Component', () => {
 
   it('sorts requests by date', async () => {
     render(<RaterDashboard />);
-    
+
     // Wait for initial load
     await waitFor(() => {
-      expect(screen.getAllByText(/Student/)).toHaveLength(3);
+      expect(screen.getByTestId('list-group').children).toHaveLength(3);
     });
 
     // Default is ascending
@@ -119,11 +104,10 @@ describe('RaterDashboard Component', () => {
 
   it('shows empty state when no requests exist', async () => {
     mockSupabaseData = [];
-    const mockWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    render(<RaterDashboard />);
+    render(<RaterDashboard />)
     await waitFor(() => {
-      expect(mockWarn).toHaveBeenCalled();
-    });
+        expect(screen.getByTestId('list-group').children).toHaveLength(0);
+      });
   });
 
   it('handles Supabase errors gracefully', async () => {

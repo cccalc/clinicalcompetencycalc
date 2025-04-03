@@ -103,7 +103,7 @@ const RaterDashboard = () => {
 
         {/* Scrollable List */}
         <div className='card overflow-auto' style={{ maxHeight: '500px' }}>
-          <div className='list-group'>
+          <div className='list-group' data-testid='list-group'>
             {formRequests.map((request) => (
               <div
                 key={request.id}
