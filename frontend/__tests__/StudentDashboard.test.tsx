@@ -1,12 +1,13 @@
 // src/components/StudentDashboard.test.tsx
+import React from 'react';
 import { render, act, screen, fireEvent, waitFor } from '@testing-library/react';
 import StudentDashboard from '../src/components/(StudentComponents)/studentDashboard';
 import { UserProvider } from '@/context/UserContext';
 import { createClient } from '@/utils/supabase/client';
 
 const TEST_USER = {
-  email: 'email@gmail.com',
-  password: 'password',
+  email: process.env.DEV_USER!,
+  password: process.env.DEV_PASSWORD!,
 };
 
 describe('StudentDashboard', () => {

@@ -3,12 +3,13 @@ import { UserProvider, useUser } from '@/context/UserContext';
 import { createClient } from '@/utils/supabase/client';
 
 const TEST_USER = {
-  email: 'email@gmail.com',
-  password: 'password',
-};
+    email: process.env.DEV_USER!,
+    password: process.env.DEV_PASSWORD!,
+  };
+
 const EXPECTED_VALUE = {
     role: 'authenticated',
-    displayName: 'Tyler',
+    displayName: process.env.DEV_NAME!,
     userRoleDev: 'dev',
     userRoleAuthorized: 'authorized',
 };
