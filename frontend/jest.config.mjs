@@ -6,19 +6,24 @@ const jestConfig = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: '../testing/tsconfig.json',
-    }
-  },
-  moduleDirectories: ['node_modules', '<rootDir>'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-  },
+      '^@/(.*)$': '<rootDir>/src/$1',
+      '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+      // Add if you need to mock specific packages
+      '@uiw/react-markdown-preview': '<rootDir>/__mocks__/markdownPreviewMock.js',
+      '@uiw/react-md-editor': '<rootDir>/__mocks__/mdEditorMock.js'
+    },
+    testPathIgnorePatterns: [
+        '<rootDir>/node_modules/',
+    ],
+    transform: {
+      '^.+\\.(t|j)sx?$': [
+        'ts-jest',
+        {
+          tsconfig: '../testing/tsconfig.json',
+        }
+      ]
+    },
 };
 
 export default jestConfig;
