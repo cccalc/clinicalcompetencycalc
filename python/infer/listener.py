@@ -37,6 +37,8 @@ async def main() -> None:
 
   await supabase.realtime.listen()
 
+  print('Subscribed to the "form_responses_insert" channel. Waiting for new responses...')
+
   while True:
     await asyncio.sleep(1)
 
@@ -54,6 +56,8 @@ def handle_new_response(payload) -> None:
   record = payload['data']['record']
 
   print('New response received:', record['response_id'])
+
+  response_data = record['response']['response']
 
 
 if __name__ == "__main__":
