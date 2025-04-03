@@ -80,14 +80,14 @@ describe('StudentDashboard', () => {
     const epaCards = rowDiv?.querySelectorAll('.col-md-4.mb-4');
     // Verify initial 3-month range is active
     const threeMonthBtn = screen.getByText('Last 3 mo');
-    epaCards?.forEach((card, index) => {
+    epaCards?.forEach((card) => {
         expect(card).toHaveClass('range-3');
     });
 
     // Switch to 6-month range
     const sixMonthBtn = screen.getByText('Last 6 mo');
     fireEvent.click(sixMonthBtn);
-    epaCards?.forEach((card, index) => {
+    epaCards?.forEach((card) => {
         expect(card).toHaveClass('range-6');
     });
 
@@ -100,7 +100,7 @@ describe('StudentDashboard', () => {
     // Switch to 12-month range
     const twelveMonthBtn = screen.getByText('Last 12 mo');
     fireEvent.click(twelveMonthBtn);
-    epaCards?.forEach((card, index) => {
+    epaCards?.forEach((card) => {
         expect(card).toHaveClass('range-12');
     });
 
