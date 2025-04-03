@@ -112,6 +112,7 @@ const StudentDashboard: React.FC = () => {
             onClick={setSelectedEpa}
             getEPADevLevel={getEPADevLevel}
             getAverage={getAverage}
+            range={range}
           />
         ))}
       </div>

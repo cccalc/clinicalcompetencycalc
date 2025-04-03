@@ -72,19 +72,24 @@ describe('StudentDashboard', () => {
     });
   });
   it('switches active time range and updates EPA cards', async () => {
-    render(<StudentDashboard />);
+    const { container } = render(<StudentDashboard />);
     
     // Wait for initial load
     await screen.findAllByText('EPA');
-
+    const rowDiv = container.querySelector('.row');
+    const epaCards = rowDiv?.querySelectorAll('.col-md-4.mb-4');
     // Verify initial 3-month range is active
     const threeMonthBtn = screen.getByText('Last 3 mo');
-    expect(threeMonthBtn).toHaveClass('active');
-    expect(threeMonthBtn).toHaveClass('btn-outline-primary');
+    epaCards?.forEach((card, index) => {
+        expect(card).toHaveClass('range-3');
+    });
 
     // Switch to 6-month range
     const sixMonthBtn = screen.getByText('Last 6 mo');
     fireEvent.click(sixMonthBtn);
+    epaCards?.forEach((card, index) => {
+        expect(card).toHaveClass('range-6');
+    });
 
     // Verify UI update
     await waitFor(() => {
@@ -95,6 +100,9 @@ describe('StudentDashboard', () => {
     // Switch to 12-month range
     const twelveMonthBtn = screen.getByText('Last 12 mo');
     fireEvent.click(twelveMonthBtn);
+    epaCards?.forEach((card, index) => {
+        expect(card).toHaveClass('range-12');
+    });
 
     // Verify UI update
     await waitFor(() => {
