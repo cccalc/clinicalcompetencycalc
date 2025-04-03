@@ -45,13 +45,13 @@ const-naming-style = UPPER_CASE
 docstring-min-length = -1
 
 # Naming style matching correct function names.
-function-naming-style = camelCase
+function-naming-style = snake_case
 
 # Good variable names which should always be accepted, separated by a comma.
 good-names = ["i", "j", "k", "ex", "Run", "_"]
 
 # Naming style matching correct method names.
-method-naming-style = camelCase
+method-naming-style = snake_case
 
 # Naming style matching correct module names.
 module-naming-style = snake_case
