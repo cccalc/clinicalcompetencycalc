@@ -15,7 +15,6 @@ import pickle
 from imblearn.over_sampling import RandomOverSampler
 from sklearn import svm
 from sklearn.model_selection import train_test_split
-import numpy as np
 import pandas as pd
 
 from fetch_data import fetch_data
