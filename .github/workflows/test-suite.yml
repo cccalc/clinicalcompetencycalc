@@ -25,13 +25,13 @@ jobs:
           
       - name: Run tests
         run: |
-          if [ ! -d "python/bart/testing" ]; then
-            echo "python/bart/testing folder not found, skipping tests for Bart";
+          if [ ! -d "python/bart/test" ]; then
+            echo "python/bart/test folder not found, skipping tests for Bart";
             exit 0;
           fi        
           cd python/bert
           . .venv/bin/activate
-          cd testing
+          cd test
           for file in *.py; do python3 -m unittest "$file" -v; done
           
   test-backend-svm:
@@ -55,11 +55,11 @@ jobs:
           
       - name: Run tests
         run: |
-          if [ ! -d "python/svm/testing" ]; then
-            echo "python/svm/testing folder not found, skipping tests for SVM";
+          if [ ! -d "python/svm/test" ]; then
+            echo "python/svm/test folder not found, skipping tests for SVM";
             exit 0;
           fi        
           cd python/svm
           . .venv/bin/activate
-          cd testing
+          cd test
           for file in *.py; do python3 -m unittest "$file" -v; done
