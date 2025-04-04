@@ -23,7 +23,6 @@ from dotenv import load_dotenv
 from supabase import Client, create_client
 
 
-# pylint: disable=invalid-name
 def fetch_data() -> None:
   """
   Main function to fetch data from Supabase and export it to CSV files.
@@ -50,6 +49,11 @@ def fetch_data() -> None:
                      .table("epa_kf_descriptions")  \
                      .select("kf_descriptions")     \
                      .single().execute()
+
+  if response.error:
+    raise ValueError(f"Error fetching kf_descriptions: {response.error.message}")
+  if not response.data or "kf_descriptions" not in response.data:
+    raise ValueError("kf_descriptions not found in the response data.")
 
   kf_descriptions = response.data["kf_descriptions"]
   table_names = ['mcq_kf' + re.sub(r'\.', '_', kf) for kf in [*kf_descriptions.keys()]]
