@@ -7,45 +7,31 @@ The script requires the following environment variables to be set:
 - SUPABASE_URL: The URL of the Supabase database.
 - SUPABASE_SERVICE_ROLE_KEY: The service role key for accessing the Supabase database.
 
-Usage:
-python fetch_data.py <folder>
-
-Arguments:
-- folder: The folder where the CSV files will be saved.
-
 Dependencies:
 - dotenv
 - os
 - pandas
 - re
 - supabase
-- sys
 """
 
 import os
 import re
-import sys
 
 import pandas as pd
 from dotenv import load_dotenv
 from supabase import Client, create_client
 
 
-def main(argv: list) -> None:
+# pylint: disable=invalid-name
+def fetch_data() -> None:
   """
   Main function to fetch data from Supabase and export it to CSV files.
 
-  :param argv: Command line arguments.
-  :type argv: list
   :raises ValueError: If the required environment variables are not set.
-  :raises SystemExit: If the incorrect number of arguments is provided.
   """
 
-  # Check if the correct number of arguments is provided
-  if len(argv) != 2:
-    print("Usage: python fetch_data.py <folder>")
-    sys.exit(1)
-  folder = argv[1]
+  folder = 'data'
   # Create the folder if it doesn't exist
   os.makedirs(folder, exist_ok=True)
 
@@ -69,13 +55,13 @@ def main(argv: list) -> None:
   table_names = ['mcq_kf' + re.sub(r'\.', '_', kf) for kf in [*kf_descriptions.keys()]]
 
   for table in table_names:
-    data = fetchData(supabase, table)
+    data = query_supabase(supabase, table)
     print(f"Fetched {len(data)} rows from table {table}")
     df = pd.DataFrame(data)
     df.to_csv(f"{folder}/{table}.csv", index=False)
 
 
-def fetchData(supabase: Client, table: str) -> list:
+def query_supabase(supabase: Client, table: str) -> list:
   """
   Fetches all data from a specified table in the Supabase database.
 
@@ -92,7 +78,3 @@ def fetchData(supabase: Client, table: str) -> list:
   """
   response = supabase.schema("trainingdata").table(table).select("*").execute()
   return response.data
-
-
-if __name__ == "__main__":
-  main(sys.argv)
