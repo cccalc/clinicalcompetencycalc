@@ -10,6 +10,10 @@ jobs:
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      DEV_USER: ${{ secrets.DEV_USER }}
+      DEV_NAME: ${{ secrets.DEV_NAME }}
+      DEV_PASSWORD: ${{ secrets.DEV_PASSWORD }}
+
 
     steps:
       - name: Checkout repository
