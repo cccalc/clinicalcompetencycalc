@@ -4,6 +4,33 @@ on:
   push:
 
 jobs:
+  test-frontend:
+    name: Test Frontend (Jest)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+          
+      - name: Run Jest tests
+        run: |
+          cd frontend
+          npm test -- --ci --coverage
+          
   test-backend-bart:
     name: Test Backend Bert (unittest)
     runs-on: ubuntu-latest
