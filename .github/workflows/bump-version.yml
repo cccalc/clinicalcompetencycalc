@@ -14,15 +14,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.AUTO_VERSION_TOKEN }}
+
+      - name: Bump version
+        uses: phips28/gh-action-bump-version@master
+        with:
           major-wording: 'major, breaking, overhaul, revamp'
           minor-wording: 'minor, feat, feature, implement, new, introduced'
           patch-wording: 'fix, bugfix, patch, workaround, secure, security, correct'
           default: 'patch'
 
           tag-prefix: 'v'
-          token: ${{ secrets.AUTO_VERSION_TOKEN }}
-
-      - name: Bump version
-        uses: phips28/gh-action-bump-version@master
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_VERSION_TOKEN }}
