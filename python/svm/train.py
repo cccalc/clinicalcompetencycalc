@@ -10,21 +10,36 @@ The script also evaluates the model on a test set and prints the accuracy.
 import argparse
 import glob
 import os
-import pickle
 
+from dotenv import load_dotenv
 from imblearn.over_sampling import RandomOverSampler
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 import pandas as pd
+from supabase import Client, create_client
 
 from fetch_data import fetch_data
-from util import log, percent_bar
+from util import export_upload_model, log, percent_bar
 
 
 def main(args) -> None:
   """
   Main function to train the SVM model.
   """
+
+  print("Loading environment variables...")
+
+  load_dotenv()
+
+  url: str = os.environ.get("SUPABASE_URL", "")
+  key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+
+  if url == "" or key == "":
+    raise ValueError("Supabase URL or key not found in environment variables.")
+
+  print("Environment variables loaded.")
+
+  supabase: Client = create_client(url, key)
 
   if not args.no_fetch:
     fetch_data()
@@ -62,11 +77,17 @@ def main(args) -> None:
     if model is not None:
       accuracies[kf] = accuracy
       # Save the trained model to a file
-      with open(f'models/{kf}.pkl', 'wb') as f:
-        pickle.dump(model, f)
+      export_upload_model(
+          model=model,
+          kf=kf,
+          foldername='models',
+          bucketname='svm-models',
+          supabase=supabase
+      )
 
   if accuracies:
-    print(f"Average accuracy across all models: {sum(accuracies.values()) / len(accuracies):.2f}")
+    print("Average accuracy across all models: "
+          f"{percent_bar(sum(accuracies.values()) / len(accuracies), 45)}")
 
 
 def train_svm(
@@ -98,67 +119,20 @@ def train_svm(
   '''
   print(f"Training on {kf:10} with {len(df):3} rows", end=" --> ")
 
-  # def cols(row):
-  #   return (f'{row.name:2}: '
-  #           f'{" ".join('.' if np.isnan(x) else 'T' if x else 'F' for x in row.values[:-1])}'
-  #           f' {row.iloc[-1]}')  # Show the class label at the end
-
-  # # if df has NaN values
-  # if df.isnull().values.any():
-  #   # NOTICE: ONLY WORKS IF THERE ARE AT MOST TWO QUESTIONS PER KF
-  #   # rows with NaN values in first option column (first question)
-  #   fnarows = df[df.iloc[:, 0].isnull()]
-  #   # rows with NaN values in the last option column (second question)
-  #   bnarows = df[df.iloc[:, -2].isnull()]
-  #   if not fnarows.empty and not bnarows.empty:
-  #     while not fnarows.empty:
-  #       frow = fnarows.iloc[0]
-  #       log(verbose, f'(F) Merging row {cols(frow)}', end=" ")
-  #       # find a row in bnarows that has the same class as frow
-  #       mrows = bnarows[bnarows.iloc[:, -1] == frow.iloc[-1]]
-  #       if not mrows.empty:
-  #         log(verbose, f"with {cols(mrows.iloc[0])}", end=" --> ")
-  #         nrow = frow.combine_first(mrows.iloc[0])
-  #         log(verbose, f"{cols(nrow)}")
-  #         df.loc[frow.name] = nrow
-  #         df = df.drop(mrows.index[0])  # drop the merged row
-  #         fnarows = df[df.iloc[:, 0].isnull()]  # refresh fnarows
-  #         bnarows = df[df.iloc[:, -2].isnull()]  # refresh bnarows
-  #       else:
-  #         log(verbose, 'failed, dropping')
-  #         df = df.drop(frow.name)
-  #         fnarows = df[df.iloc[:, 0].isnull()]  # refresh fnarows
-  #       log(verbose, f"{'->':>40}", end=" ")
-  #     while not bnarows.empty:
-  #       brow = bnarows.iloc[0]
-  #       log(verbose, f'(B) Merging row {cols(brow)}', end=" ")
-  #       # find a row in fnarows that has the same class as brow
-  #       mrows = fnarows[fnarows.iloc[:, -1] == brow.iloc[-1]]
-  #       if not mrows.empty:
-  #         log(verbose, f"with {cols(mrows.iloc[0])}", end=" --> ")
-  #         nrow = brow.combine_first(mrows.iloc[0])
-  #         log(verbose, f"{cols(nrow)}")
-  #         df.loc[brow.name] = nrow
-  #         df = df.drop(mrows.index[0])
-  #         fnarows = df[df.iloc[:, 0].isnull()]  # refresh fnarows
-  #         bnarows = df[df.iloc[:, -2].isnull()]  # refresh bnarows
-  #       else:
-  #         log(verbose, 'failed, dropping')
-  #         df = df.drop(brow.name)
-  #         bnarows = df[df.iloc[:, -2].isnull()]
-  #       log(verbose, f"{'->':>40}", end=" ")
-  #   df = df.dropna()
-
   df = df.dropna()  # Drop rows with any NaN values
 
   x = df.iloc[:, :-1].to_numpy()
   y = df.iloc[:, -1].to_numpy()
 
   if oversample:
-    log(verbose, f"Oversampling minority classes in {kf}...")
-    log(verbose, f"{'->':>40}", end=" ")
-    ros = RandomOverSampler(random_state=42)
+    log(verbose, f"Oversampling minority classes in {kf}...", end=" ")
+    class_counts = df.iloc[:, -1].value_counts().to_dict()
+    sampling_strategy = {cls: max(count, 4)  # Ensure at least 2 samples per class
+                         for cls, count in class_counts.items()}
+    ros = RandomOverSampler(sampling_strategy=sampling_strategy, random_state=42)
     x, y = ros.fit_resample(x, y)
+    log(verbose, f"Done oversampling: {len(y)} samples after oversampling.")
+    log(verbose, f"{'->':>40}", end=" ")
 
   if len(x) < length_threshold:
     print(f"Skipping {kf} because it has less than {length_threshold} rows")
@@ -168,15 +142,15 @@ def train_svm(
     x_train, x_test, y_train, y_test = train_test_split(
         x, y,
         train_size=train_proportion,  # Can be 0.8 for 80% train, 20% test
-        stratify=y,             # Key parameter for equal distribution
-        random_state=42         # For reproducibility
+        stratify=y,                   # Key parameter for equal distribution
+        random_state=42               # For reproducibility
     )
   except ValueError as e:
     print(f"Error splitting data for {kf}: {e}")
     return None, None
 
   # Create and train the SVM model
-  model = svm.SVC(kernel='poly', C=1.0)
+  model = svm.SVC(kernel='linear', C=1.0)
   model.fit(x_train, y_train)
 
   # Evaluate the model
