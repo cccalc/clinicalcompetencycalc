@@ -6,3 +6,6 @@ data/
 
 # cache
 __pycache__/
+
+# models
+models/
