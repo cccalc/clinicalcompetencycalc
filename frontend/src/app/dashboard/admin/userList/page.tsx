@@ -274,7 +274,7 @@ const AdminDashboard = () => {
         </table>
       )}
 
-      {/* Edit Modal */}
+      {/* Edit Role Modal */}
       {showModal && selectedUser && (
         <div className='modal show' tabIndex={-1} style={{ display: 'block' }}>
           <div className='modal-dialog'>
