@@ -11,7 +11,6 @@ const supabase = createClient();
 /**
  * Header component
  *
- *
  * Renders the top navigation bar with dynamic links based on the user's role.
  * Includes:
  * - Logo and app name
@@ -82,31 +81,6 @@ const Header = () => {
       alert('Failed to update display name.');
     }
     // Implement update logic (e.g., update Supabase profile)
-    if (!user) return; // Ensure user is authenticated
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ display_name: editedDisplayName })
-        .eq('id', user.id); 
-
-      if (error) throw error;
-
-      const { data: updatedProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('id', user.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      setEditedDisplayName(updatedProfile?.display_name ?? '');
-
-      alert('Display name updated successfully!');
-    } catch (error) {
-      console.error('Error updating display name:', error);
-      alert('Failed to update display name.');
-    }
   };
 
   /**
