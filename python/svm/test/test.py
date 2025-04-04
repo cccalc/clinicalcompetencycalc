@@ -3,11 +3,10 @@
 '''Test cases for the SVM folder.'''
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import call, patch, MagicMock
 
 from postgrest.base_request_builder import SingleAPIResponse
 from sklearn.svm import SVC
-from supabase import Client
 
 import fetch_data  # pylint: disable=import-error
 import util  # pylint: disable=import-error
@@ -65,6 +64,10 @@ class TestFetchData(unittest.TestCase):
 
 
 class TestUtil(unittest.TestCase):
+  '''
+  Test cases for util module.
+  '''
+
   def test_percent_bar(self):
     """Test percent_bar returns correctly formatted progress bars."""
     self.assertIn("⣿", util.percent_bar(0.5, 10))
@@ -84,18 +87,24 @@ class TestUtil(unittest.TestCase):
   @patch("util.pickle.dump")
   @patch("builtins.open", new_callable=unittest.mock.mock_open)
   @patch("util.os.makedirs")
-  @patch("util.Client.storage")
-  def test_export_upload_model(self, mock_storage, mock_makedirs, mock_open, mock_pickle_dump):
+  @patch("fetch_data.create_client")
+  def test_export_upload_model(self, mock_create_client, mock_makedirs, mock_open, mock_pickle_dump):
     """Test export_upload_model exports and uploads a model correctly."""
-    mock_supabase = MagicMock(spec=Client)
+    mock_supabase = MagicMock()
+    mock_create_client.return_value = mock_supabase
+
     model = SVC()
 
     util.export_upload_model(model, "test_kf", supabase=mock_supabase)
 
     mock_makedirs.assert_called_once_with("models", exist_ok=True)
-    mock_open.assert_any_call("models/test_kf.pkl", 'wb')
-    mock_open.assert_any_call("models/test_kf.pkl", 'rb')
+    mock_open.assert_has_calls([
+        call("models/test_kf.pkl", 'wb'),
+        call("models/test_kf.pkl", 'rb')
+    ], any_order=True)
     mock_pickle_dump.assert_called_once()
+    mock_supabase.storage.from_.assert_called_once_with("svm-models")
+    mock_supabase.storage.from_().update.assert_called_once()
 
 
 if __name__ == "__main__":

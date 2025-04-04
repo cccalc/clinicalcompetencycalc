@@ -85,7 +85,10 @@ def handle_new_response(payload, bert_model, svm_models, supabase) -> None:
   bert_res = bert_infer(bert_model, {k: v['bert'] for k, v in flat.items()})
   svms_res = svm_infer(svm_models, {k: v['svm'] for k, v in flat.items()})
 
-  res = {k: (v + svms_res[k])/2 for k, v in bert_res.items()}
+  def weighted_average(bert: float, svm: float) -> float:
+    return bert * 0.25 + svm * 0.75
+
+  res = {k: weighted_average(bert=v, svm=svms_res[k]) for k, v in bert_res.items()}
   print('res', res)
 
   (supabase.table("form_results")
