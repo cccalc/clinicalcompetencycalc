@@ -143,7 +143,9 @@ describe('AdminAnnouncements Component', () => {
     render(<AdminAnnouncements />);
     
     // Try to submit empty form
-    fireEvent.click(screen.getByText('Save Announcement'));
+    waitFor(() => {
+        fireEvent.click(screen.getByText('Save Announcement'));
+    });
     expect(alertMock).toHaveBeenCalledWith('Please fill out all required fields.');
     alertMock.mockRestore();
   });
