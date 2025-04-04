@@ -5,7 +5,7 @@ import os
 from supabase import AClient, Client, acreate_client, create_client
 from dotenv import load_dotenv
 
-from inference import download_svm_models
+from inference import bert_infer, download_svm_models, load_bert_model, load_svm_models, svm_infer
 
 
 async def main() -> None:
@@ -14,6 +14,8 @@ async def main() -> None:
 
   :return: None
   """
+
+  download = False
 
   print("Loading environment variables...")
 
@@ -30,7 +32,11 @@ async def main() -> None:
   supabase: Client = create_client(url, key)
   asupabase: AClient = await acreate_client(url, key)
 
-  download_svm_models(supabase)
+  if download:
+    download_svm_models(supabase)
+
+  bert_model = load_bert_model("bert-model/cb-250401-80_7114_model")
+  svm_models = load_svm_models()
 
   print("Connecting to Supabase Realtime server...")
 
@@ -40,7 +46,8 @@ async def main() -> None:
          .channel("form_responses_insert")
          .on_postgres_changes("INSERT",
                               schema="public", table="form_responses",
-                              callback=handle_new_response)
+                              callback=lambda payload:
+                              handle_new_response(payload, bert_model, svm_models, supabase))
          .subscribe())
 
   await asupabase.realtime.listen()
@@ -51,7 +58,7 @@ async def main() -> None:
     await asyncio.sleep(1)
 
 
-def handle_new_response(payload) -> None:
+def handle_new_response(payload, bert_model, svm_models, supabase) -> None:
   '''
   Handles the insert event from the Supabase Realtime server.
 
@@ -65,11 +72,28 @@ def handle_new_response(payload) -> None:
 
   print('New response received:', record['response_id'])
 
-  response_data = record['response']['response']
+  response = record['response']['response']
 
-  if record['response_id'] != response_data['metadata']['response_id']:
-    print("Error: Response ID mismatch detected!")
-    return
+  print("Processing response", response)
+
+  ds = [kf for kf in response.values()]
+  flat = {k: {
+      'bert': v['text'],
+      'svm': [vv for kk, vv in v.items() if kk != 'text']
+  } for d in ds for k, v in d.items()}
+
+  berts = {k: v['bert'] for k, v in flat.items()}
+  svms = {k: v['svm'] for k, v in flat.items()}
+
+  bert_res = bert_infer(bert_model, berts)
+  svms_res = svm_infer(svm_models, svms)
+
+  res = {k: (v + svms_res[k])/2 for k, v in bert_res.items()}
+  print('res', res)
+
+  (supabase.table("form_results")
+   .insert({"response_id": record['response_id'], "results": res})
+   .execute())
 
 
 if __name__ == "__main__":
