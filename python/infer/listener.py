@@ -82,11 +82,8 @@ def handle_new_response(payload, bert_model, svm_models, supabase) -> None:
       'svm': [vv for kk, vv in v.items() if kk != 'text']
   } for d in ds for k, v in d.items()}
 
-  berts = {k: v['bert'] for k, v in flat.items()}
-  svms = {k: v['svm'] for k, v in flat.items()}
-
-  bert_res = bert_infer(bert_model, berts)
-  svms_res = svm_infer(svm_models, svms)
+  bert_res = bert_infer(bert_model, {k: v['bert'] for k, v in flat.items()})
+  svms_res = svm_infer(svm_models, {k: v['svm'] for k, v in flat.items()})
 
   res = {k: (v + svms_res[k])/2 for k, v in bert_res.items()}
   print('res', res)
