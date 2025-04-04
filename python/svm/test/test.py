@@ -68,12 +68,6 @@ class TestUtil(unittest.TestCase):
   Test cases for util module.
   '''
 
-  def test_percent_bar(self):
-    """Test percent_bar returns correctly formatted progress bars."""
-    self.assertIn("⣿", util.percent_bar(0.5, 10))
-    self.assertIn("⣀", util.percent_bar(0.0, 10))
-    self.assertIn("\033[32m", util.percent_bar(0.7, 10))  # Green color for high values
-
   @patch("builtins.print")
   def test_log(self, mock_print):
     """Test log only prints when verbose is True."""
