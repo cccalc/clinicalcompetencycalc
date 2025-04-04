@@ -2,8 +2,10 @@ import asyncio
 import os
 # import json
 
-from supabase import AClient, acreate_client
+from supabase import AClient, Client, acreate_client, create_client
 from dotenv import load_dotenv
+
+from inference import download_svm_models
 
 
 async def main() -> None:
@@ -25,19 +27,23 @@ async def main() -> None:
 
   print("Environment variables loaded.")
 
-  # try:
-  supabase: AClient = await acreate_client(url, key)
+  supabase: Client = create_client(url, key)
+  asupabase: AClient = await acreate_client(url, key)
 
-  await supabase.realtime.connect()
+  download_svm_models(supabase)
 
-  await (supabase.realtime
+  print("Connecting to Supabase Realtime server...")
+
+  await asupabase.realtime.connect()
+
+  await (asupabase.realtime
          .channel("form_responses_insert")
          .on_postgres_changes("INSERT",
                               schema="public", table="form_responses",
                               callback=handle_new_response)
          .subscribe())
 
-  await supabase.realtime.listen()
+  await asupabase.realtime.listen()
 
   print('Subscribed to the "form_responses_insert" channel. Waiting for new responses...')
 

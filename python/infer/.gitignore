@@ -1,1 +1,6 @@
-bert-model
+# Ignore model files
+bert-model/
+svm-model/
+
+# Cache
+__pycache__/
