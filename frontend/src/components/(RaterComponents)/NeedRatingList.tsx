@@ -97,20 +97,20 @@ const RaterDashboard = () => {
             Rate Unlisted Student
           </button>
           <button className='btn btn-secondary' onClick={toggleSortOrder}>
-            Sort by Date Requested {sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />}
+            Sort by Date Requested {sortOrder === 'asc' ? <FaSortUp data-testid="sort-up-icon" /> : <FaSortDown data-testid="sort-down-icon" />}
           </button>
         </div>
 
         {/* Scrollable List */}
         <div className='card overflow-auto' style={{ maxHeight: '500px' }}>
-          <div className='list-group'>
+          <div className='list-group' data-testid='list-group'>
             {formRequests.map((request) => (
               <div
                 key={request.id}
                 className='list-group-item d-flex justify-content-between align-items-stretch p-3 mb-2 bg-white rounded shadow-sm'
               >
                 <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <h4 className='fw-bold text-dark'> {request.display_name}</h4>
+                  <h4 className='fw-bold text-dark' data-testid='request-item'> {request.display_name}</h4>
                   <p className='text-muted small mb-0'>{request.email}</p>
                   <p className='text-muted small mb-0'> Setting: {request.clinical_settings ?? 'N/A'}</p>
                 </div>

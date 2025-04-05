@@ -22,15 +22,16 @@ interface EPACardProps {
   onClick: (epa: EPA) => void;
   getEPADevLevel: (kfs: KeyFunction[]) => number | null;
   getAverage: (kf: KeyFunction) => number | null;
+  range: 3 | 6 | 12;
 }
 
-const EPACard: React.FC<EPACardProps> = ({ epa, onClick, getEPADevLevel, getAverage }) => {
+const EPACard: React.FC<EPACardProps> = ({ epa, onClick, getEPADevLevel, getAverage, range }) => {
   const avg = getEPADevLevel(epa.keyFunctions);
   const allGreen = epa.keyFunctions.every((kf) => getAverage(kf) === 3);
 
   return (
     <div
-      className='col-md-4 mb-4'
+      className={`col-md-4 mb-4 range-${range}`}
       role='button'
       tabIndex={0}
       onClick={() => onClick(epa)}

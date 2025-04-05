@@ -86,7 +86,7 @@ const AdminSettingsButtons = () => {
                       defaultValue={setting}
                       onBlur={(e) => handleEditSetting(id, e.target.value)}
                     />
-                    <button className='btn btn-outline-danger btn-sm ms-2' onClick={() => handleDeleteSetting(id)}>
+                    <button className='btn btn-outline-danger btn-sm ms-2' onClick={() => handleDeleteSetting(id)} aria-label='delete-setting'>
                       <i className='bi bi-trash'></i>
                     </button>
                   </div>
