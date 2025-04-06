@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { debounce } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import { getLatestMCQs } from '@/utils/get-epa-data';
 import { useSearchParams } from 'next/navigation';
@@ -8,182 +9,413 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const supabase = createClient();
 
-// ----------------------
-// Types
-// ----------------------
-
-/**
- * Represents a single EPA description record.
- */
 interface EPA {
   id: number;
   description: string;
 }
 
-/**
- * Represents a key function question associated with an EPA.
- */
 interface KeyFunction {
   kf: string;
   epa: number;
   question: string;
   options: { [key: string]: string };
+  questionId: string;
 }
 
-/**
- * RaterFormsPage Component
- *
- * Allows raters to:
- * - Select EPAs for evaluation
- * - Answer multiple-choice key function questions for each EPA
- * - Toggle between selection and evaluation views
- */
-export default function RaterFormsPage() {
-  // ----------------------
-  // State Management
-  // ----------------------
+interface FormRequest {
+  id: string;
+  created_at: string;
+  student_id: string;
+  completed_by: string;
+  clinical_settings: string;
+  notes: string;
+  goals: string;
+  display_name?: string;
+  email?: string;
+}
 
+
+type Responses = {
+  [epa: number]: {
+    [questionId: string]: { [optionKey: string]: boolean } & { text: string };
+  };
+};
+
+interface AggregatedResponseForKF {
+  [optionKey: string]: boolean | string[];
+  text: string[];
+}
+type AggregatedResponses = {
+  [epa: number]: {
+    [kf: string]: AggregatedResponseForKF;
+  };
+};
+
+function compareNumericDotStrings(a: string, b: string): number {
+  const partsA = a.split('.').map(Number);
+  const partsB = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+    const diff = (partsA[i] || 0) - (partsB[i] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+
+export default function RaterFormsPage() {
   const [epas, setEPAs] = useState<EPA[]>([]);
   const [kfData, setKFData] = useState<KeyFunction[]>([]);
   const [selectedEPAs, setSelectedEPAs] = useState<number[]>([]);
-  const [completedEPAs, setCompletedEPAs] = useState<{ [key: number]: boolean }>({});
+  const [completedEPAs, setCompletedEPAs] = useState<{ [epa: number]: boolean }>({});
   const [currentEPA, setCurrentEPA] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectionCollapsed, setSelectionCollapsed] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectionCollapsed, setSelectionCollapsed] = useState<boolean>(false);
+  const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
+  const [responses, setResponses] = useState<Responses>({});
+  const [cachedJSON, setCachedJSON] = useState<{
+    metadata: { student_id: string; rater_id: string };
+    response: Responses;
+  } | null>(null);
+  const [textInputs, setTextInputs] = useState<{ [epa: number]: { [questionId: string]: string } }>({});
 
   const searchParams = useSearchParams();
-  const studentId = searchParams.get('id');
-  console.log('Form ID:', studentId);
+  const studentId = searchParams?.get('id') ?? '';
 
-  // ----------------------
-  // Initial Data Fetch
-  // ----------------------
-
-  interface FormRequest {
-    id: string;
-    created_at: string;
-    student_id: string;
-    completed_by: string;
-    clinical_settings: string;
-    notes: string;
-    goals: string;
-    display_name?: string;
-    email?: string;
-  }
-
-  const [formRequest, setFormRequest] = useState<FormRequest | null>(null);
+  const debouncedSave = useCallback(() => {
+    const debouncedFunction = debounce(
+      (
+        newResponses: Responses,
+        newTextInputs: { [epa: number]: { [questionId: string]: string } }
+      ) => {
+        const formProgress = {
+          responses: newResponses,
+          textInputs: newTextInputs,
+        };
+        localStorage.setItem(`form-progress-${studentId}`, JSON.stringify(formProgress));
+      },
+      500
+    );
+    return debouncedFunction;
+  }, [studentId])();
 
   useEffect(() => {
-    async function fetchFormRequestDetails() {
-      if (!studentId) return;
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [debouncedSave]);
 
+
+  const saveProgress = useCallback(
+    (
+      newResponses: Responses,
+      newTextInputs: { [epa: number]: { [questionId: string]: string } }
+    ): void => {
+      debouncedSave(newResponses, newTextInputs);
+    },
+    [debouncedSave]
+  );
+
+  useEffect(() => {
+    if (studentId) {
+      const cachedData = localStorage.getItem(`form-progress-${studentId}`);
+      if (cachedData) {
+        try {
+          const parsedData = JSON.parse(cachedData) as {
+            responses: Responses;
+            textInputs: { [epa: number]: { [questionId: string]: string } };
+          };
+          setResponses(parsedData.responses || {});
+          setTextInputs(parsedData.textInputs || {});
+        } catch (error) {
+          console.error('Error parsing cached data', error);
+        }
+      }
+    }
+  }, [studentId]);
+
+  useEffect(() => {
+    saveProgress(responses, textInputs);
+  }, [responses, textInputs, saveProgress]);
+
+
+  useEffect((): void => {
+    async function fetchFormRequestDetails(): Promise<void> {
+      if (!studentId) return;
       const { data: formData, error: formError } = await supabase
         .from('form_requests')
         .select('*')
         .eq('id', studentId)
         .single();
-
       if (formError || !formData) {
         console.error('Failed to fetch form request:', formError?.message);
         return;
       }
-
       const { data: users, error: userError } = await supabase.rpc('fetch_users');
       if (userError) {
         console.error('Failed to fetch users:', userError.message);
         return;
       }
 
-      const student = users.find((u: { user_id: string }) => u.user_id === formData.student_id);
-      setFormRequest({
+      interface User {
+        user_id: string;
+        display_name?: string;
+        email?: string;
+      }
+      const student = (users as User[]).find(
+        (u) => u.user_id === formData.student_id
+      );
+      const fr: FormRequest = {
         ...formData,
-        display_name: student?.display_name || 'Unknown',
-        email: student?.email || 'Unknown',
-      });
+        display_name: student?.display_name ?? 'Unknown',
+        email: student?.email ?? 'Unknown',
+      };
+      setFormRequest(fr);
     }
-
     fetchFormRequestDetails();
   }, [studentId]);
 
-  useEffect(() => {
-    /**
-     * Fetches EPA descriptions and MCQ data on component mount.
-     */
-    async function fetchData() {
+  useEffect((): void => {
+    async function fetchCachedJSON(): Promise<void> {
+      if (!formRequest) return;
+      if (!cachedJSON) {
+        setCachedJSON({
+          metadata: {
+            student_id: formRequest.student_id,
+            rater_id: formRequest.completed_by,
+          },
+          response: {},
+        });
+      }
+    }
+    fetchCachedJSON();
+  }, [formRequest, cachedJSON]);
+
+
+  useEffect((): void => {
+    async function fetchData(): Promise<void> {
       setLoading(true);
 
-      // Fetch EPA descriptions
-      const { data: epaData, error: epaError } = await supabase.from('epa_kf_descriptions').select('*');
+      const { data: epaData, error: epaError } = await supabase
+        .from('epa_kf_descriptions')
+        .select('*');
       if (epaError) {
         console.error('EPA Fetch Error:', epaError);
-      } else {
-        const formattedEPAs = Object.entries(epaData[0].epa_descriptions).map(([key, value]) => ({
-          id: parseInt(key, 10),
-          description: value as string,
-        }));
+      } else if (epaData && epaData.length > 0 && epaData[0].epa_descriptions) {
+        const formattedEPAs: EPA[] = Object.entries(epaData[0].epa_descriptions).map(
+          ([key, value]) => ({
+            id: parseInt(key, 10),
+            description: value as string,
+          })
+        );
         setEPAs(formattedEPAs);
       }
-
-      // Fetch latest multiple-choice key function questions
+      // Fetch MCQs.
       const latestMCQs = await getLatestMCQs();
       if (latestMCQs) {
-        const formattedKFData = latestMCQs.map((mcq) => ({
-          ...mcq,
-          epa: parseInt(mcq.epa, 10),
-        })) as KeyFunction[];
+        const formattedKFData: KeyFunction[] = latestMCQs.map(
+          (mcq: { epa: string; kf: string; question: string; options: { [key: string]: string } }) => {
+            const optionKeys = Object.keys(mcq.options);
+            const sortedOptionKeys = optionKeys.sort((a, b) =>
+              compareNumericDotStrings(a, b)
+            );
+            return {
+              kf: mcq.kf,
+              epa: parseInt(mcq.epa, 10),
+              question: mcq.question,
+              options: mcq.options,
+              questionId: sortedOptionKeys[0],
+            };
+          }
+        );
         setKFData(formattedKFData);
       }
-
       setLoading(false);
     }
-
     fetchData();
   }, []);
 
-  // ----------------------
-  // Event Handlers
-  // ----------------------
+  useEffect((): void => {
+    if (kfData.length > 0 && selectedEPAs.length > 0) {
+      setResponses((prev) => {
+        const newResponses: Responses = { ...prev };
+        kfData.forEach((kf) => {
+          if (selectedEPAs.includes(kf.epa)) {
+            const epa = kf.epa;
+            const questionId = kf.questionId;
+            if (!newResponses[epa]) {
+              newResponses[epa] = {} as {
+                [questionId: string]: ({ [optionKey: string]: boolean } & { text: string });
+              };
+            }
+            if (!newResponses[epa][questionId]) {
+              const defaults: { [key: string]: boolean } = {};
+              Object.keys(kf.options).forEach((optKey) => {
+                defaults[optKey] = false;
+              });
+              newResponses[epa][questionId] = { ...defaults, text: '' } as { [optionKey: string]: boolean } & { text: string };
+            }
+          }
+        });
+        return newResponses;
+      });
+    }
+  }, [kfData, selectedEPAs]);
+  const toggleEPASelection = useCallback((epaId: number): void => {
+    setSelectedEPAs((prev) =>
+      prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]
+    );
+  }, []);
+  const toggleSelectionCollapse = useCallback((): void => {
+    setSelectionCollapsed((prev) => !prev);
+  }, []);
 
-  /**
-   * Adds or removes an EPA from the selected list.
-   * @param {number} epaId - The EPA ID to toggle
-   */
-  const toggleEPASelection = (epaId: number) => {
-    setSelectedEPAs((prev) => (prev.includes(epaId) ? prev.filter((id) => id !== epaId) : [...prev, epaId]));
-  };
-
-  /**
-   * Collapses or expands the EPA selection section.
-   */
-  const toggleSelectionCollapse = () => {
-    setSelectionCollapsed(!selectionCollapsed);
-  };
-
-  /**
-   * Submits selected EPAs and shows the form for the first one.
-   */
-  const submitEPAs = () => {
+  const submitEPAs = useCallback((): void => {
     if (selectedEPAs.length > 0) {
       setCurrentEPA(selectedEPAs[0]);
       setSelectionCollapsed(true);
     }
-  };
+  }, [selectedEPAs]);
 
-  /**
-   * Marks an EPA as completed in local state.
-   * @param {number} epaId - The EPA ID to mark as completed
-   */
-  const handleFormCompletion = (epaId: number) => {
+  const handleOptionChange = useCallback(
+    (
+      epaId: number,
+      questionId: string,
+      optionKey: string,
+      value: boolean
+    ): void => {
+      setResponses((prev) => {
+        const epaResponses = prev[epaId] || {};
+        const questionResponses = epaResponses[questionId] || { text: '' };
+        return {
+          ...prev,
+          [epaId]: {
+            ...epaResponses,
+            [questionId]: {
+              ...questionResponses,
+              [optionKey]: value,
+            },
+          },
+        };
+      });
+    },
+    []
+  );
+  const handleTextInputChange = (
+    epaId: number,
+    questionId: string,
+    value: string
+  ): void => {
+    setTextInputs((prev) => ({
+      ...prev,
+      [epaId]: {
+        ...prev[epaId],
+        [questionId]: value,
+      },
+    }));
+  };
+  async function finalSubmit(): Promise<void> {
+    if (!formRequest) {
+      console.error('Form request is not available.');
+      return;
+    }
+    const mergedResponses: Responses = { ...responses };
+    Object.keys(textInputs).forEach((epaKey: string): void => {
+      const epaNum = parseInt(epaKey, 10);
+      if (!mergedResponses[epaNum]) {
+        mergedResponses[epaNum] = {} as {
+          [questionId: string]: { [optionKey: string]: boolean } & { text: string };
+        };
+      }
+      Object.keys(textInputs[epaNum]).forEach((questionId: string): void => {
+        if (!mergedResponses[epaNum][questionId]) {
+          mergedResponses[epaNum][questionId] = { text: '' } as { [optionKey: string]: boolean } & { text: string };
+        }
+        mergedResponses[epaNum][questionId].text = textInputs[epaNum][questionId];
+      });
+    });
+    const questionMapping: { [questionId: string]: { kf: string; epa: number } } = {};
+    kfData.forEach((q) => {
+      questionMapping[q.questionId] = { kf: q.kf, epa: q.epa };
+    });
+
+    const aggregatedResponses: AggregatedResponses = {};
+    Object.keys(mergedResponses).forEach((epaKey: string): void => {
+      const epaNum = parseInt(epaKey, 10);
+      if (!aggregatedResponses[epaNum]) {
+        aggregatedResponses[epaNum] = {};
+      }
+      Object.keys(mergedResponses[epaNum]).forEach((questionId: string): void => {
+        const mapping = questionMapping[questionId];
+        if (!mapping) return;
+        const kfKey = mapping.kf;
+        if (!aggregatedResponses[epaNum][kfKey]) {
+          aggregatedResponses[epaNum][kfKey] = { text: [] };
+        }
+        const qResponse = mergedResponses[epaNum][questionId];
+        Object.keys(qResponse).forEach((key: string): void => {
+          if (key === 'text') return;
+          aggregatedResponses[epaNum][kfKey][key] =
+            (aggregatedResponses[epaNum][kfKey][key] as boolean | undefined) ?? qResponse[key];
+        });
+        aggregatedResponses[epaNum][kfKey].text.push(qResponse.text);
+      });
+      Object.keys(aggregatedResponses[epaNum]).forEach((kfKey: string): void => {
+        if (Array.isArray(aggregatedResponses[epaNum][kfKey].text)) {
+          aggregatedResponses[epaNum][kfKey].text.sort((a, b) =>
+            compareNumericDotStrings(a, b)
+          );
+          aggregatedResponses[epaNum][kfKey].text = aggregatedResponses[epaNum][kfKey].text.map(
+            (entry: string): string => entry
+          );
+        }
+      });
+    });
+    const sortedAggregatedResponses: AggregatedResponses = {} as AggregatedResponses;
+    Object.keys(aggregatedResponses)
+      .map((num) => parseInt(num, 10))
+      .sort((a, b) => a - b)
+      .forEach((epaNum: number): void => {
+        const kfGroup = aggregatedResponses[epaNum];
+        const sortedKfKeys = Object.keys(kfGroup).sort(compareNumericDotStrings);
+        sortedAggregatedResponses[epaNum] = {};
+        sortedKfKeys.forEach((kfKey: string): void => {
+          sortedAggregatedResponses[epaNum][kfKey] = kfGroup[kfKey];
+        });
+      });
+
+    const localData = cachedJSON
+      ? { ...cachedJSON }
+      : {
+          metadata: {
+            student_id: formRequest.student_id,
+            rater_id: formRequest.completed_by,
+          },
+          response: {} as Responses,
+        };
+    localData.response = sortedAggregatedResponses as unknown as Responses;
+
+    const { error } = await supabase.from('form_responses').insert({
+      request_id: formRequest.id,
+      response: localData,
+    });
+
+    if (error) {
+      console.error('Error submitting full JSON:', error.message);
+    } else {
+      console.log('Full JSON submitted successfully.');
+      localStorage.removeItem(`form-progress-${formRequest.id}`);
+      localStorage.removeItem(`form-progress-${studentId}`);
+      console.log('Cache cleared for form:', formRequest.id);
+    }
+  }
+
+  const handleFormCompletion = (epaId: number): void => {
     setCompletedEPAs((prev) => ({ ...prev, [epaId]: true }));
+    saveProgress(responses, textInputs);
   };
-
-  // ----------------------
-  // Render
-  // ----------------------
 
   return (
     <div className='container-fluid d-flex'>
-      {/* Sidebar: Selected EPA Navigation */}
+      {/* Sidebar */}
       <div className='col-md-3 bg-light p-4 border-end'>
         <h3 className='mb-3'>Selected EPAs</h3>
         <ul className='list-group'>
@@ -192,32 +424,43 @@ export default function RaterFormsPage() {
           ) : (
             [...selectedEPAs]
               .sort((a, b) => a - b)
-              .map((epaId) => (
-                <li
-                  key={epaId}
-                  className={`list-group-item d-flex justify-content-between align-items-center ${
-                    currentEPA === epaId ? 'active' : ''
-                  }`}
-                  onClick={() => setCurrentEPA(epaId)}
-                  data-bs-toggle='tooltip'
-                  data-bs-placement='right'
-                  title={epas.find((e) => e.id === epaId)?.description || ''}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span className='badge bg-primary me-2'>EPA {epaId}</span>
-                  <span className='text-truncate' style={{ maxWidth: '150px' }}>
-                    {epas.find((e) => e.id === epaId)?.description || ''}
-                  </span>
-                  <span className={`badge bg-${completedEPAs[epaId] ? 'success' : 'danger'}`}>
-                    {completedEPAs[epaId] ? '✔' : '❌'}
-                  </span>
-                </li>
-              ))
+              .map((epaId: number) => {
+                const epaItem = epas.find((e) => e.id === epaId);
+                return (
+                  <li
+                    key={epaId}
+                    className={`list-group-item d-flex justify-content-between align-items-center ${
+                      currentEPA === epaId ? 'active' : ''
+                    }`}
+                    onClick={() => setCurrentEPA(epaId)}
+                    data-bs-toggle='tooltip'
+                    data-bs-placement='right'
+                    title={epaItem?.description || ''}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <span className='badge bg-primary me-2'>EPA {epaId}</span>
+                    <span className='text-truncate' style={{ maxWidth: '150px' }}>
+                      {epaItem?.description || ''}
+                    </span>
+                    <span className={`badge bg-${completedEPAs[epaId] ? 'success' : 'danger'}`}>
+                      {completedEPAs[epaId] ? '✔' : '❌'}
+                    </span>
+                  </li>
+                );
+              })
           )}
         </ul>
+        {selectedEPAs.length > 0 &&
+          selectedEPAs.every((epaId: number) => completedEPAs[epaId]) && (
+            <div className='mt-4'>
+              <button className='btn btn-primary w-100' onClick={finalSubmit}>
+                Submit
+              </button>
+            </div>
+          )}
       </div>
 
-      {/* Main Content: EPA Selection and Question Forms */}
+      {/* Main Content */}
       <div className='col-md-9 p-4'>
         {loading ? (
           <p>Loading data...</p>
@@ -229,8 +472,12 @@ export default function RaterFormsPage() {
                   <div className='col-md-4'>
                     <h5 className='fw-bold mb-1'>{formRequest.display_name}</h5>
                     <p className='text-muted mb-1'>{formRequest.email}</p>
-                    <p className='text-muted mb-0'>Setting: {formRequest.clinical_settings || 'N/A'}</p>
-                    <small className='text-muted'>{new Date(formRequest.created_at).toLocaleString()}</small>
+                    <p className='text-muted mb-0'>
+                      Setting: {formRequest.clinical_settings || 'N/A'}
+                    </p>
+                    <small className='text-muted'>
+                      {new Date(formRequest.created_at).toLocaleString()}
+                    </small>
                   </div>
                   <div className='col-md-4 border-start'>
                     <div className='text-secondary fw-bold mb-1'>Relevant Activity:</div>
@@ -243,9 +490,11 @@ export default function RaterFormsPage() {
                 </div>
               </div>
             )}
-            {/* EPA Selection Panel */}
             {selectionCollapsed ? (
-              <button className='btn btn-secondary mb-3' onClick={toggleSelectionCollapse}>
+              <button
+                className='btn btn-secondary mb-3'
+                onClick={toggleSelectionCollapse}
+              >
                 Modify EPA Selection
               </button>
             ) : (
@@ -259,12 +508,13 @@ export default function RaterFormsPage() {
                       <button
                         key={epa.id}
                         className={`btn ${
-                          selectedEPAs.includes(epa.id) ? 'btn-primary' : 'btn-outline-secondary'
+                          selectedEPAs.includes(epa.id)
+                            ? 'btn-primary'
+                            : 'btn-outline-secondary'
                         } text-start`}
                         style={{
                           minWidth: '150px',
-                          maxWidth: '300px',
-                          whiteSpace: 'wrap',
+                          maxWidth: '300px'
                         }}
                         onClick={() => toggleEPASelection(epa.id)}
                       >
@@ -274,7 +524,11 @@ export default function RaterFormsPage() {
                     ))
                   )}
                 </div>
-                <button className='btn btn-success mt-3' onClick={submitEPAs} disabled={selectedEPAs.length === 0}>
+                <button
+                  className='btn btn-success mt-3'
+                  onClick={submitEPAs}
+                  disabled={selectedEPAs.length === 0}
+                >
                   Submit Selection
                 </button>
               </>
@@ -291,26 +545,64 @@ export default function RaterFormsPage() {
             <div className='card-body'>
               {kfData
                 .filter((kf) => kf.epa === currentEPA)
-                .map((kf, i) => (
-                  <div key={i} className='mb-4'>
-                    <p className='fw-bold'>{kf.question}</p>
-                    <div className='row'>
-                      {Object.entries(kf.options).map(([key, option]) => (
-                        <div key={key} className='col-md-6 mb-2'>
-                          <div className='form-check'>
-                            <input className='form-check-input' type='checkbox' id={key} />
-                            <label className='form-check-label' htmlFor={key}>
-                              {option}
-                            </label>
+                .map((kf) => {
+                  const questionKey = kf.questionId;
+                  const currentText = textInputs[currentEPA]?.[questionKey] || '';
+                  return (
+                    <div key={questionKey} className='mb-4'>
+                      <p className='fw-bold'>{kf.question}</p>
+                      <div className='row'>
+                        {Object.entries(kf.options).map(([optionKey, optionLabel]) => (
+                          <div key={optionKey} className='col-md-6 mb-2'>
+                            <div className='form-check'>
+                              <input
+                                className='form-check-input'
+                                type='checkbox'
+                                id={`epa-${currentEPA}-q-${questionKey}-option-${optionKey}`}
+                                name={`epa-${currentEPA}-q-${questionKey}-option-${optionKey}`}
+                                checked={!!(responses[currentEPA]?.[questionKey]?.[optionKey])}
+                                onChange={(e) =>
+                                  handleOptionChange(
+                                    currentEPA,
+                                    questionKey,
+                                    optionKey,
+                                    e.target.checked
+                                  )
+                                }
+                              />
+                              <label
+                                className='form-check-label'
+                                htmlFor={`epa-${currentEPA}-q-${questionKey}-option-${optionKey}`}
+                              >
+                                {optionLabel}
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                      <div>
+                        <h6>Additional comments:</h6>
+                        <textarea
+                          className='form-control'
+                          placeholder='Additional comments ...'
+                          value={currentText}
+                          onChange={(e) =>
+                            handleTextInputChange(currentEPA, questionKey, e.target.value)
+                          }
+                        ></textarea>
+                      </div>
+                      <hr />
                     </div>
-                    <textarea className='form-control mt-2' placeholder='Additional comments...'></textarea>
-                    <hr />
-                  </div>
-                ))}
-              <button className='btn btn-success mt-3' onClick={() => handleFormCompletion(currentEPA)}>
+                  );
+                })}
+              <button
+                className='btn btn-success mt-3'
+                onClick={() => {
+                  if (currentEPA !== null) {
+                    handleFormCompletion(currentEPA);
+                  }
+                }}
+              >
                 Mark as Completed
               </button>
             </div>

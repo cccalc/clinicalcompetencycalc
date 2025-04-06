@@ -3,7 +3,6 @@ Utility functions for the BERT model.
 '''
 
 import os
-import shutil
 
 import nlpaug.augmenter.word as naw
 import pandas as pd
@@ -181,7 +180,7 @@ def exportKerasFolder(
     destination: str,
     text_col_label: str = 'text',
     level_col_label: str = 'dev_level',
-    class_names: list[str] = None,
+    class_names: list[str] | None = None,
     verbose: bool = False,
     dry_run: bool = False,
     force: bool = False,
@@ -245,23 +244,23 @@ def exportKerasFolder(
     class_names = ['remedial', 'early_dev', 'developing', 'entrustable']
   classes = train_df[level_col_label].unique()
 
-  if os.path.exists(destination):
-    if force:
-      if verbose:
-        print(f'Removing existing folder {destination}...')
-      shutil.rmtree(destination)
-    else:
-      raise ValueError(
-          f'Destination folder {destination} already exists. Use --force to overwrite.')
+  # if os.path.exists(destination):
+  #   if force:
+  #     if verbose:
+  #       print(f'Removing existing folder {destination}...')
+  #     shutil.rmtree(destination)
+  #   else:
+  #     raise ValueError(
+  #         f'Destination folder {destination} already exists. Use --force to overwrite.')
 
   if not dry_run:
     if verbose:
       print(f'Creating folder {destination}...')
     os.makedirs(destination)
     for c in classes:
-      os.makedirs(os.path.join(destination, 'train', class_names[c]))
-      os.makedirs(os.path.join(destination, 'validate', class_names[c]))
-      os.makedirs(os.path.join(destination, 'test', class_names[c]))
+      os.makedirs(os.path.join(destination, 'train', class_names[c]), exist_ok=force)
+      os.makedirs(os.path.join(destination, 'validate', class_names[c]), exist_ok=force)
+      os.makedirs(os.path.join(destination, 'test', class_names[c]), exist_ok=force)
   else:
     if verbose:
       print(f'Would create folder {destination}...')
@@ -281,7 +280,7 @@ def exportKerasFolder(
           print(f'Writing {len(class_df)} {split} samples for class {class_names[c]}')
         for i, row in class_df.iterrows():
           with open(os.path.join(destination, split, class_names[c], f'{i}.txt'), 'w') as f:
-            f.write(row[text_col_label])
+            f.write(str(row[text_col_label]))
 
 
 def exportDfPickle(

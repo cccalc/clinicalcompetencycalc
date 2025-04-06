@@ -2,26 +2,22 @@ name: 'Bump Version'
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: [main]
 
 jobs:
   bump-version:
-    name: 'Bump Version on master'
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: 'Checkout source code'
-        uses: 'actions/checkout@v2'
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
-          persist-credentials: false
-      - name: 'cat package.json'
-        run: cat ./package.json
-      - name: 'Automated Version Bump'
-        id: version-bump
-        uses: 'phips28/gh-action-bump-version@master'
+          token: ${{ secrets.AUTO_VERSION_TOKEN }}
+
+      - name: Bump version
+        uses: phips28/gh-action-bump-version@master
         with:
           major-wording: 'major, breaking, overhaul, revamp'
           minor-wording: 'minor, feat, feature, implement, new, introduced'
@@ -30,10 +26,4 @@ jobs:
 
           tag-prefix: 'v'
         env:
-          GITHUB_TOKEN: ${{ secrets.AUTO_VERSIONING_SECRET_KEY }}
-      - name: 'cat package.json'
-        run: cat ./package.json
-      - name: 'Output Step'
-        env:
-          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-        run: echo "new tag $NEW_TAG"
+          GITHUB_TOKEN: ${{ secrets.AUTO_VERSION_TOKEN }}
