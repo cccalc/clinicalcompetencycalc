@@ -22,11 +22,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Exit if commit was an automated version bump or tag push
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
           echo "Commit message: $COMMIT_MSG"
       
-            if [[ "$COMMIT_MSG" =~ ^ci:\ version\ bump\ to\ v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "$COMMIT_MSG" =~ ^ci:\ version\ bump\ to\ v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Skipping workflow for version bump commit."
             exit 0
           fi
