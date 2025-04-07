@@ -22,7 +22,7 @@ interface UserContextType {
 }
 
 // Create a React context to store user session and role info
-export const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 /**
  * UserProvider component to wrap the application and provide user context.
