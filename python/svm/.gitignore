@@ -3,3 +3,9 @@
 
 # data folder
 data/
+
+# cache
+__pycache__/
+
+# models
+models/

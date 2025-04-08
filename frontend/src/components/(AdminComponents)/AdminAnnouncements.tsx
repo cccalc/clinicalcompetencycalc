@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { createClient } from '@/utils/supabase/client';
 import sanitizeHtml from 'sanitize-html';
@@ -50,7 +50,7 @@ export default function AdminAnnouncements() {
    *
    * @returns {Promise<void>}
    */
-  const fetchAnnouncements = async (): Promise<void> => {
+  const fetchAnnouncements = useCallback(async (): Promise<void> => {
     const { data, error } = await supabase.from('announcements').select('*').order('start_date', { ascending: false });
 
     if (error) {
@@ -58,11 +58,11 @@ export default function AdminAnnouncements() {
     } else {
       setAnnouncements(data as Announcement[]);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     fetchAnnouncements();
-  });
+  }, [fetchAnnouncements]);
 
   /**
    * Handles saving or updating an announcement.
