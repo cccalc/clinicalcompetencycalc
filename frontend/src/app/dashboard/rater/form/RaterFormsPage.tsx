@@ -85,8 +85,8 @@ export default function RaterFormsPage() {
   const searchParams = useSearchParams();
   const studentId = searchParams?.get('id') ?? '';
 
-  const debouncedSave = useCallback(
-    debounce(
+  const debouncedSave = useCallback(() => {
+    const debouncedFunction = debounce(
       (
         newResponses: Responses,
         newTextInputs: { [epa: number]: { [questionId: string]: string } },
@@ -102,9 +102,9 @@ export default function RaterFormsPage() {
         setTimeout(() => setSaveStatus(''), 3000);
       },
       500
-    ),
-    [studentId]
-  );
+    );
+    return debouncedFunction;
+  }, [studentId])();
 
   useEffect(() => {
     return () => {
