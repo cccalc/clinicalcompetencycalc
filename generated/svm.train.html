@@ -205,7 +205,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../svm.html">SVM Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bert.html">BERT Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="svm.predict.html">svm.predict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="svm.fetch_data.html">svm.fetch_data</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">svm.train</a></li>
 </ul>
@@ -261,8 +260,11 @@ The script also evaluates the model on a test set and prints the accuracy.</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code>(args)</p></td>
 <td><p>Main function to train the SVM model.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_svm</span></code>(kf, df[, train_proportion, ...])</p></td>
+<td><p>Trains an SVM model on the given DataFrame and evaluates its accuracy.</p></td>
 </tr>
 </tbody>
 </table>

@@ -9,4 +9,5 @@
    .. autosummary::
    
       main
+      train_svm
    

@@ -205,7 +205,6 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">SVM Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bert.html">BERT Documentation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="generated/svm.predict.html">svm.predict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/svm.fetch_data.html">svm.fetch_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/svm.train.html">svm.train</a></li>
 </ul>
@@ -255,44 +254,6 @@
 <p><a class="reference internal" href="model_doc.html#svm"><span class="std std-ref">Read more</span></a> about the SVM model.</p>
 <section id="svm-fetch-data">
 <h2>svm.fetch_data<a class="headerlink" href="#svm-fetch-data" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="svm.fetch_data.main">
-<span class="sig-prename descclassname"><span class="pre">svm.fetch_data.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#svm.fetch_data.main" title="Link to this definition">¶</a></dt>
-<dd><p>Main function to fetch data from Supabase and export it to CSV files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>argv</strong> (<em>list</em>) – Command line arguments.</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If the required environment variables are not set.</p></li>
-<li><p><strong>SystemExit</strong> – If the incorrect number of arguments is provided.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="svm.fetch_data.fetchData">
-<span class="sig-prename descclassname"><span class="pre">svm.fetch_data.</span></span><span class="sig-name descname"><span class="pre">fetchData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">supabase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SyncClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#svm.fetch_data.fetchData" title="Link to this definition">¶</a></dt>
-<dd><p>Fetches all data from a specified table in the Supabase database.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>supabase</strong> (<em>Client</em>) – The Supabase client object.</p></li>
-<li><p><strong>table</strong> (<em>str</em>) – The name of the table to fetch data from. This table should be in the “trainingdata”
-schema.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of dictionaries containing the data from the specified table.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 </section>
 
@@ -352,11 +313,7 @@ schema.</p></li>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">SVM Documentation</a><ul>
-<li><a class="reference internal" href="#svm-fetch-data">svm.fetch_data</a><ul>
-<li><a class="reference internal" href="#svm.fetch_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li><a class="reference internal" href="#svm.fetch_data.fetchData"><code class="docutils literal notranslate"><span class="pre">fetchData()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#svm-fetch-data">svm.fetch_data</a></li>
 </ul>
 </li>
 </ul>

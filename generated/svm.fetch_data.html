@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="svm.train" href="svm.train.html" /><link rel="prev" title="svm.predict" href="svm.predict.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="svm.train" href="svm.train.html" /><link rel="prev" title="API Reference" href="../api.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>svm.fetch_data - CCC 0.41 documentation</title>
@@ -205,7 +205,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../svm.html">SVM Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bert.html">BERT Documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="svm.predict.html">svm.predict</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">svm.fetch_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="svm.train.html">svm.train</a></li>
 </ul>
@@ -258,26 +257,21 @@ It uses the Supabase client to connect to the database and retrieve data from sp
 The script requires the following environment variables to be set:
 - SUPABASE_URL: The URL of the Supabase database.
 - SUPABASE_SERVICE_ROLE_KEY: The service role key for accessing the Supabase database.</p>
-<p>Usage:
-python fetch_data.py &lt;folder&gt;</p>
-<p>Arguments:
-- folder: The folder where the CSV files will be saved.</p>
 <p>Dependencies:
 - dotenv
 - os
 - pandas
 - re
-- supabase
-- sys</p>
+- supabase</p>
 <p class="rubric">Functions</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="../svm.html#svm.fetch_data.fetchData" title="svm.fetch_data.fetchData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetchData</span></code></a>(supabase, table)</p></td>
-<td><p>Fetches all data from a specified table in the Supabase database.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../svm.html#svm.fetch_data.main" title="svm.fetch_data.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>(argv)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fetch_data</span></code>()</p></td>
 <td><p>Main function to fetch data from Supabase and export it to CSV files.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">query_supabase</span></code>(supabase, table)</p></td>
+<td><p>Fetches all data from a specified table in the Supabase database.</p></td>
 </tr>
 </tbody>
 </table>
@@ -298,14 +292,14 @@ python fetch_data.py &lt;folder&gt;</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="svm.predict.html">
+          <a class="prev-page" href="../api.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">svm.predict</div>
+                <div class="title">API Reference</div>
                 
               </div>
             </a>
