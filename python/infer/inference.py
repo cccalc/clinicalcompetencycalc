@@ -38,7 +38,7 @@ def bert_infer(model: tf.keras.Model, data: dict[str, list[str]]) -> dict[str, i
   return {k: get_class(v) for k, v in data.items()}
 
 
-def svm_infer(models: dict[str, any], data: dict[str, list[str]]) -> dict[str, int]:
+def svm_infer(models: dict[str, any], data: dict[str, list[bool]]) -> dict[str, int]:
   '''
   Loads pre-trained SVM models and predicts the class for each response.
 

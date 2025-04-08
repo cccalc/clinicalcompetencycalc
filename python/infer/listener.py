@@ -1,6 +1,15 @@
+'''
+This script connects to the Supabase Realtime server and listens for new form responses.
+When a new response is inserted into the "form_responses" table, it processes the response using
+BERT and SVM models, and then stores the results in the "form_results" table.
+
+It requires the following environment variables to be set:
+- SUPABASE_URL: The URL of the Supabase project.
+- SUPABASE_SERVICE_ROLE_KEY: The service role key for the Supabase project.
+'''
+
 import asyncio
 import os
-# import json
 
 from supabase import AClient, Client, acreate_client, create_client
 from dotenv import load_dotenv

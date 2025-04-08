@@ -5,10 +5,13 @@
 import unittest
 from unittest.mock import call, patch, MagicMock
 
+import numpy as np
+import pandas as pd
 from postgrest.base_request_builder import SingleAPIResponse
 from sklearn.svm import SVC
 
 import fetch_data  # pylint: disable=import-error
+import train  # pylint: disable=import-error
 import util  # pylint: disable=import-error
 
 
@@ -68,7 +71,11 @@ class TestFetchData(unittest.TestCase):
     mock_response.data = {"something_else": {}}
 
     mock_supabase = MagicMock()
-    mock_supabase.schema.return_value.table.return_value.select.return_value.single.return_value.execute.return_value = mock_response
+    (mock_supabase.schema.return_value
+                  .table.return_value
+                  .select.return_value
+                  .single.return_value
+                  .execute.return_value) = mock_response
 
     mock_create_client.return_value = mock_supabase
 
@@ -154,6 +161,78 @@ class TestUtil(unittest.TestCase):
     mock_pickle_dump.assert_called_once()
     mock_supabase.storage.from_.assert_called_once_with("svm-models")
     mock_supabase.storage.from_().update.assert_called_once()
+
+
+class TestTrainSVM(unittest.TestCase):
+  '''Test cases for train_svm function in train module.'''
+
+  def setUp(self):
+    # Minimal valid DataFrame
+    self.df = pd.DataFrame({  # pylint: disable=attribute-defined-outside-init
+        'feature1': np.random.rand(25),
+        'feature2': np.random.rand(25),
+        'label': [0, 1] * 12 + [0]
+    })
+
+  def test_train_svm_success(self):
+    """Test SVM training returns accuracy and model."""
+    accuracy, model = train.train_svm("test_kf", self.df)
+    self.assertIsInstance(accuracy, float)
+    self.assertIsInstance(model, SVC)
+
+  def test_train_svm_insufficient_data(self):
+    """Test SVM training fails if not enough data after filtering."""
+    small_df = self.df.head(5)
+    accuracy, model = train.train_svm("short_kf", small_df)
+    self.assertIsNone(accuracy)
+    self.assertIsNone(model)
+
+  def test_train_svm_oversampling(self):
+    """Test SVM training with oversampling enabled."""
+    # Force class imbalance
+    imbalanced_df = self.df.copy()
+    imbalanced_df['label'] = [0] * 23 + [1, 1]
+    accuracy, model = train.train_svm("oversample_kf", imbalanced_df, oversample=True)
+    self.assertIsInstance(accuracy, float)
+    self.assertIsInstance(model, SVC)
+
+
+class TestMainTrain(unittest.TestCase):
+  '''Test cases for the main function in train module.'''
+
+  @patch("train.load_dotenv")
+  @patch("train.create_client")
+  @patch("train.fetch_data")
+  @patch("train.glob.glob", return_value=["data/mock.csv"])
+  @patch("train.pd.read_csv")
+  @patch("train.export_upload_model")
+  @patch("train.os.environ.get")
+  @patch("train.os.path.exists", return_value=False)
+  @patch("train.os.makedirs")
+  def test_main_success(
+      self, mock_makedirs, mock_exists, mock_environ_get, mock_export,
+      mock_read_csv, mock_glob, mock_fetch, mock_create_client, mock_dotenv
+  ):
+    """Test the main function in train module runs successfully."""
+    mock_environ_get.side_effect = lambda key, default=None: "mock"  # Mock env vars
+    mock_read_csv.return_value = pd.DataFrame({
+        'feature1': np.random.rand(25),
+        'feature2': np.random.rand(25),
+        'label': [0, 1] * 12 + [0]
+    })
+
+    class Args:
+      '''Mock command-line arguments for the main function.'''
+      no_fetch = False
+      train_proportion = 0.8
+      length_threshold = 20
+      oversample = False
+      verbose = False
+
+    train.main(Args())
+
+    mock_fetch.assert_called_once()
+    mock_export.assert_called_once()
 
 
 if __name__ == "__main__":
