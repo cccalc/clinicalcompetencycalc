@@ -60,7 +60,7 @@ const StudentDashboard: React.FC = () => {
   const [data, setData] = useState<EPA[]>([]);
   const [range, setRange] = useState<3 | 6 | 12>(3);
   const [selectedEpa, setSelectedEpa] = useState<EPA | null>(null);
-  const { user, loading } = useUser();
+  const { user} = useUser();
 
   useEffect(() => {
     if (!user) return; 
