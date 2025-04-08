@@ -13,11 +13,11 @@ interface OptionType {
 
 interface Props {
   raterId: string;
-  existingRequests: { student_id: string; completed_by: string }[];
+  hasActiveRequestForStudent: (studentId: string) => boolean;
   onSuccess: (newRequestId: string) => void;
 }
 
-const UnlistedStudentForm = ({ raterId, existingRequests, onSuccess }: Props) => {
+const UnlistedStudentForm = ({ raterId, hasActiveRequestForStudent, onSuccess }: Props) => {
   const [student, setStudent] = useState<OptionType | null>(null);
   const [setting, setSetting] = useState<OptionType | null>(null);
   const [details, setDetails] = useState('');
@@ -60,12 +60,8 @@ const UnlistedStudentForm = ({ raterId, existingRequests, onSuccess }: Props) =>
       return;
     }
 
-    const alreadyExists = existingRequests.some(
-      (req) => req.student_id === student.value && req.completed_by === raterId
-    );
-
-    if (alreadyExists) {
-      setMessage('This student has already requested you. Please check your dashboard.');
+    if (hasActiveRequestForStudent(student.value)) {
+      setMessage('This student already has an active evaluation request. Please check your dashboard.');
       return;
     }
 
@@ -79,6 +75,7 @@ const UnlistedStudentForm = ({ raterId, existingRequests, onSuccess }: Props) =>
           clinical_settings: setting.value,
           notes: details,
           goals,
+          active_status: true,
         },
       ])
       .select('id')
@@ -103,6 +100,7 @@ const UnlistedStudentForm = ({ raterId, existingRequests, onSuccess }: Props) =>
           value={student}
           onChange={(option: SingleValue<OptionType>) => setStudent(option)}
           placeholder='Search student...'
+          isClearable
         />
       </div>
 
@@ -113,17 +111,31 @@ const UnlistedStudentForm = ({ raterId, existingRequests, onSuccess }: Props) =>
           value={setting}
           onChange={(option: SingleValue<OptionType>) => setSetting(option)}
           placeholder='Search setting...'
+          isClearable
         />
       </div>
 
       <div className='mb-3'>
         <label className='form-label'>Student Goal(s)</label>
-        <textarea className='form-control' rows={3} value={goals} onChange={(e) => setGoals(e.target.value)} />
+        <textarea
+          className='form-control'
+          rows={3}
+          value={goals}
+          onChange={(e) => setGoals(e.target.value)}
+          placeholder="Enter the student's goals..."
+        />
       </div>
 
       <div className='mb-3'>
-        <label className='form-label'>Additional notes</label>
-        <textarea className='form-control' rows={3} value={details} onChange={(e) => setDetails(e.target.value)} />
+        <label className='form-label'>Additional notes (required)</label>
+        <textarea
+          className='form-control'
+          rows={3}
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          placeholder='Enter relevant activity details...'
+          required
+        />
       </div>
 
       <button type='submit' className='btn btn-primary' disabled={loading}>
