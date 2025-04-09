@@ -9,10 +9,10 @@ import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 
-// Dynamically load the Markdown editor (client-side only)
+// Dynamically load the markdown editor (client-only)
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
-// Safe Markdown parser (HTML disabled)
+// Safe markdown renderer
 const mdParser = new MarkdownIt({
   html: false,
   breaks: true,
@@ -27,15 +27,12 @@ type Announcement = {
   announcement_type: 'info' | 'warning' | 'danger';
 };
 
-/**
- * Admin interface for creating, editing, and deleting system-wide announcements.
- * Markdown is supported in the message editor and rendered safely with a custom parser.
- *
- * @component
- */
 export default function AdminAnnouncements() {
   const supabase = createClient();
 
+  // -------------------
+  // State
+  // -------------------
   const [message, setMessage] = useState('');
   const [type, setType] = useState<Announcement['announcement_type']>('info');
   const [startDate, setStartDate] = useState('');
@@ -44,12 +41,13 @@ export default function AdminAnnouncements() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  /**
-   * Fetches all announcements from Supabase and stores them in local state.
-   *
-   * @returns {Promise<void>}
-   */
+  // -------------------
+  // Fetch all announcements
+  // -------------------
   const fetchAnnouncements = useCallback(async (): Promise<void> => {
     const { data, error } = await supabase.from('announcements').select('*').order('start_date', { ascending: false });
 
@@ -65,27 +63,33 @@ export default function AdminAnnouncements() {
   }, [fetchAnnouncements]);
 
   /**
-   * Handles saving or updating an announcement.
-   * Sanitizes input before storing in the database.
-   *
-   * @returns {Promise<void>}
+   * Save or update an announcement
    */
   const handleSave = async (): Promise<void> => {
     if (!message.trim() || !startDate || !endDate) {
-      alert('Please fill out all required fields.');
+      setError('Please fill out all required fields.');
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (end <= start) {
+      setError('End date must be after start date.');
       return;
     }
 
     setSaving(true);
     setSuccess(false);
+    setError(null);
 
-    // Sanitize input to prevent HTML injection
-    const cleanedMessage: string = sanitizeHtml(message, {
-      allowedTags: [], // Strip all HTML
+    const cleanedMessage = sanitizeHtml(message, {
+      allowedTags: [],
       allowedAttributes: {},
     });
 
     if (editingId) {
+      // Update existing announcement
       const { error } = await supabase
         .from('announcements')
         .update({
@@ -100,13 +104,14 @@ export default function AdminAnnouncements() {
 
       if (error) {
         console.error('Update error:', error);
-        alert('Failed to update announcement.');
+        setError('Failed to update announcement.');
       } else {
         setSuccess(true);
         resetForm();
         fetchAnnouncements();
       }
     } else {
+      // Insert new announcement
       const { error } = await supabase.from('announcements').insert({
         message: cleanedMessage,
         start_date: startDate,
@@ -118,7 +123,7 @@ export default function AdminAnnouncements() {
 
       if (error) {
         console.error('Insert error:', error);
-        alert('Failed to save announcement.');
+        setError('Failed to save announcement.');
       } else {
         setSuccess(true);
         resetForm();
@@ -128,26 +133,25 @@ export default function AdminAnnouncements() {
   };
 
   /**
-   * Deletes an announcement by ID.
-   *
-   * @param {string} id - ID of the announcement to delete
-   * @returns {Promise<void>}
+   * Trigger confirmation modal and mark ID to delete
    */
-  const handleDelete = async (id: string): Promise<void> => {
-    if (!confirm('Are you sure you want to delete this announcement?')) return;
+  const handleDelete = async (): Promise<void> => {
+    if (!pendingDeleteId) return;
 
-    const { error } = await supabase.from('announcements').delete().eq('id', id);
+    const { error } = await supabase.from('announcements').delete().eq('id', pendingDeleteId);
     if (error) {
-      alert('Failed to delete announcement.');
+      setError('Failed to delete announcement.');
     } else {
+      setError(null);
       fetchAnnouncements();
     }
+
+    setPendingDeleteId(null);
+    setShowConfirmDelete(false);
   };
 
   /**
-   * Begins editing an existing announcement.
-   *
-   * @param {Announcement} announcement - Announcement data to prefill the form
+   * Begin editing an existing announcement
    */
   const startEdit = (announcement: Announcement): void => {
     setEditingId(announcement.id);
@@ -158,7 +162,7 @@ export default function AdminAnnouncements() {
   };
 
   /**
-   * Resets the announcement form to its default state.
+   * Clear all form fields
    */
   const resetForm = (): void => {
     setEditingId(null);
@@ -166,7 +170,52 @@ export default function AdminAnnouncements() {
     setStartDate('');
     setEndDate('');
     setType('info');
+    setError(null);
+    setSuccess(false);
   };
+
+  /**
+   * Preview box styling based on selected alert type
+   */
+  const getPreviewStyle = (): React.CSSProperties => {
+    switch (type) {
+      case 'info':
+        return {
+          backgroundColor: '#cff4fc',
+          color: '#055160',
+          padding: '1rem',
+          borderRadius: '6px',
+          border: '1px solid #b6effb',
+        };
+      case 'warning':
+        return {
+          backgroundColor: '#fff3cd',
+          color: '#664d03',
+          padding: '1rem',
+          borderRadius: '6px',
+          border: '1px solid #ffeeba',
+        };
+      case 'danger':
+        return {
+          backgroundColor: '#f8d7da',
+          color: '#842029',
+          padding: '1rem',
+          borderRadius: '6px',
+          border: '1px solid #f5c2c7',
+        };
+      default:
+        return {
+          backgroundColor: '#f1f3f5',
+          color: '#212529',
+          padding: '1rem',
+          borderRadius: '6px',
+        };
+    }
+  };
+
+  // -------------------
+  // UI
+  // -------------------
 
   return (
     <div className='p-3 rounded' style={{ backgroundColor: '#f1f3f5' }}>
@@ -176,6 +225,7 @@ export default function AdminAnnouncements() {
         </div>
 
         <div className='card-body px-2'>
+          {/* Markdown Editor */}
           <div className='mb-3'>
             <label className='form-label'>Announcement Message (Markdown Supported)</label>
             <div data-color-mode='light'>
@@ -183,22 +233,21 @@ export default function AdminAnnouncements() {
                 value={message}
                 onChange={(val) => setMessage(val || '')}
                 height={200}
-                preview='edit' // Disable live preview for safety
+                preview='edit'
                 hideToolbar={true}
               />
             </div>
           </div>
 
+          {/* Live Preview */}
           {message && (
             <div className='mb-3'>
               <label className='form-label'>Preview</label>
-              <MarkdownPreview
-                source={mdParser.render(message)}
-                style={{ backgroundColor: '#D3D3D3', padding: '1rem', borderRadius: '6px', color: '#212529' }}
-              />
+              <MarkdownPreview source={mdParser.render(message)} style={getPreviewStyle()} />
             </div>
           )}
 
+          {/* Form Fields */}
           <div className='row mb-3'>
             <div className='col-md-4'>
               <label className='form-label'>Type</label>
@@ -232,18 +281,31 @@ export default function AdminAnnouncements() {
             </div>
           </div>
 
-          <button className='btn btn-primary w-100' onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : editingId ? 'Update Announcement' : 'Save Announcement'}
-          </button>
+          {/* Save + Clear */}
+          <div className='d-flex justify-content-between gap-3'>
+            <button className='btn btn-primary flex-fill' onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving…' : editingId ? 'Update Announcement' : 'Save Announcement'}
+            </button>
+            <button className='btn btn-outline-secondary flex-fill' onClick={resetForm} disabled={saving}>
+              Clear
+            </button>
+          </div>
 
+          {/* Feedback */}
           {success && (
             <div className='alert alert-success mt-3'>
               <i className='bi bi-check-circle-fill me-2'></i> Announcement {editingId ? 'updated' : 'saved'}!
             </div>
           )}
+          {error && (
+            <div className='alert alert-danger mt-3'>
+              <i className='bi bi-exclamation-triangle-fill me-2'></i> {error}
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Announcement List */}
       <div className='mt-4'>
         <h6 className='text-dark'>Existing Announcements</h6>
         {announcements.length === 0 ? (
@@ -266,7 +328,13 @@ export default function AdminAnnouncements() {
                   <button className='btn btn-sm btn-outline-primary me-2' onClick={() => startEdit(a)}>
                     <i className='bi bi-pencil'></i>
                   </button>
-                  <button className='btn btn-sm btn-outline-danger' onClick={() => handleDelete(a.id)}>
+                  <button
+                    className='btn btn-sm btn-outline-danger'
+                    onClick={() => {
+                      setPendingDeleteId(a.id);
+                      setShowConfirmDelete(true);
+                    }}
+                  >
                     <i className='bi bi-trash'></i>
                   </button>
                 </div>
@@ -275,6 +343,31 @@ export default function AdminAnnouncements() {
           </ul>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmDelete && (
+        <div className='modal show fade' style={{ display: 'block' }} tabIndex={-1}>
+          <div className='modal-dialog'>
+            <div className='modal-content'>
+              <div className='modal-header bg-danger text-white'>
+                <h5 className='modal-title'>Confirm Deletion</h5>
+                <button type='button' className='btn-close' onClick={() => setShowConfirmDelete(false)}></button>
+              </div>
+              <div className='modal-body'>
+                <p>Are you sure you want to delete this announcement? This action cannot be undone.</p>
+              </div>
+              <div className='modal-footer'>
+                <button className='btn btn-secondary' onClick={() => setShowConfirmDelete(false)}>
+                  Cancel
+                </button>
+                <button className='btn btn-danger' onClick={handleDelete}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
