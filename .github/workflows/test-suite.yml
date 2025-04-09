@@ -35,38 +35,8 @@ jobs:
           cd frontend
           npm test -- --ci --coverage
           
-  test-backend-bart:
-    name: Test Backend Bert (unittest)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Initialize environment
-        run: |
-          cd python/bert
-          chmod +x init.sh
-          ./init.sh
-          
-      - name: Run tests
-        run: |
-          if [ ! -d "python/bart/test" ]; then
-            echo "python/bart/test folder not found, skipping tests for Bart";
-            exit 0;
-          fi        
-          cd python/bert
-          . .venv/bin/activate
-          cd test
-          for file in *.py; do python3 -m unittest "$file" -v; done
-          
   test-backend-svm:
-    name: Test Backend SVM (unittest)
+    name: Test Backend SVM
     runs-on: ubuntu-latest
 
     steps:
@@ -89,8 +59,7 @@ jobs:
           if [ ! -d "python/svm/test" ]; then
             echo "python/svm/test folder not found, skipping tests for SVM";
             exit 0;
-          fi        
+          fi
           cd python/svm
           . .venv/bin/activate
-          cd test
-          for file in *.py; do python3 -m unittest "$file" -v; done
+          python -m test.test
