@@ -24,8 +24,6 @@ async def main() -> None:
   :return: None
   """
 
-  download = False
-
   print("Loading environment variables...")
 
   load_dotenv()
@@ -41,8 +39,7 @@ async def main() -> None:
   supabase: Client = create_client(url, key)
   asupabase: AClient = await acreate_client(url, key)
 
-  if download:
-    download_svm_models(supabase)
+  download_svm_models(supabase)
 
   bert_model = load_bert_model("bert-model/cb-250401-80_7114_model")
   svm_models = load_svm_models()
