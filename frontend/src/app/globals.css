@@ -1,6 +1,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --header-height: 64px;
+}
+
+.main-content {
+  padding-top: var(--header-height);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -113,5 +118,10 @@ header a.active {
 
   .border {
     border: 1px solid #ccc !important;
+  }
+
+  html {
+    scroll-padding-top: var(--header-height);
+    scroll-behavior: smooth;
   }
 }

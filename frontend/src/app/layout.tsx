@@ -37,8 +37,21 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <UserProvider>
-          <Header />
-          {children}
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              zIndex: 1030,
+              backgroundColor: 'white',
+              borderBottom: '1px solid #dee2e6',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+            }}
+          >
+            <Header />
+          </div>
+          <div className='main-content'>{children}</div>
         </UserProvider>
       </body>
       <BootstrapClient />
