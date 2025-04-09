@@ -18,18 +18,16 @@ export interface SystemStats {
 
 type DelinquentRaterRow = {
   rater_id: string;
-  created_at: string;
-  rater: {
-    id: string;
-    display_name: string | null;
-  } | null;
+  display_name: string | null;
+  email: string | null;
+  count: number;
 };
 
 let cachedStats: SystemStats | null = null;
 let lastFetched: number | null = null;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-export async function getSystemStats(delinquentThresholdDays = 14): Promise<SystemStats> {
+export async function getSystemStats(): Promise<SystemStats> {
   const now = Date.now();
   if (cachedStats && lastFetched && now - lastFetched < CACHE_TTL_MS) {
     return cachedStats;
@@ -37,87 +35,52 @@ export async function getSystemStats(delinquentThresholdDays = 14): Promise<Syst
 
   const supabase = createClient();
 
-  const nowDate = new Date();
-  const delinquentCutoff = new Date(nowDate);
-  delinquentCutoff.setDate(nowDate.getDate() - delinquentThresholdDays);
-
-  // Submitted forms
+  // ✅ Total submitted forms
   const { count: totalSubmittedForms } = await supabase
     .from('form_responses')
     .select('*', { count: 'exact', head: true });
 
-  // Active form requests (pending)
+  // ✅ Active requests (active_status = true)
   const { count: activeFormRequests } = await supabase
     .from('form_requests')
-    .select('*', { count: 'exact', head: true });
+    .select('*', { count: 'exact', head: true })
+    .eq('active_status', true);
 
-  // Delinquent forms
+  // ✅ Delinquent requests: active and older than 14 days
   const { count: delinquentFormRequests } = await supabase
     .from('form_requests')
     .select('*', { count: 'exact', head: true })
-    .is('completed_at', null)
-    .lt('created_at', delinquentCutoff.toISOString());
+    .eq('active_status', true)
+    .lt('created_at', new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString());
 
-  // Average turnaround time (in days)
+  // ✅ Average turnaround time (in days)
   const { data: turnaroundData } = await supabase.rpc('average_turnaround_days');
 
-  // Top delinquent raters with profile join
-  const { data: topRatersData } = (await supabase
-    .from('form_requests')
-    .select('rater_id, created_at, rater:profiles (id, display_name)')
-    .is('completed_at', null)
-    .lt('created_at', delinquentCutoff.toISOString())) as { data: DelinquentRaterRow[] | null };
+  // ✅ Delinquent raters via RPC (no params now)
+  const { data: delinquentRatersData } = await supabase.rpc('get_delinquent_raters');
 
-  const raterMap = new Map<string, { display_name: string; count: number }>();
+  const topDelinquentRaters: SystemStats['topDelinquentRaters'] = (delinquentRatersData || []).map(
+    (row: DelinquentRaterRow) => ({
+      rater_id: row.rater_id,
+      display_name: row.display_name ?? 'Unknown',
+      email: row.email ?? 'Unavailable',
+      count: row.count ?? 0,
+    })
+  );
 
-  topRatersData?.forEach((req) => {
-    const id = req.rater_id;
-    const name = req.rater?.display_name || 'Unknown';
-    if (!raterMap.has(id)) {
-      raterMap.set(id, { display_name: name, count: 1 });
-    } else {
-      raterMap.get(id)!.count += 1;
-    }
-  });
-
-  // Fetch emails using get_email_by_user_id
-  const topDelinquentRaters: SystemStats['topDelinquentRaters'] = [];
-
-  for (const [rater_id, { display_name, count }] of raterMap.entries()) {
-    const { data: emailData } = await supabase.rpc('get_email_by_user_id', { user_id_input: rater_id });
-    topDelinquentRaters.push({
-      rater_id,
-      display_name,
-      email: emailData ?? 'Not available',
-      count,
-    });
-  }
-
-  topDelinquentRaters.sort((a, b) => b.count - a.count);
-
-  // Monthly submission trends
+  // ✅ Monthly submission trends
   const { data: monthlyData } = await supabase.rpc('monthly_form_submissions');
 
-  // EPA distribution (accurately pulling from response[epa])
+  // ✅ EPA distribution (across form responses)
   const { data: responseData } = await supabase.from('form_responses').select('response');
-
   const epaCounts: Record<string, number> = {};
 
-  // ✅ Loop through each form response
   responseData?.forEach((entry) => {
     const response = entry.response;
-
     if (!response || typeof response !== 'object') return;
-
-    // 🔥 FIX: drill into response.response to get EPA keys
     const epaKeys = Object.keys(response.response ?? {});
-
     for (const epaId of epaKeys) {
-      if (!epaCounts[epaId]) {
-        epaCounts[epaId] = 1;
-      } else {
-        epaCounts[epaId]++;
-      }
+      epaCounts[epaId] = (epaCounts[epaId] ?? 0) + 1;
     }
   });
 
@@ -125,13 +88,14 @@ export async function getSystemStats(delinquentThresholdDays = 14): Promise<Syst
     .map(([epa, count]) => ({ epa, count }))
     .sort((a, b) => Number(a.epa) - Number(b.epa));
 
+  // ✅ Final cached output
   cachedStats = {
-    totalSubmittedForms: totalSubmittedForms || 0,
-    activeFormRequests: activeFormRequests || 0,
-    delinquentFormRequests: delinquentFormRequests || 0,
-    averageTurnaroundDays: turnaroundData?.average || null,
+    totalSubmittedForms: totalSubmittedForms ?? 0,
+    activeFormRequests: activeFormRequests ?? 0,
+    delinquentFormRequests: delinquentFormRequests ?? 0,
+    averageTurnaroundDays: turnaroundData?.average ?? null,
     topDelinquentRaters,
-    monthlySubmissionTrends: monthlyData || [],
+    monthlySubmissionTrends: monthlyData ?? [],
     epaDistribution,
   };
 
