@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import LineGraph from '@/components/(StudentComponents)/LineGraph';
 import HalfCircleGauge from '@/components/(StudentComponents)/HalfCircleGauge';
 import { createClient } from '@/utils/supabase/client';
@@ -36,13 +36,13 @@ interface SupabaseRow {
   form_responses: FormResponsesInner;
 }
 
-interface StudentReportRow {
-  created_at: string;
-  time_window: string;
-  title: string;
-  report_data: Record<string, number>;
-  llm_feedback?: string | null;
-}
+// interface StudentReportRow {
+//   created_at: string;
+//   time_window: string;
+//   title: string;
+//   report_data: Record<string, number>;
+//   llm_feedback?: string | null;
+// }
 
 interface Assessment {
   epaId: number;
@@ -68,105 +68,120 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
   const [comments, setComments] = useState<string[]>([]);
   const [llmFeedback, setLlmFeedback] = useState<string | null>(null);
   const [lifetimeAverage, setLifetimeAverage] = useState<number | null>(null);
+  const [lineGraphData, setLineGraphData] = useState<{ date: string; value: number }[]>([]);
 
-  useEffect(() => {
-    const fetchTitle = async () => {
-      const { data } = await supabase.from('epa_kf_descriptions').select('epa_descriptions').single();
-      if (data?.epa_descriptions) {
-        setEpaTitle(data.epa_descriptions[epaId.toString()] || '');
-      }
-    };
-    fetchTitle();
-  }, [epaId]);
+  const epaStr = String(epaId);
+  const now = new Date();
+  const cutoff = new Date();
+  cutoff.setMonth(now.getMonth() - timeRange);
 
-  useEffect(() => {
-    const fetchAssessments = async () => {
-      const { data, error } = await supabase
-        .from('form_results')
-        .select(
-          `
-          created_at,
-          results,
-          form_responses:form_responses!form_results_response_id_fkey (
-            response,
-            form_requests:form_requests!form_responses_request_id_fkey (
-              student_id,
-              clinical_settings
-            )
-          )
+  const fetchTitle = useCallback(async () => {
+    const { data } = await supabase.from('epa_kf_descriptions').select('epa_descriptions').single();
+    if (data?.epa_descriptions) {
+      setEpaTitle(data.epa_descriptions[epaStr] || '');
+    }
+  }, [epaStr]);
+
+  const fetchAll = useCallback(async () => {
+    const { data: resultData } = await supabase
+      .from('form_results')
+      .select(
         `
+        created_at,
+        results,
+        form_responses:form_responses!form_results_response_id_fkey (
+          response,
+          form_requests:form_requests!form_responses_request_id_fkey (
+            student_id,
+            clinical_settings
+          )
         )
-        .returns<SupabaseRow[]>();
+      `
+      )
+      .returns<SupabaseRow[]>();
 
-      if (error || !data) {
-        console.error('Error fetching assessment data:', error);
-        return;
-      }
+    const { data: reportData } = await supabase
+      .from('student_reports')
+      .select('created_at, report_data, llm_feedback')
+      .eq('user_id', studentId);
 
-      const parsedAssessments: Assessment[] = [];
-      const parsedComments: string[] = [];
+    const parsedAssessments: Assessment[] = [];
+    const parsedComments: string[] = [];
 
-      for (const row of data) {
-        const formResponse = row.form_responses;
-        if (formResponse?.form_requests?.student_id !== studentId) continue;
+    for (const row of resultData ?? []) {
+      const formResponse = row.form_responses;
+      if (formResponse?.form_requests?.student_id !== studentId) continue;
 
-        const date = row.created_at;
-        const setting = formResponse.form_requests?.clinical_settings || null;
+      const date = row.created_at;
+      const setting = formResponse.form_requests?.clinical_settings || null;
 
-        for (const [kfKey, level] of Object.entries(row.results)) {
-          const [epaStr, kfNum] = kfKey.split('.');
-          if (parseInt(epaStr) === epaId) {
-            parsedAssessments.push({
-              epaId: parseInt(epaStr),
-              keyFunctionId: `kf${kfNum}`,
-              devLevel: level as DevLevel,
-              date,
-              setting,
-            });
-          }
-        }
-
-        const commentBlock = formResponse.response?.response?.[String(epaId)];
-        if (commentBlock) {
-          Object.values(commentBlock).forEach((kfObj) => {
-            if (kfObj && typeof kfObj === 'object' && 'text' in kfObj) {
-              const texts = (kfObj as KeyFunctionResponse).text;
-              if (Array.isArray(texts)) {
-                parsedComments.push(...texts.filter((t) => typeof t === 'string' && t.trim() !== ''));
-              }
-            }
+      for (const [kfKey, level] of Object.entries(row.results)) {
+        const [epaKey, kfNum] = kfKey.split('.');
+        if (parseInt(epaKey) === epaId) {
+          parsedAssessments.push({
+            epaId,
+            keyFunctionId: `kf${kfNum}`,
+            devLevel: level as DevLevel,
+            date,
+            setting,
           });
         }
       }
 
-      setAssessments(parsedAssessments);
-      setComments(parsedComments);
-    };
-
-    const fetchReport = async () => {
-      const { data: reports, error } = await supabase
-        .from('student_reports')
-        .select('*')
-        .eq('user_id', studentId)
-        .order('created_at', { ascending: false });
-
-      if (!error && reports && reports.length > 0) {
-        const recent = reports[0] as StudentReportRow;
-        const epaKey = String(epaId);
-        if (recent.report_data[epaKey] !== undefined) {
-          setLifetimeAverage(recent.report_data[epaKey]);
-        }
-        setLlmFeedback(recent.llm_feedback || null);
+      const commentBlock = formResponse.response?.response?.[epaStr];
+      if (commentBlock) {
+        Object.values(commentBlock).forEach((kfObj) => {
+          if (kfObj && typeof kfObj === 'object' && 'text' in kfObj) {
+            const texts = (kfObj as KeyFunctionResponse).text;
+            if (Array.isArray(texts)) {
+              parsedComments.push(...texts.filter((t) => typeof t === 'string' && t.trim() !== ''));
+            }
+          }
+        });
       }
-    };
+    }
 
-    fetchAssessments();
-    fetchReport();
-  }, [epaId, studentId]);
+    setAssessments(parsedAssessments);
+    setComments(parsedComments);
 
-  const now = new Date();
-  const cutoff = new Date();
-  cutoff.setMonth(now.getMonth() - timeRange);
+    const monthlyMap: Record<string, number[]> = {};
+    const lifetimeScores: number[] = [];
+
+    for (const report of reportData ?? []) {
+      const value = report.report_data?.[epaStr];
+      if (typeof value === 'number') {
+        const date = new Date(report.created_at);
+        const key = new Date(date.getFullYear(), Math.floor(date.getMonth() / 3) * 3, 1).toISOString().slice(0, 10);
+        if (!monthlyMap[key]) monthlyMap[key] = [];
+        monthlyMap[key].push(value);
+        lifetimeScores.push(value);
+      }
+      if (report.llm_feedback && report.report_data?.[epaStr] !== undefined) {
+        setLlmFeedback(report.llm_feedback);
+      }
+    }
+
+    const graphData = Object.entries(monthlyMap)
+      .map(([date, vals]) => ({
+        date,
+        value: Math.floor(vals.reduce((a, b) => a + b, 0) / vals.length),
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    setLineGraphData(graphData);
+
+    if (lifetimeScores.length > 0) {
+      setLifetimeAverage(Math.floor(lifetimeScores.reduce((a, b) => a + b, 0) / lifetimeScores.length));
+    }
+  }, [epaId, studentId, epaStr]);
+
+  useEffect(() => {
+    fetchTitle();
+  }, [fetchTitle]);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const filtered = assessments.filter((a) => new Date(a.date) >= cutoff);
   const devLevels = filtered.filter((a) => a.devLevel !== null) as { devLevel: number }[];
@@ -181,25 +196,8 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
     ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
     : 'N/A';
 
-  // ✅ New logic to count distinct form submissions per EPA
   const formAssessmentDates = new Set(assessments.filter((a) => a.epaId === epaId).map((a) => a.date));
   const assessmentCount = formAssessmentDates.size;
-
-  const groupedByMonth = assessments
-    .filter((a) => a.devLevel !== null)
-    .reduce((acc, a) => {
-      const month = new Date(a.date).toISOString().slice(0, 7);
-      if (!acc[month]) acc[month] = [];
-      acc[month].push(a.devLevel as number);
-      return acc;
-    }, {} as Record<string, number[]>);
-
-  const lineGraphData = Object.entries(groupedByMonth)
-    .map(([month, levels]) => ({
-      date: month + '-01',
-      value: Math.round(levels.reduce((sum, v) => sum + v, 0) / levels.length),
-    }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
     <div className={`card rounded shadow-sm ${expanded ? 'expanded' : ''}`}>
@@ -249,7 +247,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
                 </tr>
               </thead>
               <tbody>
-                {(kfDescriptions?.[String(epaId)] || []).map((label, index) => {
+                {(kfDescriptions?.[epaStr] || []).map((label, index) => {
                   const kfId = `kf${index + 1}`;
                   const scores = filtered.filter((a) => a.keyFunctionId === kfId && a.devLevel !== null);
                   const avgKF =
