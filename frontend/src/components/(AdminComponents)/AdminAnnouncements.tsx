@@ -250,8 +250,9 @@ export default function AdminAnnouncements() {
           {/* Form Fields */}
           <div className='row mb-3'>
             <div className='col-md-4'>
-              <label className='form-label'>Type</label>
+              <label htmlFor='announcement-type' className='form-label'>Type</label>
               <select
+                id='announcement-type'
                 className='form-select'
                 value={type}
                 onChange={(e) => setType(e.target.value as Announcement['announcement_type'])}
@@ -262,8 +263,9 @@ export default function AdminAnnouncements() {
               </select>
             </div>
             <div className='col-md-4'>
-              <label className='form-label'>Start Date</label>
+              <label htmlFor='start-date' className='form-label'>Start Date</label>
               <input
+                id='start-date'
                 type='datetime-local'
                 className='form-control'
                 value={startDate}
@@ -271,8 +273,9 @@ export default function AdminAnnouncements() {
               />
             </div>
             <div className='col-md-4'>
-              <label className='form-label'>End Date</label>
+              <label htmlFor='end-date' className='form-label'>End Date</label>
               <input
+                id='end-date'
                 type='datetime-local'
                 className='form-control'
                 value={endDate}

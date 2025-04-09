@@ -96,6 +96,7 @@ const UnlistedStudentForm = ({ raterId, hasActiveRequestForStudent, onSuccess }:
       <div className='mb-3'>
         <label className='form-label'>Select Student</label>
         <Select
+          aria-label='Select Student'
           options={studentOptions}
           value={student}
           onChange={(option: SingleValue<OptionType>) => setStudent(option)}
@@ -107,6 +108,7 @@ const UnlistedStudentForm = ({ raterId, hasActiveRequestForStudent, onSuccess }:
       <div className='mb-3'>
         <label className='form-label'>Clinical Setting</label>
         <Select
+          aria-label='Clinical Setting'
           options={settingOptions}
           value={setting}
           onChange={(option: SingleValue<OptionType>) => setSetting(option)}
@@ -116,26 +118,13 @@ const UnlistedStudentForm = ({ raterId, hasActiveRequestForStudent, onSuccess }:
       </div>
 
       <div className='mb-3'>
-        <label className='form-label'>Student Goal(s)</label>
-        <textarea
-          className='form-control'
-          rows={3}
-          value={goals}
-          onChange={(e) => setGoals(e.target.value)}
-          placeholder="Enter the student's goals..."
-        />
+        <label aria-label='Student Goal(s)' className='form-label'>Student Goal(s)</label>
+        <textarea aria-label='student-goals-value' className='form-control' rows={3} value={goals} onChange={(e) => setGoals(e.target.value)} />
       </div>
 
       <div className='mb-3'>
-        <label className='form-label'>Additional notes (required)</label>
-        <textarea
-          className='form-control'
-          rows={3}
-          value={details}
-          onChange={(e) => setDetails(e.target.value)}
-          placeholder='Enter relevant activity details...'
-          required
-        />
+        <label aria-label='Additional notes' className='form-label'>Additional notes</label>
+        <textarea aria-label='additional-notes-value' className='form-control' rows={3} value={details} onChange={(e) => setDetails(e.target.value)} />
       </div>
 
       <button type='submit' className='btn btn-primary' disabled={loading}>
