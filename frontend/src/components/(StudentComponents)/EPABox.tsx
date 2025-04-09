@@ -181,6 +181,10 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
     ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
     : 'N/A';
 
+  // ✅ New logic to count distinct form submissions per EPA
+  const formAssessmentDates = new Set(assessments.filter((a) => a.epaId === epaId).map((a) => a.date));
+  const assessmentCount = formAssessmentDates.size;
+
   const groupedByMonth = assessments
     .filter((a) => a.devLevel !== null)
     .reduce((acc, a) => {
@@ -222,7 +226,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
             <div className='col-md-6'>
               <h6 className='fw-bold border-bottom pb-1'>EPA Stats</h6>
               <ul className='list-group mb-3'>
-                <li className='list-group-item'>Assessments: {devLevels.length}</li>
+                <li className='list-group-item'>Assessments: {assessmentCount}</li>
                 <li className='list-group-item'>Days Since Last: {daysSinceLast}</li>
                 <li className='list-group-item'>Settings: {settings.join(', ')}</li>
                 <li className='list-group-item'>
@@ -272,22 +276,26 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
 
           <div className='mb-4'>
             <h6 className='fw-bold border-bottom pb-1'>Comments</h6>
-            <ul className='list-group'>
-              {comments.length > 0 ? (
-                comments.map((c, i) => (
-                  <li key={i} className='list-group-item'>
-                    {c}
-                  </li>
-                ))
-              ) : (
-                <li className='list-group-item'>No comments found</li>
-              )}
-            </ul>
+            <div style={{ maxHeight: '300px', overflowY: 'auto' }} className='border rounded p-2'>
+              <ul className='list-group'>
+                {comments.length > 0 ? (
+                  comments.map((c, i) => (
+                    <li key={i} className='list-group-item'>
+                      {c}
+                    </li>
+                  ))
+                ) : (
+                  <li className='list-group-item'>No comments found</li>
+                )}
+              </ul>
+            </div>
           </div>
 
-          <div>
+          <div className='mb-4'>
             <h6 className='fw-bold border-bottom pb-1'>AI Summary & Recommendations</h6>
-            <p className='text-muted'>{llmFeedback || <em>No AI feedback available for this EPA.</em>}</p>
+            <div style={{ maxHeight: '300px', overflowY: 'auto' }} className='border rounded p-3 bg-light'>
+              <p className='text-muted mb-0'>{llmFeedback || <em>No AI feedback available for this EPA.</em>}</p>
+            </div>
           </div>
         </div>
       )}

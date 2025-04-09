@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
 const supabase = createClient();
@@ -17,71 +17,107 @@ const ReportGenerationForm: React.FC<ReportGenerationFormProps> = ({ studentId, 
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-  const generateReport = async (): Promise<void> => {
+  useEffect(() => {
+    if (success) {
+      const timeout = setTimeout(() => setSuccess(false), 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [success]);
+
+  const generateReport = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (loading || title.trim() === '') return;
+
     setLoading(true);
     setError('');
     setSuccess(false);
 
     try {
-      const { error } = await supabase.rpc('generate_student_report', {
+      const { error } = await supabase.rpc('generate_report', {
         student_id_input: studentId,
         time_range_input: timeRange,
-        report_title: title,
+        report_title: title.trim(),
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase RPC Error:', error);
+        let message = 'An error occurred while generating the report.';
+        if (error.message) message += `\nMessage: ${error.message}`;
+        if (error.code) message += `\nCode: ${error.code}`;
+        if (error.details) message += `\nDetails: ${error.details}`;
+        throw new Error(message);
+      }
 
       setSuccess(true);
       setTitle('');
-      onGenerated(); // notify parent component
+      onGenerated();
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred.');
-      }
+      console.error('Report generation failed:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred during report generation.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className='card p-3'>
-      <h5 className='mb-3'>Generate New Report</h5>
+    <div className='card shadow-sm p-4 mt-5'>
+      <h4 className='mb-3 fw-semibold'>Generate New Report</h4>
 
-      <div className='mb-3'>
-        <label className='form-label'>Report Title</label>
-        <input
-          type='text'
-          className='form-control'
-          value={title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-          placeholder='Enter report name'
-        />
-      </div>
-
-      <div className='mb-3'>
-        <label className='form-label'>Time Range</label>
-        <div className='btn-group' role='group'>
-          {[3, 6, 12].map((value) => (
-            <button
-              key={value}
-              type='button'
-              className={`btn btn-outline-primary${timeRange === value ? ' active' : ''}`}
-              onClick={() => setTimeRange(value as 3 | 6 | 12)}
-            >
-              Last {value} mo
-            </button>
-          ))}
+      <form onSubmit={generateReport}>
+        <div className='mb-3'>
+          <label htmlFor='report-title' className='form-label'>
+            Report Title
+          </label>
+          <input
+            id='report-title'
+            type='text'
+            className={`form-control ${title.trim() === '' && error ? 'is-invalid' : ''}`}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder='Enter report title'
+            required
+            disabled={loading}
+          />
         </div>
-      </div>
 
-      <button className='btn btn-success' onClick={generateReport} disabled={loading || title.trim() === ''}>
-        {loading ? 'Generating...' : 'Generate Report'}
-      </button>
+        <div className='mb-3'>
+          <label className='form-label d-block'>Time Range</label>
+          <div className='btn-group' role='group' aria-label='Time range options'>
+            {[3, 6, 12].map((value) => (
+              <button
+                key={value}
+                type='button'
+                className={`btn btn-outline-primary${timeRange === value ? ' active' : ''}`}
+                onClick={() => setTimeRange(value as 3 | 6 | 12)}
+                disabled={loading}
+              >
+                Last {value} mo
+              </button>
+            ))}
+          </div>
+        </div>
 
-      {success && <p className='text-success mt-2'>Report generated successfully.</p>}
-      {error && <p className='text-danger mt-2'>Error: {error}</p>}
+        <div className='d-flex justify-content-between align-items-center mt-4'>
+          <button
+            type='submit'
+            className='btn btn-success'
+            disabled={loading || title.trim() === ''}
+            aria-disabled={loading}
+          >
+            {loading ? 'Generating...' : 'Generate Report'}
+          </button>
+
+          {success && <span className='text-success fw-semibold'>✔ Report generated!</span>}
+        </div>
+
+        {error && (
+          <div className='alert alert-danger mt-4' style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Error:</strong>
+            <br />
+            {error}
+          </div>
+        )}
+      </form>
     </div>
   );
 };

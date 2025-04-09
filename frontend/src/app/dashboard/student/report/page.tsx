@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@/context/UserContext';
 import EPABox from '@/components/(StudentComponents)/EPABox';
 import DownloadPDFButton from '@/components/(StudentComponents)/DownloadPDFButton';
@@ -20,6 +20,11 @@ interface StudentReport {
   created_at: string;
 }
 
+interface ProfessionalismRow {
+  professionalism: string | null;
+  form_requests: { student_id: string }; // explicitly not an array
+}
+
 const REPORT_EPAS = Array.from({ length: 13 }, (_, i) => i + 1); // EPA 1 to 13
 
 const ReportPage = () => {
@@ -28,6 +33,7 @@ const ReportPage = () => {
   const [kfDescriptions, setKfDescriptions] = useState<Record<string, string[]> | null>(null);
   const [reports, setReports] = useState<StudentReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<StudentReport | null>(null);
+  const [professionalismComments, setProfessionalismComments] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -73,6 +79,41 @@ const ReportPage = () => {
       setSelectedReport(data[0] as StudentReport);
     }
   };
+
+  const fetchProfessionalismComments = useCallback(async () => {
+    if (!user) return;
+
+    const { data, error } = (await supabase.from('form_responses').select(`
+    professionalism,
+    form_requests (
+      student_id
+    )
+  `)) as { data: ProfessionalismRow[] | null; error: { message: string } | null };
+
+    if (error) {
+      console.error('Error fetching professionalism comments:', error);
+      return;
+    }
+
+    const filtered = (data ?? [])
+      .filter(
+        (row) =>
+          row.form_requests?.student_id === user.id &&
+          typeof row.professionalism === 'string' &&
+          row.professionalism.trim() !== ''
+      )
+      .map((row) => row.professionalism!.trim());
+
+    setProfessionalismComments(filtered);
+
+    setProfessionalismComments(filtered);
+  }, [user]);
+
+  useEffect(() => {
+    if (selectedReport) {
+      fetchProfessionalismComments();
+    }
+  }, [selectedReport, user, fetchProfessionalismComments]);
 
   if (loading) return <p>Loading user...</p>;
   if (!user) return <p>Please sign in to view reports.</p>;
@@ -134,6 +175,31 @@ const ReportPage = () => {
                 studentId={user.id}
               />
             ))}
+
+            {/* ✅ Professionalism Comments */}
+            <div className='card mt-4 mb-5'>
+              <div className='card-header fw-bold'>Professionalism Comments</div>
+              <div
+                className='card-body'
+                style={{
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {professionalismComments.length > 0 ? (
+                  <ul className='list-group'>
+                    {professionalismComments.map((comment, idx) => (
+                      <li key={idx} className='list-group-item'>
+                        {comment}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className='text-muted'>No professionalism comments found.</p>
+                )}
+              </div>
+            </div>
           </div>
         </>
       )}

@@ -100,3 +100,18 @@ header a.active {
 .react-select__menu-portal {
   z-index: 9999;
 }
+
+@media print {
+  header,
+  .hide-on-print {
+    display: none !important;
+  }
+
+  .card {
+    page-break-inside: avoid;
+  }
+
+  .border {
+    border: 1px solid #ccc !important;
+  }
+}

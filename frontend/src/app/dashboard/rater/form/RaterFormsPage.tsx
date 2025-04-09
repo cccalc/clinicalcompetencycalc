@@ -80,6 +80,7 @@ export default function RaterFormsPage() {
   const [showProfessionalismForm, setShowProfessionalismForm] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<string>('');
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+  const [submittingFinal, setSubmittingFinal] = useState(false);
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -101,7 +102,7 @@ export default function RaterFormsPage() {
         setSaveStatus('Autosaved at ' + new Date().toLocaleTimeString());
         setTimeout(() => setSaveStatus(''), 3000);
       },
-      500
+      1000
     );
     return debouncedFunction;
   }, [studentId])();
@@ -291,7 +292,7 @@ export default function RaterFormsPage() {
           },
         };
       });
-      setSaveStatus('Saving...');
+      //setSaveStatus('Saving...');
     },
     []
   );
@@ -338,10 +339,9 @@ export default function RaterFormsPage() {
   );
 
   async function finalSubmit() {
-    if (!formRequest) {
-      console.error('Form request is not available.');
-      return;
-    }
+    if (!formRequest || submittingFinal) return; // prevent double submission
+
+    setSubmittingFinal(true);
 
     const mergedResponses: Responses = { ...responses };
     Object.keys(textInputs).forEach((epaKey) => {
@@ -424,6 +424,7 @@ export default function RaterFormsPage() {
 
     if (updateError) {
       console.error('Error updating form request status:', updateError.message);
+      setSubmittingFinal(false); // unlock button
       return;
     }
 
@@ -436,6 +437,7 @@ export default function RaterFormsPage() {
 
     if (error) {
       console.error('Error submitting form:', error.message);
+      setSubmittingFinal(false); // unlock button
     } else {
       console.log('Form submitted successfully.');
       localStorage.removeItem(`form-progress-${formRequest.id}`);
@@ -710,8 +712,8 @@ export default function RaterFormsPage() {
                     onChange={(e) => handleProfessionalismChange(e.target.value)}
                   ></textarea>
                 </div>
-                <button className='btn btn-success mt-3' onClick={finalSubmit}>
-                  Submit Final Evaluation
+                <button className='btn btn-success mt-3' onClick={finalSubmit} disabled={submittingFinal}>
+                  {submittingFinal ? 'Submitting...' : 'Submit Final Evaluation'}
                 </button>
               </div>
             </div>
