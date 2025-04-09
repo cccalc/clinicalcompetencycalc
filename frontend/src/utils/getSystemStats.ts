@@ -93,7 +93,7 @@ export async function getSystemStats(): Promise<SystemStats> {
     totalSubmittedForms: totalSubmittedForms ?? 0,
     activeFormRequests: activeFormRequests ?? 0,
     delinquentFormRequests: delinquentFormRequests ?? 0,
-    averageTurnaroundDays: turnaroundData?.average ?? null,
+    averageTurnaroundDays: turnaroundData ?? null,
     topDelinquentRaters,
     monthlySubmissionTrends: monthlyData ?? [],
     epaDistribution,
