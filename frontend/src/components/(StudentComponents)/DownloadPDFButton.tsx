@@ -17,7 +17,7 @@ const DownloadPDFButton: React.FC = () => {
   return (
     <div className='text-end d-print-none mb-3'>
       <button className='btn btn-success' onClick={handlePrint}>
-        Download PDF
+        Print Report
       </button>
     </div>
   );

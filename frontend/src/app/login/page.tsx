@@ -19,7 +19,7 @@ export default function Login() {
   useEffect(() => {
     if (localStorage.getItem('redirectToDashboard') === 'true') {
       localStorage.removeItem('redirectToDashboard');
-      router.push('/dashboard');
+      router.push('/loading-user');
     }
   }, [router]);
 

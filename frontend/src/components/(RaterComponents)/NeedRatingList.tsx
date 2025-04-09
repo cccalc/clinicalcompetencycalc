@@ -5,7 +5,7 @@ import { FaSortUp, FaSortDown } from 'react-icons/fa';
 import { createClient } from '@/utils/supabase/client';
 import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
-import UnlistedStudentForm from './UnlistedStudentForm'; // Ensure this file exists
+import UnlistedStudentForm from './UnlistedStudentForm';
 
 const supabase = createClient();
 
@@ -20,6 +20,7 @@ const RaterDashboard = () => {
     completed_by: string;
     notes: string;
     goals: string;
+    active_status: boolean;
   }
 
   const { user } = useUser();
@@ -38,7 +39,8 @@ const RaterDashboard = () => {
       const { data: formRequests, error: formError } = await supabase
         .from('form_requests')
         .select('*')
-        .eq('completed_by', user.id);
+        .eq('completed_by', user.id)
+        .eq('active_status', true); // Only fetch active requests
 
       if (formError) {
         console.error('Error fetching form requests:', formError.message);
@@ -82,6 +84,10 @@ const RaterDashboard = () => {
     );
   };
 
+  const hasActiveRequestForStudent = (studentId: string) => {
+    return formRequests.some((request) => request.student_id === studentId && request.active_status === true);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -93,7 +99,7 @@ const RaterDashboard = () => {
 
         {/* Top Controls */}
         <div className='d-flex justify-content-between align-items-center mb-3'>
-          <button className='btn btn-success' onClick={() => setShowModal(true)}>
+          <button className='btn btn-success' onClick={() => setShowModal(true)} disabled={!user}>
             Rate Unlisted Student
           </button>
           <button className='btn btn-secondary' onClick={toggleSortOrder}>
@@ -164,8 +170,8 @@ const RaterDashboard = () => {
                 </div>
                 <div className='modal-body'>
                   <UnlistedStudentForm
-                    existingRequests={formRequests}
                     raterId={user!.id}
+                    hasActiveRequestForStudent={hasActiveRequestForStudent}
                     onSuccess={(newRequestId: string) => {
                       setShowModal(false);
                       router.push(`/dashboard/rater/form?id=${newRequestId}`);

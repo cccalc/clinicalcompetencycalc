@@ -198,25 +198,29 @@ const AdminDashboard = () => {
 
   return (
     <div className='container text-center'>
-      <h1 className='my-4 text-primary fw-bold'>Manage Users</h1>
+      <h1 className='my-4 text-dark fw-bold'>Manage Users</h1>
 
       {/* Search & Filter */}
-      <div className='mb-3 d-flex justify-content-between'>
-        <input
-          type='text'
-          className='form-control me-2'
-          placeholder='Search by name or email...'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select className='form-select w-25' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
-          <option value=''>All Roles</option>
-          {roles.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
-          ))}
-        </select>
+      <div className='mb-4 row gx-3 align-items-center'>
+        <div className='col-md-8 mb-2 mb-md-0'>
+          <input
+            type='text'
+            className='form-control'
+            placeholder='Search by name or email...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className='col-md-4'>
+          <select className='form-select' value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+            <option value=''>All Roles</option>
+            {roles.map((role) => (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Loading Spinner */}
@@ -246,7 +250,14 @@ const AdminDashboard = () => {
                 <td>{user.display_name}</td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
-                <td>{user.account_status}</td>
+                <td>
+                  <span
+                    className={`badge rounded-pill ${user.account_status === 'Active' ? 'bg-success' : 'bg-secondary'}`}
+                  >
+                    {user.account_status}
+                  </span>
+                </td>
+
                 <td>
                   <button
                     className='btn btn-primary btn-sm me-2'

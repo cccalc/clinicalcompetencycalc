@@ -157,8 +157,10 @@ const Header = () => {
                     Manage Users
                   </Link>
                   <Link
-                    href='/all-reports'
-                    className={`btn ${pathname === '/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                    href='/dashboard/admin/all-reports'
+                    className={`btn ${
+                      pathname === 'dashboard/admin/all-reports' ? 'btn-secondary' : 'btn-outline-secondary'
+                    }`}
                   >
                     All Reports
                   </Link>
