@@ -1,6 +1,6 @@
-rm -rf .venv
+
 python3.11 -m venv .venv
-source .venv/bin/activate
+.  .venv/bin/activate
 pip install --upgrade pip
 pip install "tensorflow-text==2.15.*"
 pip install "tensorflow=2.15.*"
