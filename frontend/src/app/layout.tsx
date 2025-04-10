@@ -25,7 +25,19 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Clinical Competency Calculator',
-  description: 'An application for calculating clinical competency',
+  description: 'A system to help evaluate clinical competency in medical education.',
+  icons: [
+    {
+      media: '(prefers-color-scheme: light)',
+      url: '/favicon/icon-light.png',
+      href: '/favicon/icon-light.png',
+    },
+    {
+      media: '(prefers-color-scheme: dark)',
+      url: '/favicon/icon-dark.png',
+      href: '/favicon/icon-dark.png',
+    },
+  ],
 };
 
 export default function RootLayout({
