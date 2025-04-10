@@ -125,3 +125,17 @@ header a.active {
     scroll-behavior: smooth;
   }
 }
+
+@media screen {
+  .scrollable-box {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+}
+
+@media print {
+  .scrollable-box {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}

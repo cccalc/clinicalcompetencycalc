@@ -36,14 +36,6 @@ interface SupabaseRow {
   form_responses: FormResponsesInner;
 }
 
-// interface StudentReport {
-//   created_at: string;
-//   time_window: '3m' | '6m' | '12m';
-//   report_data: Record<string, number>;
-//   kf_avg_data?: Record<string, number>;
-//   llm_feedback?: string | null;
-// }
-
 interface Assessment {
   epaId: number;
   keyFunctionId: string;
@@ -147,7 +139,6 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
     setAssessments(parsedAssessments);
     setComments(parsedComments);
 
-    // Get matching report and extract KF-level data
     const targetWindow = `${timeRange}m`;
     const targetReport = (reportData ?? []).find((r) => r.time_window === targetWindow);
 
@@ -161,8 +152,6 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
             const kfId = `kf${kfKey.split('.')[1]}`;
             if (typeof val === 'number') {
               kfs[kfId] = val;
-            }
-            if (typeof val === 'number') {
               epaKfScores.push(val);
             }
           }
@@ -176,7 +165,6 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
       setLlmFeedback(targetReport.llm_feedback ?? null);
     }
 
-    // Lifetime average and graph
     const monthlyMap: Record<string, number[]> = {};
     const lifetimeScores: number[] = [];
 
@@ -295,7 +283,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
 
           <div className='mb-4'>
             <h6 className='fw-bold border-bottom pb-1'>Comments</h6>
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }} className='border rounded p-2'>
+            <div className='border rounded p-2 scrollable-box'>
               <ul className='list-group'>
                 {comments.length > 0 ? (
                   comments.map((c, i) => (
@@ -312,7 +300,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
 
           <div className='mb-4'>
             <h6 className='fw-bold border-bottom pb-1'>AI Summary & Recommendations</h6>
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }} className='border rounded p-3 bg-light'>
+            <div className='border rounded p-3 bg-light scrollable-box'>
               <p className='text-muted mb-0'>{llmFeedback || <em>No AI feedback available for this EPA.</em>}</p>
             </div>
           </div>
