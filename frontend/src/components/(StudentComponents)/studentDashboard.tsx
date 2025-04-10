@@ -16,12 +16,13 @@ interface HistoryEntry {
 
 interface KeyFunction {
   id: string;
+  description: string; 
   history: HistoryEntry[];
 }
 
 interface EPA {
   epa: number;
-  title?: string;
+  title: string;
   keyFunctions: KeyFunction[];
 }
 
@@ -33,7 +34,6 @@ const devLevelMap: Record<string, number> = {
 };
 
 type DevLevel = keyof typeof devLevelMap;
-
 
 interface FormRequest {
   id: string;
@@ -47,7 +47,6 @@ interface FormResponses {
   form_requests: FormRequest;
 }
 
-
 interface FormResultsEntry {
   id: number;
   created_at: string;
@@ -60,12 +59,14 @@ const StudentDashboard: React.FC = () => {
   const [data, setData] = useState<EPA[]>([]);
   const [range, setRange] = useState<3 | 6 | 12>(3);
   const [selectedEpa, setSelectedEpa] = useState<EPA | null>(null);
-  const { user} = useUser();
+  const { user, loading } = useUser();
 
   useEffect(() => {
     if (!user) return; 
+
     async function fetchData() {
-      const { data, error } = await supabase
+
+      const { data: formResultsData, error: formError } = await supabase
         .from('form_results')
         .select(`
           id,
@@ -85,19 +86,17 @@ const StudentDashboard: React.FC = () => {
 
         .filter('form_responses.form_requests.student_id', 'eq', user?.id || '');
 
-      if (error) {
-        console.error('Data Fetch Error:', error);
+      if (formError) {
+        console.error('Data Fetch Error:', formError);
         return;
       }
-
-      if (!data || !Array.isArray(data) || data.length === 0) {
+      if (!formResultsData || !Array.isArray(formResultsData) || formResultsData.length === 0) {
         console.warn('No valid data found in form_results for this student');
         return;
       }
-
       const epaMap: Record<number, EPA> = {};
 
-      (data as unknown as FormResultsEntry[]).forEach((entry) => {
+      (formResultsData as unknown as FormResultsEntry[]).forEach((entry) => {
         const { form_responses, created_at } = entry;
 
         if (
@@ -107,7 +106,6 @@ const StudentDashboard: React.FC = () => {
           console.error('ID mismatch in joined data:', entry);
           return;
         }
-
         const parsedData = entry.results as Record<string, number>;
         Object.entries(parsedData).forEach(([key, value]) => {
 
@@ -116,42 +114,88 @@ const StudentDashboard: React.FC = () => {
           const kfId = key;
 
 
-          const clampedLevel = Math.min(Math.round(value), 3);
+          const clampedLevel = Math.min(Math.floor(value), 3);
           const levelName =
             (Object.keys(devLevelMap) as DevLevel[]).find(
               (lvl) => devLevelMap[lvl] === clampedLevel
             ) || 'none';
 
           if (!epaMap[epaId]) {
-            epaMap[epaId] = { epa: epaId, keyFunctions: [] };
+            epaMap[epaId] = { epa: epaId, title: '', keyFunctions: [] };
           }
-
           epaMap[epaId].keyFunctions.push({
             id: kfId,
-            history: [
-              {
-                date: created_at,
-                level: levelName,
-              },
-            ],
+            history: [{ date: created_at, level: levelName }],
+            description: '', 
           });
         });
       });
 
-      setData(Object.values(epaMap));
+      const epasArray = Object.values(epaMap);
+
+
+      const { data: epaDescData, error: epaDescError } = await supabase
+        .from('epa_kf_descriptions')
+        .select('*');
+
+      if (epaDescError) {
+        console.error('EPA Fetch Error:', epaDescError);
+        setData(epasArray);
+        return;
+      }
+      if (!epaDescData || !epaDescData.length) {
+        console.warn('EPA descriptions not found');
+        setData(epasArray);
+        return;
+      }
+
+
+      const formattedEPAs = Object.entries(epaDescData[0].epa_descriptions).map(
+        ([key, value]) => ({
+          id: parseInt(key, 10),
+          description: value as string,
+        })
+      );
+      const formattedKFs = Object.entries(epaDescData[0].kf_descriptions).map(
+        ([key, value]) => ({
+          id: key,
+          description: value as string,
+        })
+      );
+
+      const epasWithTitles = epasArray.map((epa) => {
+        const match = formattedEPAs.find((item) => item.id === epa.epa);
+        return { ...epa, title: match ? match.description : epa.title };
+      });
+
+
+      const epasWithKFDescriptions = epasWithTitles.map((epa) => ({
+        ...epa,
+        keyFunctions: epa.keyFunctions.map((kf) => ({
+          ...kf,
+          description: formattedKFs.find((item) => item.id === kf.id)?.description || '',
+        })),
+      }));
+
+      setData(epasWithKFDescriptions);
     }
 
     fetchData();
   }, [user]);
 
+
   const getAverage = (kf: KeyFunction): number | null => {
     const cutoff = new Date();
     cutoff.setMonth(cutoff.getMonth() - range);
-    const recent = kf.history.filter((h) => new Date(h.date) >= cutoff && h.level !== 'none');
+    const recent = kf.history.filter(
+      (h) => new Date(h.date) >= cutoff && h.level !== 'none'
+    );
     if (recent.length < 1) return null;
-    const avg = recent.reduce((sum, h) => sum + devLevelMap[h.level], 0) / recent.length;
+    const avg =
+      recent.reduce((sum, h) => sum + devLevelMap[h.level], 0) / recent.length;
     return Math.floor(avg);
   };
+
 
   const getEPADevLevel = (kfList: KeyFunction[]): number | null => {
     const scores = kfList.map(getAverage).filter((v): v is number => v !== null);
@@ -165,10 +209,11 @@ const StudentDashboard: React.FC = () => {
       : avg;
   };
 
+  if (loading) return <div>Loading...</div>;
   return (
     <div className='container mt-4'>
       <div className='d-flex justify-content-center mb-4 gap-2'>
-        <ToggleControl selected={range} onSelect={setRange} />
+        <ToggleControl selected={range} onSelect={(value: 3 | 6 | 12) => setRange(value)} />
       </div>
       <div className='row'>
         {data.map((epa) => (

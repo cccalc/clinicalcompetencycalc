@@ -10,6 +10,7 @@ interface HistoryEntry {
 
 interface KeyFunction {
   id: string;
+  description: string;
   history: HistoryEntry[];
 }
 
@@ -55,11 +56,11 @@ const EPAModal: React.FC<EPAModalProps> = ({ selectedEpa, onClose, getAverage })
               <button type='button' className='btn-close' onClick={onClose} aria-label='Close'></button>
             </div>
             <div className='modal-body'>
-              {selectedEpa.keyFunctions.map((kf, i) => {
+              {selectedEpa.keyFunctions.map((kf) => {
                 const avg = getAverage(kf);
                 return avg !== null ? (
                   <div key={kf.id} className='d-flex justify-content-between align-items-center border-bottom py-2'>
-                    <div>Key Function {i + 1}</div>
+                    <div>{kf.description}</div>
                     <span className='badge text-white' style={{ backgroundColor: devLevelColors[avg] }}>
                       {devLevelLabels[avg]}
                     </span>
