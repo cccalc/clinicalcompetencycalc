@@ -75,7 +75,10 @@ export default function Login() {
   };
 
   return (
-    <div className='container d-flex flex-column justify-content-center gap-3 p-5 vh-100' style={{ maxWidth: '630px' }}>
+    <div
+      className='container d-flex flex-column justify-content-center gap-3 p-5 vh-100'
+      style={{ maxWidth: '630px', overflow: 'hidden', maxHeight: '70vh' }}
+    >
       <div>
         <span>
           <Image className='mb-3' src={logo} height={32} alt='CCC logo' />

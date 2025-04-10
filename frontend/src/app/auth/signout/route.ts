@@ -1,21 +1,19 @@
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'; // prod: https://ccc.v9ys52xnm4vvw.us-east-1.cs.amazonlightsail.com
+
+export async function POST() {
   const supabase = await createClient();
 
-  // Check if a user's logged in
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // revoke the user’s session (scope:'global' logs them out of every device)
+  await supabase.auth.signOut({ scope: 'global' });
 
-  if (user) {
-    await supabase.auth.signOut();
-  }
-
+  // revalidate cache if you need it
   revalidatePath('/', 'layout');
-  return NextResponse.redirect(new URL('/login', req.url), {
-    status: 302,
-  });
+
+  // build an absolute redirect URL
+  const redirectURL = `${BASE_URL}/login`;
+  return NextResponse.redirect(redirectURL, { status: 302 });
 }

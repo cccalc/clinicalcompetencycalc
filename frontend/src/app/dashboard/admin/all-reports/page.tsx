@@ -4,6 +4,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { getEPAKFDescs } from '@/utils/get-epa-data';
+import { useRequireRole } from '@/utils/useRequiredRole';
 import dynamic from 'next/dynamic';
 import DownloadPDFButton from '@/components/(StudentComponents)/DownloadPDFButton';
 
@@ -35,6 +36,7 @@ interface FormResult {
 const REPORT_EPAS = Array.from({ length: 13 }, (_, i) => i + 1);
 
 export default function AdminAllReportsPage() {
+  useRequireRole(['admin', 'dev']);
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [reports, setReports] = useState<StudentReport[]>([]);

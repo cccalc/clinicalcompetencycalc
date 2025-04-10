@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { useRequireRole } from '@/utils/useRequiredRole';
 
 const supabase = createClient();
 
@@ -17,6 +18,7 @@ const supabase = createClient();
  * Data is pulled from Supabase using an RPC and direct table queries.
  */
 const AdminDashboard = () => {
+  useRequireRole(['admin', 'dev']);
   // ----------------------
   // Types
   // ----------------------

@@ -5,6 +5,7 @@ import { debounce } from 'lodash';
 import { createClient } from '@/utils/supabase/client';
 import { getLatestMCQs } from '@/utils/get-epa-data';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useRequireRole } from '@/utils/useRequiredRole';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const supabase = createClient();
@@ -62,6 +63,7 @@ function compareNumericDotStrings(a: string, b: string): number {
 }
 
 export default function RaterFormsPage() {
+  useRequireRole(['rater', 'dev']);
   const [epas, setEPAs] = useState<EPA[]>([]);
   const [kfData, setKFData] = useState<KeyFunction[]>([]);
   const [selectedEPAs, setSelectedEPAs] = useState<number[]>([]);
@@ -100,7 +102,7 @@ export default function RaterFormsPage() {
         };
         localStorage.setItem(`form-progress-${studentId}`, JSON.stringify(formProgress));
         setSaveStatus('Autosaved at ' + new Date().toLocaleTimeString());
-        setTimeout(() => setSaveStatus(''), 3000);
+        setTimeout(() => setSaveStatus(''), 10000);
       },
       1000
     );

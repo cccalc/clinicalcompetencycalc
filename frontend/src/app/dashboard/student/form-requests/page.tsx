@@ -3,6 +3,7 @@
 import { useEffect, useState, FormEvent } from 'react';
 import Select, { SingleValue } from 'react-select';
 import { createClient } from '@/utils/supabase/client';
+import { useRequireRole } from '@/utils/useRequiredRole';
 
 const supabase = createClient();
 
@@ -12,6 +13,7 @@ interface OptionType {
 }
 
 const FormRequests = () => {
+  useRequireRole(['student', 'dev']);
   const [faculty, setFaculty] = useState<OptionType | null>(null);
   const [setting, setSetting] = useState<OptionType | null>(null);
   const [details, setDetails] = useState('');
