@@ -44,9 +44,13 @@ async def main() -> None:
   bert_model = load_bert_model("bert-model/cb-250401-80_7114_model")
   svm_models = load_svm_models()
 
-  print("Connecting to Supabase Realtime server...")
+  print("Connecting to Supabase Realtime server...", end=' ')
 
   await asupabase.realtime.connect()
+
+  print("Connected.")
+
+  print('Subscribing to the "form_responses_insert" channel...', end=' ')
 
   await (asupabase.realtime
          .channel("form_responses_insert")
@@ -56,9 +60,21 @@ async def main() -> None:
                               handle_new_response(payload, bert_model, svm_models, supabase))
          .subscribe())
 
+  print('Subscribed.')
+
   await asupabase.realtime.listen()
 
-  print('Subscribed to the "form_responses_insert" channel. Waiting for new responses...')
+  print('Subscribing to the "student_reports_insert" channel...', end=' ')
+
+  await (asupabase.realtime
+         .channel("student_reports_insert")
+         .on_postgres_changes("INSERT",
+                              schema="public", table="student_reports",
+                              callback=lambda payload:
+                              handle_new_report(payload, supabase))
+         .subscribe())
+
+  print('Subscribed.')
 
   while True:
     await asyncio.sleep(1)
@@ -100,6 +116,21 @@ def handle_new_response(payload, bert_model, svm_models, supabase) -> None:
   (supabase.table("form_results")
    .insert({"response_id": record['response_id'], "results": res})
    .execute())
+
+
+def handle_new_report(payload, supabase) -> None:
+  '''
+  Handles the insert event from the Supabase Realtime server for student reports.
+
+  :param payload: The payload received from the Supabase Realtime server.
+  :type payload: dict
+
+  :return: None
+  '''
+
+  record = payload['data']['record']
+
+  print('New report received:', record['id'])
 
 
 if __name__ == "__main__":

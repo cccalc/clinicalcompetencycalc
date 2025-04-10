@@ -37,6 +37,8 @@ def bert_infer(model: tf.keras.Model, data: dict[str, list[str]]) -> dict[str, i
 
   return {k: get_class(v) for k, v in data.items()}
 
+# ==================================================================================================
+
 
 def svm_infer(models: dict[str, any], data: dict[str, list[bool]]) -> dict[str, int]:
   '''
@@ -61,6 +63,24 @@ def svm_infer(models: dict[str, any], data: dict[str, list[bool]]) -> dict[str, 
 
   return {k: get_class(k, v) for k, v in data.items()}
 
+# ==================================================================================================
+
+
+def generate_report_summary(kf_avg_data: dict[str, float]) -> str:
+  '''
+  Generates a summary report based on the average scores of key functions.
+
+  :param kf_avg_data: A dictionary where keys are key functions and values are their average scores.
+  :type kf_avg_data: dict[str, float]
+
+  :return: A summary report as a string.
+  :rtype: str
+  '''
+
+  pass
+
+# ==================================================================================================
+
 
 def load_bert_model(model_path: str):
   '''
@@ -80,6 +100,8 @@ def load_bert_model(model_path: str):
   model = tf.keras.models.load_model(model_path, compile=False)
   print("BERT model loaded successfully.")
   return model
+
+# ==================================================================================================
 
 
 def download_svm_models(supabase: Client) -> None:
@@ -104,6 +126,8 @@ def download_svm_models(supabase: Client) -> None:
       f.write(response)
     print(f"to svm-models/{model_name}")
   print("All SVM models downloaded successfully.")
+
+# ==================================================================================================
 
 
 def load_svm_models() -> dict[str, any]:
