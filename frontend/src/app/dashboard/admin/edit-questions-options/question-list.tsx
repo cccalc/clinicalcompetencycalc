@@ -6,12 +6,14 @@ import Loading from '@/components/loading';
 import { getHistoricalMCQs } from '@/utils/get-epa-data';
 import type { Tables } from '@/utils/supabase/database.types';
 import type { MCQ } from '@/utils/types';
+import { useRequireRole } from '@/utils/useRequiredRole';
 
 import EditOptionModal from './edit-modal-option';
 import EditQuestionModal from './edit-modal-question';
 import QuestionItem from './question-list-item';
 
 export default function QuestionList() {
+  useRequireRole(['admin', 'dev']);
   const [mcqsInformation, setMCQsInformation] = useState<Tables<'mcqs_options'>[] | null>(null);
 
   const [optionMCQ, setOptionMCQ] = useState<MCQ | null>(null);

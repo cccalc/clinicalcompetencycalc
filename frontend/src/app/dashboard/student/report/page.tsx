@@ -7,6 +7,7 @@ import DownloadPDFButton from '@/components/(StudentComponents)/DownloadPDFButto
 import ReportGenerationForm from '@/components/(StudentComponents)/ReportGenerationForm';
 import { createClient } from '@/utils/supabase/client';
 import { getEPAKFDescs } from '@/utils/get-epa-data';
+import { useRequireRole } from '@/utils/useRequiredRole';
 
 const supabase = createClient();
 
@@ -28,6 +29,7 @@ interface ProfessionalismRow {
 const REPORT_EPAS = Array.from({ length: 13 }, (_, i) => i + 1); // EPA 1 to 13
 
 const ReportPage = () => {
+  useRequireRole(['student', 'dev']);
   const { user, loading } = useUser();
   const [timeRange, setTimeRange] = useState<3 | 6 | 12>(3);
   const [kfDescriptions, setKfDescriptions] = useState<Record<string, string[]> | null>(null);
