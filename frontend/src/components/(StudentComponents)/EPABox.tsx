@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useLayoutEffect, useRef } from 'react';
 import LineGraph from '@/components/(StudentComponents)/LineGraph';
 import HalfCircleGauge from '@/components/(StudentComponents)/HalfCircleGauge';
 import { createClient } from '@/utils/supabase/client';
@@ -36,14 +36,6 @@ interface SupabaseRow {
   form_responses: FormResponsesInner;
 }
 
-// interface StudentReportRow {
-//   created_at: string;
-//   time_window: string;
-//   title: string;
-//   report_data: Record<string, number>;
-//   llm_feedback?: string | null;
-// }
-
 interface Assessment {
   epaId: number;
   keyFunctionId: string;
@@ -62,13 +54,47 @@ interface EPABoxProps {
 const supabase = createClient();
 
 const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, studentId }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('print').matches;
+    }
+    return false;
+  });
+
+  const wasAutoExpandedRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const handleBeforePrint = () => {
+      if (!expanded) {
+        setExpanded(true);
+        wasAutoExpandedRef.current = true;
+      }
+    };
+
+    const handleAfterPrint = () => {
+      if (wasAutoExpandedRef.current) {
+        setExpanded(false);
+        wasAutoExpandedRef.current = false;
+      }
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
+
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+  }, [expanded]);
+
   const [epaTitle, setEpaTitle] = useState('');
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [comments, setComments] = useState<string[]>([]);
   const [llmFeedback, setLlmFeedback] = useState<string | null>(null);
   const [lifetimeAverage, setLifetimeAverage] = useState<number | null>(null);
   const [lineGraphData, setLineGraphData] = useState<{ date: string; value: number }[]>([]);
+  const [kfAverages, setKfAverages] = useState<Record<string, number>>({});
+  const [epaAvgFromKFs, setEpaAvgFromKFs] = useState<number | null>(null);
 
   const epaStr = String(epaId);
   const now = new Date();
@@ -82,7 +108,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
     }
   }, [epaStr]);
 
-  const fetchAll = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     const { data: resultData } = await supabase
       .from('form_results')
       .select(
@@ -102,8 +128,9 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
 
     const { data: reportData } = await supabase
       .from('student_reports')
-      .select('created_at, report_data, llm_feedback')
-      .eq('user_id', studentId);
+      .select('created_at, time_window, report_data, kf_avg_data, llm_feedback')
+      .eq('user_id', studentId)
+      .order('created_at', { ascending: false });
 
     const parsedAssessments: Assessment[] = [];
     const parsedComments: string[] = [];
@@ -144,20 +171,43 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
     setAssessments(parsedAssessments);
     setComments(parsedComments);
 
+    const targetWindow = `${timeRange}m`;
+    const targetReport = (reportData ?? []).find((r) => r.time_window === targetWindow);
+
+    if (targetReport) {
+      const kfs: Record<string, number> = {};
+      const epaKfScores: number[] = [];
+
+      if (targetReport.kf_avg_data) {
+        for (const [kfKey, val] of Object.entries(targetReport.kf_avg_data)) {
+          if (kfKey.startsWith(`${epaId}.`)) {
+            const kfId = `kf${kfKey.split('.')[1]}`;
+            if (typeof val === 'number') {
+              kfs[kfId] = val;
+              epaKfScores.push(val);
+            }
+          }
+        }
+      }
+
+      setKfAverages(kfs);
+      setEpaAvgFromKFs(
+        epaKfScores.length > 0 ? Math.floor(epaKfScores.reduce((a, b) => a + b, 0) / epaKfScores.length) : null
+      );
+      setLlmFeedback(targetReport.llm_feedback ?? null);
+    }
+
     const monthlyMap: Record<string, number[]> = {};
     const lifetimeScores: number[] = [];
 
-    for (const report of reportData ?? []) {
-      const value = report.report_data?.[epaStr];
-      if (typeof value === 'number') {
-        const date = new Date(report.created_at);
+    for (const r of reportData ?? []) {
+      const val = r.report_data?.[epaStr];
+      if (typeof val === 'number') {
+        const date = new Date(r.created_at);
         const key = new Date(date.getFullYear(), Math.floor(date.getMonth() / 3) * 3, 1).toISOString().slice(0, 10);
         if (!monthlyMap[key]) monthlyMap[key] = [];
-        monthlyMap[key].push(value);
-        lifetimeScores.push(value);
-      }
-      if (report.llm_feedback && report.report_data?.[epaStr] !== undefined) {
-        setLlmFeedback(report.llm_feedback);
+        monthlyMap[key].push(val);
+        lifetimeScores.push(val);
       }
     }
 
@@ -173,31 +223,27 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
     if (lifetimeScores.length > 0) {
       setLifetimeAverage(Math.floor(lifetimeScores.reduce((a, b) => a + b, 0) / lifetimeScores.length));
     }
-  }, [epaId, studentId, epaStr]);
+  }, [epaId, studentId, timeRange, epaStr]);
 
   useEffect(() => {
     fetchTitle();
   }, [fetchTitle]);
 
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    fetchData();
+  }, [fetchData]);
 
   const filtered = assessments.filter((a) => new Date(a.date) >= cutoff);
-  const devLevels = filtered.filter((a) => a.devLevel !== null) as { devLevel: number }[];
-
-  const avg =
-    devLevels.length >= 3 ? Math.floor(devLevels.reduce((acc, cur) => acc + cur.devLevel, 0) / devLevels.length) : null;
-
-  const allGreen = devLevels.length >= 3 && devLevels.every((d) => d.devLevel === 3);
   const settings = Array.from(new Set(filtered.map((a) => a.setting).filter(Boolean)));
   const lastDate = filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.date;
   const daysSinceLast = lastDate
     ? Math.floor((now.getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24))
     : 'N/A';
 
-  const formAssessmentDates = new Set(assessments.filter((a) => a.epaId === epaId).map((a) => a.date));
+  const formAssessmentDates = new Set(filtered.map((a) => a.date));
   const assessmentCount = formAssessmentDates.size;
+
+  const allGreen = Object.values(kfAverages).length >= 3 && Object.values(kfAverages).every((v) => Math.floor(v) === 3);
 
   return (
     <div className={`card rounded shadow-sm ${expanded ? 'expanded' : ''}`}>
@@ -211,7 +257,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
             EPA {epaId}: {epaTitle}
           </h5>
         </div>
-        <HalfCircleGauge average={avg} allGreen={allGreen} />
+        <HalfCircleGauge average={epaAvgFromKFs} allGreen={allGreen} />
       </div>
 
       {expanded && (
@@ -249,21 +295,16 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
               <tbody>
                 {(kfDescriptions?.[epaStr] || []).map((label, index) => {
                   const kfId = `kf${index + 1}`;
-                  const scores = filtered.filter((a) => a.keyFunctionId === kfId && a.devLevel !== null);
-                  const avgKF =
-                    scores.length > 0
-                      ? Math.floor(scores.reduce((sum, a) => sum + (a.devLevel ?? 0), 0) / scores.length)
-                      : '—';
-
+                  const avg = kfAverages[kfId];
                   return (
                     <tr key={kfId}>
                       <td className='text-wrap' style={{ maxWidth: '300px' }}>
                         {label}
                       </td>
                       <td>
-                        {avgKF === '—'
+                        {avg === undefined
                           ? '—'
-                          : `${['Remedial', 'Early-Developing', 'Developing', 'Entrustable'][avgKF]}`}
+                          : `${['Remedial', 'Early-Developing', 'Developing', 'Entrustable'][Math.floor(avg)]}`}
                       </td>
                     </tr>
                   );
@@ -274,7 +315,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
 
           <div className='mb-4'>
             <h6 className='fw-bold border-bottom pb-1'>Comments</h6>
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }} className='border rounded p-2'>
+            <div className='border rounded p-2 scrollable-box'>
               <ul className='list-group'>
                 {comments.length > 0 ? (
                   comments.map((c, i) => (
@@ -291,7 +332,7 @@ const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, stude
 
           <div className='mb-4'>
             <h6 className='fw-bold border-bottom pb-1'>AI Summary & Recommendations</h6>
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }} className='border rounded p-3 bg-light'>
+            <div className='border rounded p-3 bg-light scrollable-box'>
               <p className='text-muted mb-0'>{llmFeedback || <em>No AI feedback available for this EPA.</em>}</p>
             </div>
           </div>

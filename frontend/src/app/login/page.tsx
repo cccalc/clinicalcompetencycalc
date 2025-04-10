@@ -25,7 +25,8 @@ export default function Login() {
 
   const validate = async (
     e: SyntheticEvent,
-    authFunction: (formData: FormData) => Promise<{ alertColor: string; error: string }>
+    authFunction: (formData: FormData) => Promise<{ alertColor: string; error: string }>,
+    isSignup: boolean = false
   ) => {
     e.preventDefault();
     let valid = true;
@@ -63,8 +64,12 @@ export default function Login() {
         // ✅ Ensure session updates properly
         await supabase.auth.getSession();
 
-        window.location.reload();
-        localStorage.setItem('redirectToDashboard', 'true');
+        if (isSignup) {
+          router.push('/postsignup/verify');
+        } else {
+          localStorage.setItem('redirectToDashboard', 'true');
+          window.location.reload();
+        }
       }
     }
   };
@@ -126,10 +131,15 @@ export default function Login() {
 
         {/* Buttons */}
         <div className='d-flex justify-content-end gap-2'>
-          <button id='signup' className='btn btn-outline-secondary' type='button' onClick={(e) => validate(e, signup)}>
+          <button
+            id='signup'
+            className='btn btn-outline-secondary'
+            type='button'
+            onClick={(e) => validate(e, signup, true)}
+          >
             Sign Up
           </button>
-          <button id='login' className='btn btn-primary' type='submit' onClick={(e) => validate(e, login)}>
+          <button id='login' className='btn btn-primary' type='submit' onClick={(e) => validate(e, login, false)}>
             Login
           </button>
         </div>

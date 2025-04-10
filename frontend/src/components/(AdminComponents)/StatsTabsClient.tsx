@@ -81,7 +81,10 @@ export default function StatsTabsClient() {
               <StatCard label='Submitted Forms' value={stats.totalSubmittedForms} />
               <StatCard label='Active Requests' value={stats.activeFormRequests} />
               <StatCard label='Delinquent Requests' value={stats.delinquentFormRequests} />
-              <StatCard label='Avg. Turnaround (days)' value={stats.averageTurnaroundDays?.toFixed(1) || 'N/A'} />
+              <StatCard
+                label='Avg. Turnaround (days)'
+                value={stats.averageTurnaroundDays != null ? stats.averageTurnaroundDays.toFixed(1) : 'N/A'}
+              />
             </div>
           )}
 

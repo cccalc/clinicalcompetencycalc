@@ -9,7 +9,7 @@ import { Inter } from 'next/font/google';
 
 import BootstrapClient from '@/components/bootstrap-client';
 import { UserProvider } from '../context/UserContext';
-import Header from '@/components/header';
+import Header from '@/components/Header/header';
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",

@@ -39,7 +39,7 @@ const AdminSettingsButtons = () => {
   };
 
   return (
-    <div className='p-4 rounded' style={{ backgroundColor: '#f8f9fa', maxWidth: '39vw', width: '100%' }}>
+    <div className='p-4 rounded' style={{ backgroundColor: '#f1f3f5', maxWidth: '39vw', width: '100%' }}>
       <div className='card shadow-sm p-3 border-0'>
         <div
           className='card-header d-flex justify-content-between align-items-center bg-white border-bottom pb-2 sticky-top'
@@ -86,7 +86,11 @@ const AdminSettingsButtons = () => {
                       defaultValue={setting}
                       onBlur={(e) => handleEditSetting(id, e.target.value)}
                     />
-                    <button className='btn btn-outline-danger btn-sm ms-2' onClick={() => handleDeleteSetting(id)} aria-label='delete-setting'>
+                    <button
+                      className='btn btn-outline-danger btn-sm ms-2'
+                      onClick={() => handleDeleteSetting(id)}
+                      aria-label='delete-setting'
+                    >
                       <i className='bi bi-trash'></i>
                     </button>
                   </div>
