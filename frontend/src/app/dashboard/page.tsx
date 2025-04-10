@@ -4,7 +4,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useUser } from '@/context/UserContext';
 import { createClient } from '@/utils/supabase/client';
 import Markdown from '@uiw/react-markdown-preview';
-
+import ProfileSettingsModal from '@/components/Header/ProfileSettingsModal';
 import styles from './page.module.css';
 
 type Announcement = {
@@ -20,17 +20,18 @@ const RaterDashboard = lazy(() => import('@/components/(RaterComponents)/raterDa
 const StudentDashboard = lazy(() => import('@/components/(StudentComponents)/studentDashboard'));
 
 const Dashboard = () => {
-  const { userRoleAuthorized, userRoleRater, displayName, userRoleStudent, userRoleDev } = useUser();
-  const [devView, setDevView] = useState<'admin' | 'rater' | 'student'>('admin');
+  const { user, displayName, loading, userRoleAuthorized, userRoleRater, userRoleStudent, userRoleDev } = useUser();
 
+  const [devView, setDevView] = useState<'admin' | 'rater' | 'student'>('admin');
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
   const [fadingIds, setFadingIds] = useState<string[]>([]);
+  const [showNameModal, setShowNameModal] = useState(false);
 
+  // Fetch system announcements
   useEffect(() => {
     const fetchAnnouncements = async () => {
       const supabase = createClient();
-
       const now = new Date();
       const pad = (n: number) => n.toString().padStart(2, '0');
       const formattedLocal = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(
@@ -54,6 +55,7 @@ const Dashboard = () => {
     fetchAnnouncements();
   }, []);
 
+  // Handle dismissed announcement state
   useEffect(() => {
     const saved = sessionStorage.getItem('dismissedBannerIds');
     if (saved) {
@@ -76,6 +78,9 @@ const Dashboard = () => {
       setFadingIds((prev) => prev.filter((f) => f !== id));
     }, 300); // match Bootstrap fade animation duration
   };
+
+  // Calculate whether the display name has been set (ignoring any whitespace)
+  const mustSetDisplayName = !loading && user && !displayName.trim();
 
   const renderDashboard = () => {
     if (userRoleDev) {
@@ -110,7 +115,22 @@ const Dashboard = () => {
 
   return (
     <main className='container mx-auto p-4'>
-      {/* 🔔 System Announcements */}
+      {/* Persistent alert banner that will remain until a display name is set */}
+      {mustSetDisplayName && (
+        <div className='alert alert-warning d-flex justify-content-between align-items-center'>
+          <span>
+            <strong>Action required:</strong> please set a display name before continuing.
+          </span>
+          <button className='btn btn-sm btn-primary' onClick={() => setShowNameModal(true)}>
+            Set now
+          </button>
+        </div>
+      )}
+
+      {/* Profile Settings Modal (triggered when clicking "Set now") */}
+      <ProfileSettingsModal show={showNameModal} onClose={() => setShowNameModal(false)} />
+
+      {/* System Announcements */}
       {announcements
         .filter((a) => !dismissedIds.includes(a.id))
         .map((a) => (
@@ -140,8 +160,8 @@ const Dashboard = () => {
           </div>
         ))}
 
-      {/* 👋 Greeting */}
-      <p className='h5 mb-4'>Welcome, {displayName}</p>
+      {/* Greeting */}
+      <p className='h5 mb-4'>Welcome, {displayName || 'friend'}</p>
 
       {/* Developer-only view toggle */}
       {userRoleDev && (
@@ -162,7 +182,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Lazy-loaded dashboard with fallback */}
+      {/* Lazy-loaded dashboard component */}
       <Suspense fallback={<div>Loading dashboard...</div>}>{renderDashboard()}</Suspense>
     </main>
   );

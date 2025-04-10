@@ -3,44 +3,55 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useUser } from '@/context/UserContext';
+
+import { useUser } from '@/context/UserContext'; // user auth state :contentReference[oaicite:0]{index=0}
 import logo from '@/components/ccc-logo-color.svg';
+
 import NavLinks from './NavLinks';
 import ProfileDropdown from './ProfileDropdown';
 import ProfileSettingsModal from './ProfileSettingsModal';
+import DeveloperTicketModal from '@/components/DevTicketsModal';
 
 /**
- * Header component
+ * Header
  *
- * Displays the application logo, role-based navigation links, and user profile controls.
- * Modal visibility is controlled locally with React state.
+ * ▸ Shows logo, nav links (role‑aware inside <NavLinks />), and profile dropdown.
+ * ▸ Manages *two* modal windows with separate React state:
+ *     – ProfileSettingsModal  (edit display name, etc.)
+ *     – DeveloperTicketModal  (submit bug / feature requests)
  */
-const Header = () => {
+export default function Header() {
   const { user } = useUser();
-  const [showModal, setShowModal] = useState(false);
+
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showTicketModal, setShowTicketModal] = useState(false);
 
   return (
     <header className='bg-white text-gray-800 p-2 shadow-md'>
       <div className='container mx-auto d-flex justify-content-between align-items-center flex-wrap'>
-        {/* 🔹 App Logo and Title */}
+        {/* ── Logo ───────────────────────────────────────────── */}
         <Link href='/dashboard' className='d-flex align-items-center text-decoration-none'>
           <Image src={logo} alt='Logo' width={40} height={40} priority />
           <span className='ms-2 fs-4 fw-bold'>Clinical Competency Calculator</span>
         </Link>
 
-        {/* 🔹 Conditional navigation and profile UI (only if user is logged in) */}
+        {/* ── Nav + profile (only when signed in) ───────────── */}
         {user && (
           <nav className='d-flex gap-3 align-items-center flex-wrap'>
             <NavLinks />
-            <ProfileDropdown onOpenModal={() => setShowModal(true)} />
+
+            <ProfileDropdown
+              onOpenProfile={() => setShowProfileModal(true)}
+              onOpenTicket={() => setShowTicketModal(true)}
+            />
           </nav>
         )}
       </div>
 
-      {/* 🔹 Modal rendered at root level for z-index layering */}
-      <ProfileSettingsModal show={showModal} onClose={() => setShowModal(false)} />
+      {/* ── Modals rendered at root for proper z‑index layering ─ */}
+      <ProfileSettingsModal show={showProfileModal} onClose={() => setShowProfileModal(false)} />
+
+      <DeveloperTicketModal show={showTicketModal} onClose={() => setShowTicketModal(false)} />
     </header>
   );
-};
-
-export default Header;
+}
