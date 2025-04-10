@@ -39,8 +39,9 @@ export default function LoadingUserPage() {
     <div
       className='d-flex flex-column justify-content-center align-items-center text-center px-3'
       style={{
-        height: '100vh',
+        height: '80vh',
         background: 'linear-gradient(135deg, #f8f9fa 0%, #dee2e6 100%)',
+        overflow: 'hidden',
       }}
     >
       <Image src={logo} alt='CCC Logo' width={96} height={96} className='mb-4' priority />
