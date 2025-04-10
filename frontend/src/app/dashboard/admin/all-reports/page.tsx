@@ -138,51 +138,58 @@ export default function AdminAllReportsPage() {
   return (
     <div className='container py-5 bg-white'>
       <style>{`
-        @media print {
-          body { background: white !important; }
-          header,
-          .d-print-none,
-          .modal,
-          .btn,
-          .form-control,
-          .form-select,
-          .form-label {
-            display: none !important;
-          }
-          .container {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 0 !important;
-          }
-          .print-visible {
-            display: block !important;
-            page-break-before: always;
-          }
-          .print-visible * {
-            display: block !important;
-            color: black !important;
-          }
-          .epa-report-section {
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-          }
-        }
-        .fade-transition {
-          opacity: 0;
-          transition: opacity 0.3s ease-in-out;
-        }
-        .fade-transition.show {
-          opacity: 1;
-        }
-      `}</style>
+  @media print {
+    body {
+      background: white !important;
+    }
 
-      <div className='card shadow-sm p-4 mt-5 mb-3'>
+    header,
+    .d-print-none,
+    .modal,
+    .btn,
+    .form-control,
+    .form-select,
+    .form-label {
+      display: none !important;
+    }
+
+    .container {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 !important;
+    }
+
+    .epa-report-section {
+      border: none !important;
+      box-shadow: none !important;
+      padding: 1rem 0 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .print-visible {
+      display: block !important;
+      color: black !important;
+      page-break-before: always;
+    }
+  }
+
+  .fade-transition {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .fade-transition.show {
+    opacity: 1;
+  }
+`}</style>
+
+      <div className='card shadow-sm p-4 mt-5 mb-3 d-print-none'>
         <h2 className='mb-4 d-print-none'>Student Report Generation</h2>
         {/* Student Picker */}
         <div className='d-print-none'>
-          <div className='mb-3'>
-            <label className='form-label'>Select Student</label>
+          <div className='mb-3 d-print-none'>
+            <label className='form-label d-print-none'>Select Student</label>
             <select
               className='form-select'
               value={selectedStudent?.id || ''}
@@ -203,7 +210,7 @@ export default function AdminAllReportsPage() {
             </select>
           </div>
 
-          <div className='d-flex gap-3 align-items-end mb-4'>
+          <div className='d-flex gap-3 align-items-end mb-4 d-print-none'>
             <div>
               <label className='form-label'>Time Range</label>
               <select
@@ -218,7 +225,7 @@ export default function AdminAllReportsPage() {
                 ))}
               </select>
             </div>
-            <div className='flex-grow-1'>
+            <div className='flex-grow-1 d-print-none'>
               <label className='form-label'>Report Title</label>
               <input type='text' className='form-control' value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
@@ -228,7 +235,7 @@ export default function AdminAllReportsPage() {
           </div>
         </div>
 
-        <hr className='d-print-none mb-5 mt-3' />
+        <hr className='d-print-none mb-5 mt-3 d-print-none' />
 
         {selectedStudent && reports.length > 0 && (
           <div className='mb-4 d-print-none'>
@@ -250,14 +257,14 @@ export default function AdminAllReportsPage() {
       </div>
       {loadingReport && (
         <div className='text-center my-5 d-print-none'>
-          <div className='spinner-border text-primary' role='status'>
-            <span className='visually-hidden'>Loading...</span>
+          <div className='spinner-border text-primary d-print-none' role='status'>
+            <span className='visually-hidden d-print-none'>Loading...</span>
           </div>
         </div>
       )}
 
       {selectedStudent && selectedReport && !loadingReport && (
-        <div className='pb-3 card p-4 mb-5'>
+        <div className='pb-3 p-4 mb-5'>
           <div className='d-flex justify-content-between align-items-center mb-3 d-print-none'>
             <h3 className='m-0 d-print-none'>{selectedReport.title}</h3>
             <DownloadPDFButton />
@@ -266,7 +273,7 @@ export default function AdminAllReportsPage() {
           <hr className='d-print-none' />
 
           {REPORT_EPAS.map((epaId) => (
-            <div key={epaId} className={`mb-1 p-3 epa-report-section`}>
+            <div key={`container-${epaId}`} className={`mb-1 p-3 epa-report-section`}>
               <div className='d-flex justify-content-between align-items-center mb-2'>
                 <button
                   className='btn btn-sm btn-outline-primary d-print-none'
@@ -279,6 +286,7 @@ export default function AdminAllReportsPage() {
                 </button>
               </div>
               <EPABox
+                key={`epabox-${epaId}-${selectedStudent.id}-${selectedReport?.id}`}
                 epaId={epaId}
                 timeRange={parseInt(selectedReport.time_window) as 3 | 6 | 12}
                 kfDescriptions={kfDescriptions}

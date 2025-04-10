@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useLayoutEffect, useRef } from 'react';
 import LineGraph from '@/components/(StudentComponents)/LineGraph';
 import HalfCircleGauge from '@/components/(StudentComponents)/HalfCircleGauge';
 import { createClient } from '@/utils/supabase/client';
@@ -54,7 +54,39 @@ interface EPABoxProps {
 const supabase = createClient();
 
 const EPABox: React.FC<EPABoxProps> = ({ epaId, timeRange, kfDescriptions, studentId }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('print').matches;
+    }
+    return false;
+  });
+
+  const wasAutoExpandedRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const handleBeforePrint = () => {
+      if (!expanded) {
+        setExpanded(true);
+        wasAutoExpandedRef.current = true;
+      }
+    };
+
+    const handleAfterPrint = () => {
+      if (wasAutoExpandedRef.current) {
+        setExpanded(false);
+        wasAutoExpandedRef.current = false;
+      }
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
+
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+  }, [expanded]);
+
   const [epaTitle, setEpaTitle] = useState('');
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [comments, setComments] = useState<string[]>([]);
