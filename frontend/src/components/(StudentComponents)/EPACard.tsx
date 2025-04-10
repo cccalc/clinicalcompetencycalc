@@ -8,12 +8,13 @@ interface HistoryEntry {
 
 interface KeyFunction {
   id: string;
+  description: string;
   history: HistoryEntry[];
 }
 
 interface EPA {
   epa: number;
-  title?: string;
+  title: string;
   keyFunctions: KeyFunction[];
 }
 
