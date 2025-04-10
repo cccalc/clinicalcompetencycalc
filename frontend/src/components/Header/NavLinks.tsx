@@ -44,6 +44,10 @@ const NavLinks = () => {
     links.push(link('/dashboard', 'Home'));
   }
 
+  if (userRoleDev) {
+    links.push(link('/tickets', 'Tickets'));
+  }
+
   return <>{links}</>;
 };
 
