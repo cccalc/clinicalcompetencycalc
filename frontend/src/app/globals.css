@@ -1,7 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --header-height: 64px;
+  --header-height: 8rem;
 }
 
 .main-content {

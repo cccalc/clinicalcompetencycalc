@@ -10,6 +10,21 @@ export default function LoadingUserPage() {
   const { loading, user } = useUser();
   const router = useRouter();
 
+  // This effect hides the header by directly manipulating its style.
+  // When this page unmounts, it restores the header display.
+  useEffect(() => {
+    const header = document.querySelector('header');
+    if (header) {
+      header.style.display = 'none';
+    }
+    return () => {
+      if (header) {
+        header.style.display = '';
+      }
+    };
+  }, []);
+
+  // Redirect logic when loading is finished
   useEffect(() => {
     if (!loading) {
       if (user) {

@@ -16,10 +16,13 @@ interface ProfileSettingsModalProps {
  *
  * Bootstrap-styled modal rendered manually using React state only.
  * Provides editable display name, shows email, and saves to Supabase.
+ * Instead of native alerts, this version uses a toast notification.
  */
 const ProfileSettingsModal = ({ show, onClose }: ProfileSettingsModalProps) => {
   const { user, displayName, email } = useUser();
   const [editedDisplayName, setEditedDisplayName] = useState(displayName);
+  // New state to hold toast notification information.
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Sync input state when context updates
   useEffect(() => {
@@ -28,7 +31,7 @@ const ProfileSettingsModal = ({ show, onClose }: ProfileSettingsModalProps) => {
 
   const isChanged = editedDisplayName !== displayName;
 
-  // Save updated display name to Supabase
+  // Save updated display name to Supabase, then show a toast instead of an alert.
   const handleSave = useCallback(async () => {
     if (!user) return;
 
@@ -37,19 +40,46 @@ const ProfileSettingsModal = ({ show, onClose }: ProfileSettingsModalProps) => {
 
       if (error) throw error;
 
-      alert('Display name updated successfully!');
+      // Show a non-blocking toast notification.
+      setToast({ message: 'Display name updated successfully!', type: 'success' });
       onClose();
+      // Optionally reload page if needed.
+      window.location.reload();
     } catch (err) {
       console.error('Failed to update display name:', err);
-      alert('Failed to update display name.');
+      setToast({ message: 'Failed to update display name.', type: 'error' });
     }
   }, [editedDisplayName, user, onClose]);
+
+  // Automatically clear the toast after 3 seconds.
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Do not render if modal is not active
   if (!show) return null;
 
   return (
     <>
+      {/* Toast notification */}
+      {toast && (
+        <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 1050 }}>
+          <div
+            className={`alert ${
+              toast.type === 'success' ? 'alert-success' : 'alert-danger'
+            } alert-dismissible fade show`}
+            role='alert'
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
+
       {/* Simulated Bootstrap modal backdrop */}
       <div className='modal-backdrop fade show'></div>
 
